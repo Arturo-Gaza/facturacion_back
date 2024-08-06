@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('user');
             $table->boolean('habilitado');
             $table->integer('intentos')->default('0');
-            $table->boolean('login_activo');
+            $table->boolean('login_activo')->default(false);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

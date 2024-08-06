@@ -14,4 +14,7 @@ interface UsuarioRepositoryInterface
     public function update(array $data, $id);
     public function generateToken(User $user): string;
     public function getPermisosByUsuario(int $id);
+
+    public function loginActive(int $id);
+    public function loginInactive(int $id);
 }

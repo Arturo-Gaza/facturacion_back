@@ -37,7 +37,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function aumentarIntento(int $intentos, $id)
     {
-    User::where('id', $id)->update(array('intentos' => $intentos+1));
+        User::where('id', $id)->update(array('intentos' => $intentos + 1));
     }
 
     public function generateToken(User $user): string
@@ -48,12 +48,19 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function getPermisosByUsuario(int $id)
     {
         $usuarioSistema = User::select('role_has_permissions.permission_id')
-        ->join('user_roles','user_roles.id_user','=','user.id')
-        ->join('role_has_permissions','role_has_permissions.role_id','=','user_roles.id_rol')
-        ->where('users.id',$id)->get();
+            ->join('user_roles', 'user_roles.id_user', '=', 'user.id')
+            ->join('role_has_permissions', 'role_has_permissions.role_id', '=', 'user_roles.id_rol')
+            ->where('users.id', $id)->get();
         return $usuarioSistema;
     }
 
+    public function loginActive(int $id)
+    {
+        User::where('id', $id)->update(array('login_activo' => true));
+    }
 
-
+    public function loginInactive(int $id)
+    {
+        User::where('id', $id)->update(array('login_activo' => false));
+    }
 }

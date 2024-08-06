@@ -67,36 +67,6 @@ class UsuarioController extends Controller
         }
     }
 
-    public function addSistemas(Request $request, string $id){
-        DB::beginTransaction();
-        try {
-
-           $this->usuario->addSistemas($request->all(),$id);
-
-          //  $this->usuario->update($data,$id);
-            DB::commit();
-            return ApiResponseHelper::sendResponse($this, 'Sistemas agregados correctamente',200);
-        } catch (Exception $ex) {
-            DB::rollBack();
-            return ApiResponseHelper::rollback($ex);
-        }
-    }
-
-    public function addRoles(Request $request, string $id){
-        DB::beginTransaction();
-        try {
-
-           $this->usuario->addRoles($request->all(),$id);
-
-          //  $this->usuario->update($data,$id);
-            DB::commit();
-            return ApiResponseHelper::sendResponse($this, 'Roles agregados correctamente',200);
-        } catch (Exception $ex) {
-            DB::rollBack();
-            return ApiResponseHelper::rollback($ex);
-        }
-    }
-
     /**
      * Remove the specified resource from storage.
      */

@@ -84,27 +84,26 @@ class AuthController extends Controller
         ]);
 
         $user = $this->userRepo->findByEmailOrUser($request->email);
-        if($user == null){
+        if ($user == null) {
             return response()->json(['message' => 'Credenciales no válidas '], 400);
         }
 
-        if ($user->intentos >=3) {
+        if ($user->intentos >= 3) {
             return response()->json(['message' => 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador '], 400);
-        }
-        else{
+        } else {
 
             if (!$user->habilitado == 1) {
 
                 return response()->json(['message' => 'Usuario inhabilitado'], 400);
-            }else{
+            } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
-                   // $user->intentos=$user->intentos+1;
-                   // $user->update($user->toArray(),$user->id);
+                    // $user->intentos=$user->intentos+1;
+                    // $user->update($user->toArray(),$user->id);
 
 
                     DB::beginTransaction();
                     try {
-                        $this->userRepo->aumentarIntento($user->intentos ,$user->id);
+                        $this->userRepo->aumentarIntento($user->intentos, $user->id);
 
                         DB::commit();
                     } catch (Exception $ex) {
@@ -114,11 +113,20 @@ class AuthController extends Controller
 
                     return response()->json(['message' => 'Credenciales no válidas '], 400);
                 }
-
             }
         }
 
         $token = $this->userRepo->generateToken($user);
+
+        DB::beginTransaction();
+        try {
+            $this->userRepo->loginActive($user->id);
+
+            DB::commit();
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
 
         return response()->json([
             'status' => true,
@@ -145,10 +153,19 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function logout(Request $request)
+    public function logout(Request $request, $id)
     {
         $request->user()->tokens()->delete();
 
+        DB::beginTransaction();
+        try {
+            $this->userRepo->loginInactive($id);
+
+            DB::commit();
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
         return response()->json(['message' => 'Logged out'], 200);
     }
 }

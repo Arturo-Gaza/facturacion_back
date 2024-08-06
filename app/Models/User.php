@@ -23,7 +23,8 @@ class User extends Authenticatable
         'password',
         'user',
         'habilitado',
-        'intentos'
+        'intentos',
+        'login_activo'
     ];
 
     /**
