@@ -12,6 +12,7 @@ class ApiResponseHelper
         DB::rollBack();
         self::throw($e,$message);
     }
+    //hola
 
     public static function throw($e, $message = 'Ocurrio un error durante el proceso')
     {
