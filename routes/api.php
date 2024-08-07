@@ -45,16 +45,11 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Cierre de sesión
     Route::get('auth/logout', [AuthController::class, 'logout']);
-
-});
-//Rutas catalogos usuario
-Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
-
-    //Usuario
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::get('usuario/getPermisosByUsuario/{id}', [UsuarioController::class, 'getPermisosByUsuario']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
 
-
 });
+
+
