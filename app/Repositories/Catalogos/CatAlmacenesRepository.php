@@ -2,8 +2,9 @@
 
 namespace App\Repositories\Catalogos;
 use App\Models\Catalogos\CatAlmacenes;
+use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
 
-class CatAlmacenesRepository
+class CatAlmacenesRepository implements CatAlmacenesRepositoryInterface
 {
     public function getAll()
     {
