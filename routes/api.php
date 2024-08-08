@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatRolesController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\AcceptJsonMiddleware;
@@ -16,6 +17,11 @@ Route::get('catRoles/getAll', [CatRolesController::class, 'getAll']);
 Route::get('catRoles/getById/{id}', [CatRolesController::class, 'getById']);
 Route::post('catRoles/register', [CatRolesController::class, 'store']);
 Route::put('catRoles/update/{id}', [CatRolesController::class, 'update']);
+
+Route::get('catAlmacenes/getAll', [CatAlmacenesController::class, 'getAll']);
+Route::get('catAlmacenes/getById/{id}', [CatAlmacenesController::class, 'getById']);
+Route::post('catAlmacenes/register', [CatAlmacenesController::class, 'store']);
+Route::put('catAlmacenes/update/{id}', [CatAlmacenesController::class, 'update']);
 
 //Rutas publicaas
 //Esta ruta cambiarla a privada
