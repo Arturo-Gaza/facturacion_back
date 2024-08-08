@@ -27,9 +27,9 @@ class StoreUsuarioRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', Rules\Password::defaults()],
-            'user' => ['required','min:6','unique:'.User::class]
+            'user' => ['required', 'min:6', 'unique:' . User::class]
         ];
     }
 
@@ -58,14 +58,13 @@ class StoreUsuarioRequest extends FormRequest
         ];
     }
 
-    public function failedValidation(Validator $validator) {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Ocurrio un error al registrar',
-                'data' => $validator->errors()
-            ]
-            ));
+    public function failedValidation(Validator $validator)
+    {
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }
