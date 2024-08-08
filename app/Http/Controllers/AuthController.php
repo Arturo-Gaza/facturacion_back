@@ -84,6 +84,7 @@ class AuthController extends Controller
         ]);
 
         $user = $this->userRepo->findByEmailOrUser($request->email);
+        $userresponse = $this->userRepo->responseUser($request->email);
         if ($user == null) {
             return response()->json(['message' => 'Credenciales no válidas '], 400);
         }
@@ -131,11 +132,11 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Usuario logueado correctamente',
-            'data' => $user,
+            'data' => $userresponse,
             'token' => $token,
 
         ], 200);
-        return ApiResponseHelper::sendResponse($user, 'Record insert succesfull', 201);
+        return ApiResponseHelper::sendResponse($userresponse, 'Record insert succesfull', 201);
     }
 
     /**

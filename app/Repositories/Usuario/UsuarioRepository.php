@@ -23,6 +23,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return User::where('email', $email)->orWhere('user', $email)->first();
     }
 
+    public function responseUser(string $email){
+        $usuario = User::select('users.id','users.user','users.name','users.idRol','users.email','cat_roles.nombre' )
+        ->join('cat_roles','cat_roles.idRol','=','users.idRol')->where('users.email', $email)->orWhere('users.user', $email)->first();
+        return $usuario;
+    }
+
+
 
     public function store(array $data)
     {
