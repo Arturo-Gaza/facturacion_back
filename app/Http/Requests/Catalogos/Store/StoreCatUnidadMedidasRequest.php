@@ -34,7 +34,7 @@ class StoreCatUnidadMedidasRequest extends FormRequest
         return [
             'clave_unidad_medida.required' => 'El campo Clave unidad de medida es obligatorio.',
             'clave_unidad_medida.string' => 'El campo Clave unidad de medida debe ser una cadena de texto.',
-            'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 255 caracteres.',
+            'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 50 caracteres.',
 
             'descripcion_unidad_medida.required' => 'El campo Descripcion unidad de medida es obligatorio.',
             'descripcion_unidad_medida.string' => 'El campo Descripcion unidad de medida debe ser una cadena de texto.',

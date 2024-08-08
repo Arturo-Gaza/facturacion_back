@@ -10,7 +10,9 @@ use Illuminate\Support\ServiceProvider;
 use App\Interfaces\Catalogos\CatUnidadMedidasRepositoryInterface;
 use App\Repositories\Catalogos\CatUnidadMedidasRepository;
 use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
+use App\Interfaces\Catalogos\CatGpoFamiliaRepositoryInterface;
 use App\Repositories\Catalogos\CatAlmacenesRepository;
+use App\Repositories\Catalogos\CatGpoFamiliaRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CatRolesRepositoryInterface::class, CatRolesRepository::class);
         $this->app->bind(CatUnidadMedidasRepositoryInterface::class, CatUnidadMedidasRepository::class);
         $this->app->bind(CatAlmacenesRepositoryInterface::class, CatAlmacenesRepository::class);
+        $this->app->bind(CatGpoFamiliaRepositoryInterface::class, CatGpoFamiliaRepository::class);
 
     }
 
