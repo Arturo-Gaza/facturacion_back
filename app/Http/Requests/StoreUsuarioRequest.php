@@ -27,6 +27,8 @@ class StoreUsuarioRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
+            'apellidoP' => ['required', 'string', 'max:255'],
+            'apellidoM' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', Rules\Password::defaults()],
             'user' => ['required', 'min:6', 'unique:' . User::class]
@@ -44,6 +46,12 @@ class StoreUsuarioRequest extends FormRequest
             'name.required' => 'El campo nombre es obligatorio.',
             'name.string' => 'El campo nombre debe ser una cadena de texto.',
             'name.max' => 'El campo nombre no debe exceder los 255 caracteres.',
+            'apellidoP.required' => 'El campo apellido paterno es obligatorio.',
+            'apellidoP.string' => 'El campo apellido paterno debe ser una cadena de texto.',
+            'apellidoP.max' => 'El campo apellido paterno no debe exceder los 255 caracteres.',
+            'apellidoM.required' => 'El campo apellido materno es obligatorio.',
+            'apellidoM.string' => 'El campo apellido materno debe ser una cadena de texto.',
+            'apellidoM.max' => 'El campo apellido materno no debe exceder los 255 caracteres.',
             'email.required' => 'El campo correo electrónico es obligatorio.',
             'email.string' => 'El campo correo electrónico debe ser una cadena de texto.',
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
