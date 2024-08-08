@@ -7,6 +7,10 @@ use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Repositories\Catalogos\CatRolesRepository;
 use App\Repositories\Usuario\UsuarioRepository;
 use Illuminate\Support\ServiceProvider;
+use App\Interfaces\Catalogos\CatUnidadMedidasRepositoryInterface;
+use App\Repositories\Catalogos\CatUnidadMedidasRepository;
+use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
+use App\Repositories\Catalogos\CatAlmacenesRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -17,6 +21,8 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(UsuarioRepositoryInterface::class, UsuarioRepository::class);
         $this->app->bind(CatRolesRepositoryInterface::class, CatRolesRepository::class);
+        $this->app->bind(CatUnidadMedidasRepositoryInterface::class, CatUnidadMedidasRepository::class);
+        $this->app->bind(CatAlmacenesRepositoryInterface::class, CatAlmacenesRepository::class);
 
     }
 

@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatRolesController;
+use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\Catalogos\CatRoles;
@@ -16,6 +18,18 @@ Route::get('catRoles/getAll', [CatRolesController::class, 'getAll']);
 Route::get('catRoles/getById/{id}', [CatRolesController::class, 'getById']);
 Route::post('catRoles/register', [CatRolesController::class, 'store']);
 Route::put('catRoles/update/{id}', [CatRolesController::class, 'update']);
+
+//Rutas de catalogo Almacenes
+Route::get('catAlmacenes/getAll', [CatAlmacenesController::class, 'getAll']);
+Route::get('catAlmacenes/getById/{id}', [CatAlmacenesController::class, 'getById']);
+Route::post('catAlmacenes/register', [CatAlmacenesController::class, 'store']);
+Route::put('catAlmacenes/update/{id}', [CatAlmacenesController::class, 'update']);
+
+//Rutas Catalogo Unidad de Medida
+Route::get('catUnidadMedidas/getAll', [CatUnidadMedidasController ::class, 'getAll']);
+Route::get('catUnidadMedidas/getById/{id}', [CatUnidadMedidasController::class, 'getById']);
+Route::post('catUnidadMedidas/register', [CatUnidadMedidasController::class, 'store']);
+Route::put('catUnidadMedidas/update/{id}', [CatUnidadMedidasController::class, 'update']);
 
 //Rutas publicaas
 //Esta ruta cambiarla a privada
