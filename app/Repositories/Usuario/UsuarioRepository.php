@@ -24,7 +24,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     }
 
     public function responseUser(string $email){
-        $usuario = User::select('users.id','users.user','users.name','users.idRol','users.email','cat_roles.nombre' )
+        $usuario = User::select('users.id','users.user','users.name','users.idRol','users.email','users.apellidoP','users.apellidoM','cat_roles.nombre' )
         ->join('cat_roles','cat_roles.idRol','=','users.idRol')->where('users.email', $email)->orWhere('users.user', $email)->first();
         return $usuario;
     }
