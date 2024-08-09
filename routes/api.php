@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
+use App\Http\Controllers\Catalogos\CatProductosController;
 use App\Http\Controllers\Catalogos\CatRolesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\UsuarioController;
@@ -37,6 +38,12 @@ Route::get('catGpoFamilia/getAll', [CatGpoFamiliaController ::class, 'getAll']);
 Route::get('catGpoFamilia/getById/{id}', [CatGpoFamiliaController::class, 'getById']);
 Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
 Route::put('catGpoFamilia/update/{id}', [CatGpoFamiliaController::class, 'update']);
+
+//Rutas Catalogo Productos
+Route::get('catProductos/getAll', [CatProductosController ::class, 'getAll']);
+Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
+Route::post('catProductos/register', [CatProductosController::class, 'store']);
+Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
 
 //Rutas publicaas
 //Esta ruta cambiarla a privada

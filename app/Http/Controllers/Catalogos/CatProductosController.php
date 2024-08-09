@@ -3,27 +3,27 @@
 namespace App\Http\Controllers\Catalogos;
 
 use App\Http\Controllers\Controller;
-use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
-use App\Http\Requests\Catalogos\Store\StoreCatAlmacenesRequest;
-use App\Http\Requests\Catalogos\Update\UpdateCatAlmacenesRequest;
 use Illuminate\Http\Request;
 use App\Classes\ApiResponseHelper;
+use App\Http\Requests\Catalogos\Store\StoreCatProductosRequest;
+use App\Http\Requests\Catalogos\Update\UpdateProductosRequest;
+use App\Interfaces\Catalogos\CatProductosRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
-class CatAlmacenesController  extends Controller
+class CatProductosController extends Controller
 {
-    protected $_catAlmacenes;
+    protected $_catProductos;
 
-    public function __construct(CatAlmacenesRepositoryInterface $catCatAlmacenes)
+    public function __construct(CatProductosRepositoryInterface $catProductos)
     {
-        $this->_catAlmacenes = $catCatAlmacenes;
+        $this->_catProductos = $catProductos;
     }
 
     public function getAll()
     {
         try {
-            $getAll = $this->_catAlmacenes->getAll();
+            $getAll = $this->_catProductos->getAll();
             return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
         }
         catch (Exception $ex) {
@@ -34,14 +34,14 @@ class CatAlmacenesController  extends Controller
     public function getById($id)
     {
         try {
-            $getById = $this->_catAlmacenes->getByID($id);
+            $getById = $this->_catProductos->getByID($id);
             return ApiResponseHelper::sendResponse($getById, 'Catálogo obtenido', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
         }
     }
 
-    public function store(StoreCatAlmacenesRequest $cat){
+    public function store(StoreCatProductosRequest $cat){
         DB::beginTransaction();
         try {
             $data = [
@@ -49,7 +49,7 @@ class CatAlmacenesController  extends Controller
                 'descripcion_almacen'=>$cat->descripcion_almacen,
                 'habilitado'=> $cat->habilitado
             ];
-            $student = $this->_catAlmacenes->store($data);
+            $producto = $this->_catProductos->store($data);
             DB::commit();
             return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente',201);
         } catch (Exception $ex) {
@@ -58,7 +58,7 @@ class CatAlmacenesController  extends Controller
         }
     }
 
-    public function update(UpdateCatAlmacenesRequest $cat,$id){
+    public function update(UpdateProductosRequest $cat,$id){
         DB::beginTransaction();
         try {
             $data = [
@@ -66,7 +66,7 @@ class CatAlmacenesController  extends Controller
                 'descripcion_almacen'=>$cat->descripcion_almacen,
                 'habilitado'=> $cat->habilitado
             ];
-            $this->_catAlmacenes->update($data,$id);
+            $this->_catProductos->update($data,$id);
             DB::commit();
             return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
         } catch (Exception $ex) {
@@ -74,5 +74,4 @@ class CatAlmacenesController  extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
-
 }
