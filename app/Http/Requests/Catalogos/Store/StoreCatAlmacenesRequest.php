@@ -45,13 +45,11 @@ class StoreCatAlmacenesRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Error de validacion',
-                'data' => $validator->errors()
-            ]
-        ));
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }

@@ -45,13 +45,11 @@ class UpdateCatAlmacenesRequest extends FormRequest
 
     public function failedValidation(Validator $validator)
     {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Ocurrio un error al registrar',
-                'data' => $validator->errors()
-            ]
-        ));
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }
