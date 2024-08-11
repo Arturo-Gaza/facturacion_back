@@ -8,7 +8,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateCatUnidadMedidaRequest extends FormRequest
 {
-   /**
+    /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
@@ -24,8 +24,8 @@ class UpdateCatUnidadMedidaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_unidad_medida' => 'required|string|max:5',
-            'descripcion_unidad_medida' => 'required|string|max:50'
+            'clave_unidad_medida' => 'required|string|max:10',
+            'descripcion_unidad_medida' => 'required|string|max:200'
         ];
     }
 
@@ -34,24 +34,22 @@ class UpdateCatUnidadMedidaRequest extends FormRequest
         return [
             'clave_unidad_medida.required' => 'El campo Clave unidad de medida es obligatorio.',
             'clave_unidad_medida.string' => 'El campo Clave unidad de medida debe ser una cadena de texto.',
-            'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 255 caracteres.',
+            'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 10 caracteres.',
 
             'descripcion_unidad_medida.required' => 'El campo Descripcion unidad de medida es obligatorio.',
             'descripcion_unidad_medida.string' => 'El campo Descripcion unidad de medida debe ser una cadena de texto.',
-            'descripcion_unidad_medida.max' => 'El campo Descripcion unidad de medida no debe exceder los 50 caracteres.',
+            'descripcion_unidad_medida.max' => 'El campo Descripcion unidad de medida no debe exceder los 200 caracteres.',
 
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Ocurrio un error al registrar',
-                'data' => $validator->errors()
-            ]
-        ));
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }

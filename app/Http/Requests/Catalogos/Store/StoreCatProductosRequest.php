@@ -24,8 +24,8 @@ class StoreCatProductosRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_producto' => 'required|string|max:9',
-            'descripcion_producto_material' => 'required|string|max:50',
+            'clave_producto' => 'required|string|max:10',
+            'descripcion_producto_material' => 'required|string|max:200',
         ];
     }
 
@@ -34,26 +34,22 @@ class StoreCatProductosRequest extends FormRequest
         return [
             'clave_producto.required' => 'El campo clave producto es obligatorio.',
             'clave_producto.string' => 'El campo clave producto es numerica.',
-            'clave_producto.max' => 'El campo clave producto no debe exceder los 9 caracteres.',
+            'clave_producto.max' => 'El campo clave producto no debe exceder los 10 caracteres.',
 
             'descripcion_producto_material.required' => 'El campo descripcion producto material es obligatorio.',
             'descripcion_producto_material.string' => 'El campo descripcion producto material debe ser una cadena de texto.',
-            'descripcion_producto_material.max' => 'El campo descripcion producto material no debe exceder los 50 caracteres.',
+            'descripcion_producto_material.max' => 'El campo descripcion producto material no debe exceder los 200 caracteres.',
 
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Error de validacion',
-                'data' => $validator->errors()
-            ]
-        ));
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }
-
-

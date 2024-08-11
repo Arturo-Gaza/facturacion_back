@@ -21,8 +21,8 @@ class UpdateGpoFamiliaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_gpo_familia' => 'required|string|max:5',
-            'descripcion_gpo_familia' => 'required|string|max:50'
+            'clave_gpo_familia' => 'required|string|max:10',
+            'descripcion_gpo_familia' => 'required|string|max:200'
         ];
     }
 
@@ -31,24 +31,22 @@ class UpdateGpoFamiliaRequest extends FormRequest
         return [
             'clave_gpo_familia.required' => 'El campo clave grupo familia es obligatorio.',
             'clave_gpo_familia.string' => 'El campo clave grupo familia debe ser una cadena de texto.',
-            'clave_gpo_familia.max' => 'El campo clave grupo familia no debe exceder los 50 caracteres.',
+            'clave_gpo_familia.max' => 'El campo clave grupo familia no debe exceder los 10 caracteres.',
 
             'descripcion_gpo_familia.required' => 'El campo descripcion grupo familia es obligatorio.',
             'descripcion_gpo_familia.string' => 'El campo descripcion grupo familia debe ser una cadena de texto.',
-            'descripcion_gpo_familia.max' => 'El campo descripcion grupo familia no debe exceder los 50 caracteres.',
+            'descripcion_gpo_familia.max' => 'El campo descripcion grupo familia no debe exceder los 200 caracteres.',
 
         ];
     }
 
     public function failedValidation(Validator $validator)
     {
-
-        throw new HttpResponseException(response()->json(
-            [
-                'success' => false,
-                'message' => 'Error de validacion',
-                'data' => $validator->errors()
-            ]
-        ));
+        $errors = $validator->errors()->all();
+        throw new HttpResponseException(response()->json([
+            'success' => false,
+            'message' => 'Errores de validación',
+            'errors' => $errors
+        ], 422));
     }
 }

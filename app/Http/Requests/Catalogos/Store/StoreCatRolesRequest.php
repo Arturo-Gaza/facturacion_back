@@ -16,7 +16,7 @@ class StoreCatRolesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:5'
+            'nombre' => 'required|string|max:50'
         ];
     }
 
@@ -25,7 +25,7 @@ class StoreCatRolesRequest extends FormRequest
         return [
             'nombre.required' => 'El campo nombre es obligatorio.',
             'nombre.string' => 'El campo nombre debe ser una cadena de texto.',
-            'nombre.max' => 'El campo nombre no debe exceder los 5 caracteres.',
+            'nombre.max' => 'El campo nombre no debe exceder los 50 caracteres.',
         ];
     }
 

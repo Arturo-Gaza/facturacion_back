@@ -24,8 +24,8 @@ class UpdateCatAlmacenesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_almacen' => 'required|string|max:5',
-            'descripcion_almacen' => 'required|string|max:50'
+            'clave_almacen' => 'required|string|max:10',
+            'descripcion_almacen' => 'required|string|max:200'
         ];
     }
 
@@ -34,11 +34,11 @@ class UpdateCatAlmacenesRequest extends FormRequest
         return [
             'clave_almacen.required' => 'El campo Clave Almacen es obligatorio.',
             'clave_almacen.string' => 'El campo Clave Almacen debe ser una cadena de texto.',
-            'clave_almacen.max' => 'El campo Clave Almacen no debe exceder los 255 caracteres.',
+            'clave_almacen.max' => 'El campo Clave Almacen no debe exceder los 10 caracteres.',
 
             'descripcion_almacen.required' => 'El campo Descripcion Almacen es obligatorio.',
             'descripcion_almacen.string' => 'El campo Descripcion Almacen debe ser una cadena de texto.',
-            'descripcion_almacen.max' => 'El campo Descripcion Almacen no debe exceder los 50 caracteres.',
+            'descripcion_almacen.max' => 'El campo Descripcion Almacen no debe exceder los 200 caracteres.',
 
         ];
     }
