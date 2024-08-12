@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->integer('idRol');
             $table->string('name');
             $table->string('apellidoP');
             $table->string('apellidoM');
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->boolean('habilitado');
             $table->integer('intentos')->default('0');
             $table->boolean('login_activo')->default(false);
-            $table->foreign('idRol')->references('idRol')->on('cat_roles');
+            $table->foreignId('idRol')->constrained('cat_roles');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
