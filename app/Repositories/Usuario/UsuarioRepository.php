@@ -12,7 +12,10 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 {
     public function getAll()
     {
-        return User::all();
+        $usuario = User::select('users.id', 'users.user', 'users.name', 'users.apellidoP', 'users.apellidoM', 'users.email', 'users.idRol','users.habilitado', 'cat_roles.nombre')
+            ->join('cat_roles', 'cat_roles.id', '=', 'users.idRol')->get();
+        return $usuario;
+
     }
 
     public function getByID($id): ?User
