@@ -7,6 +7,7 @@ use App\Models\User;
 interface UsuarioRepositoryInterface
 {
     public function getAll();
+    public function getByID($id);
     public function getAllHabilitados();
     public function findByEmailOrUser(string $email): ?User;
     public function responseUser(string $email);
@@ -14,8 +15,6 @@ interface UsuarioRepositoryInterface
     public function store(array $data);
     public function update(array $data, $id);
     public function generateToken(User $user): string;
-    public function getPermisosByUsuario(int $id);
-
     public function loginActive(int $id);
     public function loginInactive(int $id);
 }

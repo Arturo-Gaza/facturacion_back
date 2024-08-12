@@ -21,7 +21,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     //Cierre de sesión
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
     Route::post('auth/register', [AuthController::class, 'register']);
-    Route::get('usuario/getPermisosByUsuario/{id}', [UsuarioController::class, 'getPermisosByUsuario']);
+    Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
 
