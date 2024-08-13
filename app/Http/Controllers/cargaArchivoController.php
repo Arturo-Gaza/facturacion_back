@@ -45,7 +45,6 @@ public function processCsv(Request $request)
       
         // Retorna resultados
         return response()->json([
-            'Numero de columnas' => count($encabezado),
             'Numero de registros' => $conteo
             
         ]);
