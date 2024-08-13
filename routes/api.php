@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
 use App\Http\Controllers\Catalogos\CatProductosController;
@@ -44,6 +45,8 @@ Route::get('catProductos/getAll', [CatProductosController ::class, 'getAll']);
 Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
 Route::post('catProductos/register', [CatProductosController::class, 'store']);
 Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
+
+Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 
 //Rutas publicaas
 //Esta ruta cambiarla a privada

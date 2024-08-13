@@ -45,9 +45,12 @@ class CatProductosController extends Controller
         DB::beginTransaction();
         try {
             $data = [
-                'clave_almacen'=> $cat->clave_almacen,
-                'descripcion_almacen'=>$cat->descripcion_almacen,
-                'habilitado'=> $cat->habilitado
+                'id_cat_almacenes' => $cat->id_cat_almacenes,
+                'clave_producto' => $cat->clave_producto,
+                'descripcion_producto_material' => $cat->descripcion_producto_material,
+                'id_unidad_medida' => $cat->id_unidad_medida,
+                'id_gpo_familia' => $cat->id_gpo_familia,
+                'habilitado' => $cat->habilitado
             ];
             $producto = $this->_catProductos->store($data);
             DB::commit();
@@ -62,9 +65,12 @@ class CatProductosController extends Controller
         DB::beginTransaction();
         try {
             $data = [
-                'clave_almacen'=> $cat->clave_almacen,
-                'descripcion_almacen'=>$cat->descripcion_almacen,
-                'habilitado'=> $cat->habilitado
+                'id_cat_almacenes' => $cat->id_cat_almacenes,
+                'clave_producto' => $cat->clave_producto,
+                'descripcion_producto_material' => $cat->descripcion_producto_material,
+                'id_unidad_medida' => $cat->id_unidad_medida,
+                'id_gpo_familia' => $cat->id_gpo_familia,
+                'habilitado' => $cat->habilitado
             ];
             $this->_catProductos->update($data,$id);
             DB::commit();
