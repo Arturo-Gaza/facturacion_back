@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
 use App\Http\Controllers\Catalogos\CatProductosController;
@@ -55,4 +56,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
+
+    //Ruta api archivo csv
+    Route::post('/process-csv', [cargaArchivoController::class, 'update']);
 });
