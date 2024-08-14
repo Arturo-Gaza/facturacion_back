@@ -90,8 +90,7 @@ class cargaArchivoController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna3 = 'Texto breve de material'; // Nombre de la columna a comparar
-        $records = $csv->getRecords();
+        $nombreColumna3 = 'Texto breve de material'; 
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -114,15 +113,36 @@ class cargaArchivoController extends Controller
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-  
+        $nombreColumna4 = 'GPO';
+        $columnaComparar4 =[];
+
+        foreach ($records as $record) {
+            if(!empty($record[$nombreColumna4])) {
+                $columnaComparar4[] = $record[$nombreColumna4 ];
+            }
+        }
+
+        $columnaComparar4 = array_unique($columnaComparar4);
+
+        $tablefamilia = 'cat_gpo_familias';
+        $columnaCampara4 = 'descripcion_gpo_familia';
+
+        $datoNoEncontrado4 = [];
+        foreach ($columnaComparar4 as $value) {
+            $existente = DB::table($tablefamilia)->where($columnaCampara4, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado4[] = $value;
+            }
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
       
         // Retorna resultados
         return response()->json([
             'Numero de registros' => $conteo,
-            'Este dato no se encuentra en la base' => $datoNoEncontrado,
-            'Este dato no se encuentra ' => $datoNoEncontrado2,
-            'Dato no encotrado' => $datoNoEncontrado3
+            'Datos no encontrados en catalogo almacenes' => $datoNoEncontrado,
+            'Datos no encontrados en catalogo Unidades de medida' => $datoNoEncontrado2,
+            'Datos no encontrados en catalogo Productos' => $datoNoEncontrado3,
+            'Datos no encontrados en catalogo Grupo de articulos' => $datoNoEncontrado4,
         ]);
     }
 }
