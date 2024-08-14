@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('cat_productos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_cat_almacenes')->constrained('cat_almacenes');
             $table->string('clave_producto');
             $table->string('descripcion_producto_material');
+            $table->foreignId('id_cat_almacenes')->constrained('cat_almacenes');
             $table->foreignId('id_unidad_medida')->constrained('cat_unidad_medidas');
             $table->foreignId('id_gpo_familia')->constrained('cat_gpo_familias');
             $table->timestamps();
