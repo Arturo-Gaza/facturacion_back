@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('auth/login', [AuthController::class, 'login']);
+//Ruta api archivo csv
+Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
@@ -57,6 +59,5 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
 
-    //Ruta api archivo csv
-    Route::post('/process-csv', [cargaArchivoController::class, 'update']);
+    
 });

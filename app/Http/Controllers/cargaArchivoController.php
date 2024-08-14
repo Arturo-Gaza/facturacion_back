@@ -39,15 +39,10 @@ class cargaArchivoController extends Controller
                 $conteo++;
             }
         }
-
-        /////////////////////////////////////////////////////////////////////////////////////
-       ////////////////////////////////////////////////////////////////////////////////////
       
         // Retorna resultados
         return response()->json([
-            'Numero de columnas' => count($encabezado),
             'Numero de registros' => $conteo
-            
         ]);
     }
 }
