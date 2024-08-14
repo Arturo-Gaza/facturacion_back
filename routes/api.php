@@ -20,6 +20,8 @@ Route::post('auth/login', [AuthController::class, 'login']);
 //Ruta api archivo csv
 Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 
+Route::post('catProductos/register', [CatProductosController::class, 'store']);
+
 //Rutas de Tabla detalle archivo carga
 Route::get('tabDetalleCarga/getAll', [TabDetalleCargaController::class, 'getAll']);
 Route::get('tabDetalleCarga/getById/{id}', [TabDetalleCargaController::class, 'getById']);
@@ -63,7 +65,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     //Rutas Catalogo Productos
     Route::get('catProductos/getAll', [CatProductosController::class, 'getAll']);
     Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
-    Route::post('catProductos/register', [CatProductosController::class, 'store']);
+    
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
 
     
