@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+
 use App\Interfaces\ArchivoConteo\TabConteoRepositoryInterface;
 use App\Interfaces\Catalogos\CatRolesRepositoryInterface;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
@@ -31,8 +32,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CatAlmacenesRepositoryInterface::class, CatAlmacenesRepository::class);
         $this->app->bind(CatGpoFamiliaRepositoryInterface::class, CatGpoFamiliaRepository::class);
         $this->app->bind(CatProductosRepositoryInterface::class, CatProductosRepository::class);
-        $this->app->bind(TabConteoRepositoryInterface::class, TabConteoRepository::class);
-
+         $this->app->bind(TabConteoRepositoryInterface::class, TabConteoRepository::class);
 
     }
 

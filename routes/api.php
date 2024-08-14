@@ -1,7 +1,9 @@
 <?php
 
+
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
 use App\Http\Controllers\Catalogos\CatProductosController;
@@ -24,6 +26,11 @@ Route::post('catProductos/register', [CatProductosController::class, 'store']);
 Route::post('catAlmacenes/register', [CatAlmacenesController::class, 'store']);
 Route::post('catUnidadMedidas/register', [CatUnidadMedidasController::class, 'store']);
 Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
+//Ruta api archivo csv
+Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+
+Route::post('catProductos/register', [CatProductosController::class, 'store']);
+
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
@@ -66,4 +73,5 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
       Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
       Route::post('TabConteo/register', [TabConteoController::class, 'store']);
       Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
+
 });
