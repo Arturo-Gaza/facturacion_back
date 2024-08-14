@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
@@ -18,6 +19,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('auth/login', [AuthController::class, 'login']);
 //Ruta api archivo csv
 Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+
+//Rutas de Tabla detalle archivo carga
+Route::get('tabDetalleCarga/getAll', [TabDetalleCargaController::class, 'getAll']);
+Route::get('tabDetalleCarga/getById/{id}', [TabDetalleCargaController::class, 'getById']);
+Route::post('tabDetalleCarga/register', [TabDetalleCargaController::class, 'store']);
+Route::put('tabDetalleCarga/update/{id}', [TabDetalleCargaController::class, 'update']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
