@@ -12,7 +12,13 @@ class cargaArchivoController extends Controller
     {
         // Verifica si se ha enviado un archivo CSV
         if (!$request->hasFile('csv_file')) {
-            return response()->json(['error' => 'No se ha subido ningún archivo.'], 400);
+
+            $errors = ['No se ha subido ningún archivo.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrio un error',
+                'errors' => $errors
+            ], 422);
         }
 
         // Ruta al archivo
@@ -20,18 +26,23 @@ class cargaArchivoController extends Controller
 
         // Leer el archivo
         $csv = Reader::createFromPath($file_csv, 'r');
-        $csv->setHeaderOffset(0); 
+        $csv->setHeaderOffset(0);
 
         // Verificar el número de columnas
         $encabezado = $csv->getHeader();
-        $numColumnas = 14; 
+        $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
-            return response()->json(['error' => 'El archivo no tiene el número esperado de columnas.'], 400);
+            $errors = ['El archivo no tiene el número esperado de columnas.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrio un error',
+                'errors' => $errors
+            ], 422);
         }
 
-         // Contar registros en una columna 
-         $registrosColumna = 'Almacen'; // Nombre de la columna a contar
-         $records = $csv->getRecords();
+        // Contar registros en una columna
+        $registrosColumna = 'Almacen'; // Nombre de la columna a contar
+        $records = $csv->getRecords();
 
         $conteo = 0;
         foreach ($records as $record) {
@@ -41,7 +52,7 @@ class cargaArchivoController extends Controller
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna = 'Almacen'; 
+        $nombreColumna = 'Almacen';
         $records = $csv->getRecords();
         $columnaComparar = [];
 
@@ -52,8 +63,8 @@ class cargaArchivoController extends Controller
         }
 
         $columnaComparar = array_unique($columnaComparar);
-        $tableName = 'cat_almacenes'; 
-        $columnCompara = 'descripcion_almacen'; 
+        $tableName = 'cat_almacenes';
+        $columnCompara = 'descripcion_almacen';
 
         $datoNoEncontrado = [];
         foreach ($columnaComparar as $value) {
@@ -71,7 +82,7 @@ class cargaArchivoController extends Controller
 
         foreach ($records as $record) {
             if (!empty($record[$nombreColumna2])) {
-                $columnaComparar2[] = $record[$nombreColumna2 ];
+                $columnaComparar2[] = $record[$nombreColumna2];
             }
         }
 
@@ -90,7 +101,7 @@ class cargaArchivoController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna3 = 'Texto breve de material'; 
+        $nombreColumna3 = 'Texto breve de material';
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -114,11 +125,11 @@ class cargaArchivoController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna4 = 'GPO';
-        $columnaComparar4 =[];
+        $columnaComparar4 = [];
 
         foreach ($records as $record) {
-            if(!empty($record[$nombreColumna4])) {
-                $columnaComparar4[] = $record[$nombreColumna4 ];
+            if (!empty($record[$nombreColumna4])) {
+                $columnaComparar4[] = $record[$nombreColumna4];
             }
         }
 
@@ -135,14 +146,16 @@ class cargaArchivoController extends Controller
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
-      
+
         // Retorna resultados
         return response()->json([
             'Numero de registros' => $conteo,
-            'Datos no encontrados en catalogo almacenes' => $datoNoEncontrado,
-            'Datos no encontrados en catalogo Unidades de medida' => $datoNoEncontrado2,
-            'Datos no encontrados en catalogo Productos' => $datoNoEncontrado3,
-            'Datos no encontrados en catalogo Grupo de articulos' => $datoNoEncontrado4,
+            'dtno_Almacenes' => $datoNoEncontrado,
+            'dtno_Unidades_medida' => $datoNoEncontrado2,
+            'dtno_Productos' => $datoNoEncontrado3,
+            'dtno_Grupo_articulos' => $datoNoEncontrado4,
+            'success' => true,
+            'message' => 'Los siguientes datos no se encuentran en los catálogos correspondientes.',
         ]);
     }
 }
