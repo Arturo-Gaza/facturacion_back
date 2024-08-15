@@ -9,7 +9,7 @@ class CatProductos extends Model
 {
     use HasFactory;
     protected $table = 'cat_productos';
-    protected $fillable = ['clave_producto', 'descripcion_producto_material' ];
+    protected $fillable = ['id_cat_almacenes','id_unidad_medida','id_gpo_familia','clave_producto', 'descripcion_producto_material','habilitado' ];
 }
 
 

@@ -24,10 +24,9 @@ class CatProductosController extends Controller
     {
         try {
             $getAll = $this->_catProductos->getAll();
-            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
-        }
-        catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -42,41 +41,48 @@ class CatProductosController extends Controller
     }
 
     public function store(StoreCatProductosRequest $cat)
-{
-    DB::beginTransaction(); // Inicia la transacción
-    try {
-        // Prepara los datos para la creación
-        $data = [
-            'clave_almacen' => $cat->clave_almacen,
-            'descripcion_almacen' => $cat->descripcion_almacen,
-            'habilitado' => $cat->habilitado,
-        ];
+    {
+        DB::beginTransaction(); // Inicia la transacción
+        try {
+            // Prepara los datos para la creación
+            $data = [
+                'id_cat_almacenes' => $cat->id_cat_almacenes,
+                'id_unidad_medida' => $cat->id_unidad_medida,
+                'id_gpo_familia' => $cat->id_gpo_familia,
+                'clave_producto' => $cat->clave_producto,
+                'descripcion_producto_material' => $cat->descripcion_producto_material,
+                'habilitado' => $cat->habilitado,
+            ];
 
-        // Llama al método store en el repositorio para crear el registro
-        $producto = $this->_catProductos->store($data);
+            // Llama al método store en el repositorio para crear el registro
+            $producto = $this->_catProductos->store($data);
 
-        DB::commit(); // Confirma la transacción si todo está bien
+            DB::commit(); // Confirma la transacción si todo está bien
 
-        // Envía una respuesta exitosa
-        return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente', 201);
-    } catch (Exception $ex) {
-        DB::rollBack(); // Revierte la transacción en caso de error
-        // Envía una respuesta de error
-        return ApiResponseHelper::rollback($ex);
+            // Envía una respuesta exitosa
+            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente', 201);
+        } catch (Exception $ex) {
+            DB::rollBack(); // Revierte la transacción en caso de error
+            // Envía una respuesta de error
+            return ApiResponseHelper::rollback($ex);
+        }
     }
-}
 
-    public function update(UpdateProductosRequest $cat,$id){
+    public function update(UpdateProductosRequest $cat, $id)
+    {
         DB::beginTransaction();
         try {
             $data = [
-                'clave_almacen'=> $cat->clave_almacen,
-                'descripcion_almacen'=>$cat->descripcion_almacen,
-                'habilitado'=> $cat->habilitado
+                'id_cat_almacenes' => $cat->id_cat_almacenes,
+                'id_unidad_medida' => $cat->id_unidad_medida,
+                'id_gpo_familia' => $cat->id_gpo_familia,
+                'clave_producto' => $cat->clave_producto,
+                'descripcion_producto_material' => $cat->descripcion_producto_material,
+                'habilitado' => $cat->habilitado,
             ];
-            $this->_catProductos->update($data,$id);
+            $this->_catProductos->update($data, $id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
