@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-
+use App\Interfaces\ArchivoCarga\TabArchivoCargaRepositoryInterface;
 use App\Interfaces\ArchivoConteo\TabConteoRepositoryInterface;
 use App\Interfaces\Catalogos\CatRolesRepositoryInterface;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
@@ -14,6 +14,7 @@ use App\Repositories\Catalogos\CatUnidadMedidasRepository;
 use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
 use App\Interfaces\Catalogos\CatGpoFamiliaRepositoryInterface;
 use App\Interfaces\Catalogos\CatProductosRepositoryInterface;
+use App\Repositories\ArchivoCarga\TabDetalleCargasRerpository;
 use App\Repositories\ArchivoConteo\TabConteoRepository;
 use App\Repositories\Catalogos\CatAlmacenesRepository;
 use App\Repositories\Catalogos\CatGpoFamiliaRepository;
@@ -32,6 +33,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CatAlmacenesRepositoryInterface::class, CatAlmacenesRepository::class);
         $this->app->bind(CatGpoFamiliaRepositoryInterface::class, CatGpoFamiliaRepository::class);
         $this->app->bind(CatProductosRepositoryInterface::class, CatProductosRepository::class);
+        $this->app->bind(TabArchivoCargaRepositoryInterface::class, TabDetalleCargasRerpository::class);
          $this->app->bind(TabConteoRepositoryInterface::class, TabConteoRepository::class);
 
     }

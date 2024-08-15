@@ -12,22 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tab_detalle_cargas', function (Blueprint $table) {
-            $table->id('id_carga');
+            $table->id();
             $table->string('cve_carga');
             $table->date('fecha_asignacion')->nullable();
             $table->date('fecha_inicio_conteo')->nullable();
             $table->date('fecha_fin_conteo')->nullable();
             $table->integer('conteo')->nullable();
             $table->string('nombre_archivo');
-            $table->foreignId('id_usuario')->constrained('users'); 
             $table->integer('Reg_Archivo')->nullable();
             $table->integer('Reg_a_Contar')->nullable();
             $table->integer('reg_vobo')->nullable();
             $table->integer('reg_excluidos')->nullable();
             $table->integer('reg_incorpora')->nullable();
-            $table->string('estatus')->nullable();
-            $table->string('acciones')->nullable();
             $table->text('observaciones')->nullable();
+            $table->boolean('habilitado');
+            $table->foreignId('id_estatus')->constrained('cat_estatuses');
+            $table->foreignId('id_usuario')->constrained('users');
             $table->timestamps();
         });
     }

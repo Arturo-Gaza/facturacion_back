@@ -13,7 +13,7 @@ class UpdateTabDetalleCargaRequest extends FormRequest
         return true;
     }
 
-     /**
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -33,11 +33,9 @@ class UpdateTabDetalleCargaRequest extends FormRequest
             'reg_vobo' => 'nullable|integer',
             'reg_excluidos' => 'nullable|integer',
             'reg_incorpora' => 'nullable|integer',
-            'estatus' => 'nullable|string|max:20',
-            'acciones' => 'nullable|string',
+            'id_estatus' => 'required|exists:users,id',
             'observaciones' => 'nullable|string',
         ];
-    
     }
 
     public function messages(): array
@@ -66,10 +64,9 @@ class UpdateTabDetalleCargaRequest extends FormRequest
             'reg_excluidos.integer' => 'El registro de excluidos debe ser un número entero.',
             'reg_incorpora.integer' => 'El registro de incorporados debe ser un número entero.',
 
-            'estatus.string' => 'El estatus debe ser una cadena de texto.',
-            'estatus.max' => 'El estatus no debe exceder los 20 caracteres.',
+            'id_estatus.required' => 'El estatus es obligatorio.',
+            'id_estatus.exists' => 'El estatus seleccionado no es válido.',
 
-            'acciones.string' => 'Las acciones deben ser una cadena de texto.',
             'observaciones.string' => 'Las observaciones deben ser una cadena de texto.',
         ];
     }

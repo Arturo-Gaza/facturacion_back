@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class tab_detalle_carga extends Model
 {
     use HasFactory;
-
-    protected $primaryKey = 'id_carga';
-
+    protected $table = 'tab_detalle_cargas';
     protected $fillable = [
         'cve_carga',
         'fecha_asignacion',
@@ -24,9 +22,8 @@ class tab_detalle_carga extends Model
         'reg_vobo',
         'reg_excluidos',
         'reg_incorpora',
-        'estatus',
-        'acciones',
+        'id_estatus',
         'observaciones',
+        'habilitado'
     ];
-
 }

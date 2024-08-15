@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\cargaArchivoController;
@@ -11,6 +11,7 @@ use App\Http\Controllers\Catalogos\CatRolesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\AcceptJsonMiddleware;
+use App\Models\ArchivoCarga\tab_detalle_carga;
 use App\Models\ArchivoConteo\TabConteo;
 use Illuminate\Support\Facades\Route;
 
@@ -62,12 +63,14 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
     Route::put('catGpoFamilia/update/{id}', [CatGpoFamiliaController::class, 'update']);
 
-    //Rutas Catalogo Productos
-    Route::get('catProductos/getAll', [CatProductosController::class, 'getAll']);
-    Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
-    Route::post('catProductos/register', [CatProductosController::class, 'store']);
-    Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
+
 
     //Ruta api archivo csv
     Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+
+    //Rutas Carga detalle
+    Route::get('tabCargaDetalle/getAll', [TabDetalleCargaController::class, 'getAll']);
+    Route::get('tabCargaDetalle/getById/{id}', [TabDetalleCargaController::class, 'getById']);
+    Route::post('tabCargaDetalle/register', [TabDetalleCargaController::class, 'store']);
+    Route::put('tabCargaDetalle/update/{id}', [TabDetalleCargaController::class, 'update']);
 });
