@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AuthController;
@@ -73,4 +74,10 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('tabCargaDetalle/getById/{id}', [TabDetalleCargaController::class, 'getById']);
     Route::post('tabCargaDetalle/register', [TabDetalleCargaController::class, 'store']);
     Route::put('tabCargaDetalle/update/{id}', [TabDetalleCargaController::class, 'update']);
+
+    //Rutas detalle archivo
+    Route::get('tabDetalleArchivo/getAll', [TabArchivoDetalleController::class, 'getAll']);
+    Route::get('tabDetalleArchivo/getById/{id}', [TabArchivoDetalleController::class, 'getById']);
+    Route::post('tabDetalleArchivo/register', [TabArchivoDetalleController::class, 'store']);
+    Route::put('tabDetalleArchivo/update/{id}', [TabArchivoDetalleController::class, 'update']);
 });
