@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tab_conteos', function (Blueprint $table) {
+        Schema::create('tab_conteo', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_detalle_carga')->constrained('tab_detalle_cargas');
-            $table->string('codigo')->unique();
-            $table->string('descripciòn');
+            $table->foreignId('id_carga')->constrained('tab_detalle_cargas');
+            $table->string('codigo');
+            $table->string('descripcion');
             $table->string('ume');
             $table->integer('cantidad');
-            $table->string('ubicaciòn');
+            $table->string('ubicacion');
             $table->text('observaciones')->nullable();
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tab_conteos');
+        Schema::dropIfExists('tab_conteo');
     }
 };

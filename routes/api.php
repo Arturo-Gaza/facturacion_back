@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/register', [AuthController::class, 'register']);
 
 //Rutas Tabla Conteo
 Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
@@ -45,7 +46,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Cierre de sesión
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
-    Route::post('auth/register', [AuthController::class, 'register']);
+   
     Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);

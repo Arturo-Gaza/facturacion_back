@@ -24,10 +24,10 @@ public function authorize(): bool
 public function rules(): array
 {
     return [
-        'codigo' => 'required|string|max:20|unique:tab_conteo,codigo',
+        'codigo' => 'required|string|max:10',
         'descripcion' => 'required|string|max:255',
         'ume' => 'required|string|max:10',
-        'cantidad' => 'required|integer|min:1',
+        'cantidad' => 'required|integer|max:10',
         'ubicacion' => 'required|string|max:100',
         'observaciones' => 'nullable|string|max:500',
     ];

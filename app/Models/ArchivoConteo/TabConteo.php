@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class TabConteo extends Model
 {
     use HasFactory;
-    protected $table = 'tab_conteos';
-    protected $fillable = ['codigo', 'descripcion', 'ume', 'cantidad', 'ubicacion', 'observaciones'];
+    protected $table = 'tab_conteo';
+    protected $fillable = [
+            'id_carga',
+            'codigo',
+            'descripcion',
+            'ume',
+            'cantidad',
+            'ubicacion',
+            'observaciones',
+    ];
 }

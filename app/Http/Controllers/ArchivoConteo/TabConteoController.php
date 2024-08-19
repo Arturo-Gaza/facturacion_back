@@ -45,10 +45,11 @@ class TabConteoController extends Controller
         DB::beginTransaction();
         try {
             $data = [
+                'id_carga'=> $cat->id_carga,
                 'codigo'=> $cat->codigo,
                 'descripcion'=>$cat->descripcion,
                 'ume'=> $cat->ume,
-                'cantida'=> $cat->cantidad,
+                'cantidad'=> $cat->cantidad,
                 'ubicacion'=> $cat->ubicacion,
                 'observaciones'=> $cat->observaciones
             ];
@@ -65,10 +66,11 @@ class TabConteoController extends Controller
         DB::beginTransaction();
         try {
             $data = [
+                'id_carga'=> $cat->id_carga,
                 'codigo'=> $cat->codigo,
                 'descripcion'=>$cat->descripcion,
                 'ume'=> $cat->ume,
-                'cantida'=> $cat->cantidad,
+                'cantidad'=> $cat->cantidad,
                 'ubicacion'=> $cat->ubicacion,
                 'observaciones'=> $cat->observaciones
             ];

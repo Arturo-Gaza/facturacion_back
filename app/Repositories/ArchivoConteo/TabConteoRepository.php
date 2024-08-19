@@ -5,6 +5,7 @@ namespace App\Repositories\ArchivoConteo;
 use App\Interfaces\ArchivoConteo\TabConteoRepositoryInterface;
 use App\Models\ArchivoConteo\TabConteo;
 
+
 class TabConteoRepository implements TabConteoRepositoryInterface
 {
     public function getAll()
