@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
+use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
 use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
@@ -25,9 +27,18 @@ Route::post('auth/login', [AuthController::class, 'login']);
 
 //Rutas Tabla Conteo
 Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
-Route::post('TabConteo/register', [TabConteoController::class, 'store']);
+Route::post('TabConteo/register', [TabConteoController::class, 'store']); 
 Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
 Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
+
+Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
+
+//Ruta para insertar datos faltantes
+Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']);
+
+Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+Route::post('/cargarArchivoCompleto', [cargaArchivoController::class, 'cargarArchivoCompleto']);
+Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
 
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
@@ -67,7 +78,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
 
     //Ruta api archivo csv
-    Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+    
 
     //Rutas Carga detalle
     Route::get('tabCargaDetalle/getAll', [TabDetalleCargaController::class, 'getAll']);
