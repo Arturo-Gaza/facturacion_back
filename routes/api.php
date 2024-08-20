@@ -4,6 +4,7 @@ use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
 use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
 use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
+use App\Http\Controllers\ArchivoCompletoController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\cargaArchivoController;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
+Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'getCargasByUsuario']);
 
 //Rutas Tabla Conteo
 Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
