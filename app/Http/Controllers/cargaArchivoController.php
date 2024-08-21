@@ -183,7 +183,7 @@ class cargaArchivoController extends Controller
 
         // Retorna resultados
         return response()->json([
-            'Numero de registros' => $conteo,
+            'num_registros' => $conteo,
             'dtno_Almacenes' => $datoNoEncontrado,
             'dtno_Unidades_medida' => $datoNoEncontrado2,
             'dtno_Productos' => $datoNoEncontrado3,
