@@ -30,7 +30,7 @@ Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'ge
 
 //Rutas Tabla Conteo
 Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
-Route::post('TabConteo/register', [TabConteoController::class, 'store']); 
+Route::post('TabConteo/register', [TabConteoController::class, 'store']);
 Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
 Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
 
@@ -48,7 +48,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Cierre de sesión
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
-   
+
     Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
@@ -78,10 +78,16 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
     Route::put('catGpoFamilia/update/{id}', [CatGpoFamiliaController::class, 'update']);
 
+    //Rutas Catalogo Productos
+    Route::get('catProductos/getAll', [CatProductosController::class, 'getAll']);
+    Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
+    Route::post('catProductos/register', [CatProductosController::class, 'store']);
+    Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
+
 
 
     //Ruta api archivo csv
-    
+
 
     //Rutas Carga detalle
     Route::get('tabCargaDetalle/getAll', [TabDetalleCargaController::class, 'getAll']);
