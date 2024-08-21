@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class cargaArchivoController extends Controller
 {
@@ -20,17 +21,17 @@ class cargaArchivoController extends Controller
                 'errors' => $errors
             ], 422);
         }
-    
+
         // Ruta al archivo
         $file_csv = $request->file('csv_file')->getRealPath();
-    
+
         $handle = fopen($file_csv, 'r');
-    
+
         stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-    
+
         $csv = Reader::createFromStream($handle);
         $csv->setHeaderOffset(0);
-    
+
         // Verificar el número de columnas
         $encabezado = $csv->getHeader();
         $numColumnas = 14;
@@ -44,24 +45,27 @@ class cargaArchivoController extends Controller
         }
 
         // Contar registros en una columna
-        
-        $registrosColumna = 'Almacén'; 
+
+        $registrosColumna = 0;
         $records = $csv->getRecords();
 
         $conteo = 0;
+
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$registrosColumna])) {
                 $conteo++;
             }
         }
-        
+
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna = 'Almacén';
+        $nombreColumna = 0;
         $records = $csv->getRecords();
         $columnaComparar = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna])) {
                 $columnaComparar[] = $record[$nombreColumna];
             }
@@ -81,11 +85,12 @@ class cargaArchivoController extends Controller
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna2 = 'UME'; 
+        $nombreColumna2 = 3;
         $records = $csv->getRecords();
         $columnaComparar2 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna2])) {
                 $columnaComparar2[] = $record[$nombreColumna2];
             }
@@ -106,7 +111,7 @@ class cargaArchivoController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna3 = 'Texto breve de material';
+        $nombreColumna3 = 2;
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -129,10 +134,11 @@ class cargaArchivoController extends Controller
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        $nombreColumna4 = 'Grupo de artículos';
+        $nombreColumna4 = 4;
         $columnaComparar4 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna4])) {
                 $columnaComparar4[] = $record[$nombreColumna4];
             }
@@ -151,6 +157,29 @@ class cargaArchivoController extends Controller
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
+        $nombreColumna5 = 1;
+        $columnaComparar5 = [];
+
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$nombreColumna5])) {
+                $columnaComparar5[] = $record[$nombreColumna5];
+            }
+        }
+
+        $columnaComparar5 = array_unique($columnaComparar5);
+
+        $tableproductocve = 'cat_productos';
+        $columnaCampara5 = 'clave_producto';
+
+        $datoNoEncontrado5 = [];
+        foreach ($columnaComparar5 as $value) {
+            $existente = DB::table($tableproductocve)->where($columnaCampara5, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado5[] = $value;
+            }
+        }
+        //////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Retorna resultados
         return response()->json([
@@ -159,6 +188,7 @@ class cargaArchivoController extends Controller
             'dtno_Unidades_medida' => $datoNoEncontrado2,
             'dtno_Productos' => $datoNoEncontrado3,
             'dtno_Grupo_articulos' => $datoNoEncontrado4,
+            'dtno_Clave Material' => $datoNoEncontrado5,
             'success' => true,
             'message' => 'Los siguientes datos no se encuentran en los catálogos correspondientes.',
         ]);
@@ -167,44 +197,43 @@ class cargaArchivoController extends Controller
     public function obtenerNuevoId()
     {
         $ultimoId = DB::table('tab_detalle_cargas')
-            ->orderBy('id', 'desc') 
-            ->value('id'); 
-    
+            ->orderBy('id', 'desc')
+            ->value('id');
+
         return $ultimoId;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public function cargarArchivoCompleto(Request $request)
     {
-         // Ruta al archivo
-         $file_csv = $request->file('csv_file')->getRealPath();
-    
-         $handle = fopen($file_csv, 'r');
-     
-         stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-     
-         $csv = Reader::createFromStream($handle);
-         $csv->setHeaderOffset(0);
-     
-         // Verificar el número de columnas
-         $encabezado = $csv->getHeader();
-         $numColumnas = 14;
-         if (count($encabezado) !== $numColumnas) {
-             $errors = ['El archivo no tiene el número esperado de columnas.'];
-             return response()->json([
-                 'success' => false,
-                 'message' => 'Ocurrió un error',
-                 'errors' => $errors
-             ], 422);
-         }
-         
-         $claveCarga = $this->obtenerNuevoId();
+        // Ruta al archivo
+        $file_csv = $request->file('csv_file')->getRealPath();
 
-        
+        $handle = fopen($file_csv, 'r');
+
+        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
+
+        $csv = Reader::createFromStream($handle);
+        $csv->setHeaderOffset(0);
+
+        // Verificar el número de columnas
+        $encabezado = $csv->getHeader();
+        $numColumnas = 14;
+        if (count($encabezado) !== $numColumnas) {
+            $errors = ['El archivo no tiene el número esperado de columnas.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error',
+                'errors' => $errors
+            ], 422);
+        }
+
+        $claveCarga = $this->obtenerNuevoId();
+
+
         foreach ($csv->getRecords() as $record) {
             DB::table('tab_archivo_completos')->insert([
-                'id_detalle_carga' => $claveCarga,
-                'almacen' => trim($record['Almacén']),
+                'clave_almacen' => trim($record['Almacén']),
                 'material' => trim($record['Material']),
                 'texto_breve_material' => mb_convert_encoding(trim($record['Texto breve de material']), 'UTF-8', 'ISO-8859-1'),
                 'ume' => trim($record['UME']),
@@ -218,19 +247,72 @@ class cargaArchivoController extends Controller
                 'cantidad_total' =>  $this->limpiarFormatoMoneda(trim($record['Cantidad total (SAP)'])),
                 'importe_unitario' => $this->limpiarFormatoMoneda(trim($record['Importe unitario'])),
                 'importe_total' =>  $this->limpiarFormatoMoneda(trim($record['Importe total'])),
-                'created_at' => now(), 
-                'updated_at' => now(), 
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
-
+        $this->insertarDatosSiNoExisten();
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private function limpiarFormatoMoneda($valor)
-{
-    // Elimina signos de dólar y comas
-    return preg_replace('/[^\d.]/', '', $valor);
-}
+    {
+        // Elimina signos de dólar y comas
+        return preg_replace('/[^\d.]/', '', $valor);
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public function insertarDatosSiNoExisten()
+    {
+        $datos = DB::table('tab_archivo_completos')
+        ->join('cat_almacenes', 'tab_archivo_completos.clave_almacen', '=', 'cat_almacenes.clave_almacen')
+        ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
+        ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
+        ->select(
+            'tab_archivo_completos.material AS clave_producto',
+            'tab_archivo_completos.texto_breve_material AS descripcion_producto_material',
+            'cat_almacenes.id AS id_cat_almacenes',
+            'cat_unidad_medidas.id AS id_unidad_medida',
+            'cat_gpo_familias.id AS id_gpo_familia'
+        )
+        ->distinct()
+        ->get();
+    
+    
+    $datosInsertados = [];
+    
+    
+    foreach ($datos as $dato) {
+        $existe = DB::table('cat_productos')
+            ->where('clave_producto', $dato->clave_producto)
+            ->where('descripcion_producto_material', $dato->descripcion_producto_material)
+            ->where('id_cat_almacenes', $dato->id_cat_almacenes)
+            ->where('id_unidad_medida', $dato->id_unidad_medida)
+            ->where('id_gpo_familia', $dato->id_gpo_familia)
+            ->exists();
+    
+        
+        if (!$existe) {
+            DB::table('cat_productos')->insert([
+                'clave_producto' => $dato->clave_producto,
+                'descripcion_producto_material' => $dato->descripcion_producto_material,
+                'id_cat_almacenes' => $dato->id_cat_almacenes,
+                'id_unidad_medida' => $dato->id_unidad_medida,
+                'id_gpo_familia' => $dato->id_gpo_familia,
+                'habilitado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+    
+           
+            $datosInsertados[] = $dato;
+            Log::info('Dato insertado: ', (array) $dato);
+        }
+    }
+    
+    
+    return response()->json($datosInsertados);
+    }
+
+  
 }
