@@ -1,0 +1,195 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\ArchivoCarga\tab_detalle_carga;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use League\Csv\Reader;
+use Illuminate\Support\Facades\Storage;
+
+class DetalleArchivoController extends Controller
+{
+    protected $nombreArchivoCSV = 'archivoCargado.csv';
+
+    public function detalleArchivo(Request $request)
+    {
+        if ($request->hasFile('csv_file')) {
+            $archivo = $request->file('csv_file');
+            $nombreArchivo = $archivo->getClientOriginalName();
+            $path = $archivo->storeAs('csv', $nombreArchivo);
+            $file_csv = Storage::path($path);
+        } elseif (Storage::exists('csv/' . $this->nombreArchivoCSV)) {
+            $file_csv = Storage::path('csv/' . $this->nombreArchivoCSV);
+            $nombreArchivo = basename($file_csv);
+        } else {
+            return response()->json(['error' => 'No se ha subido ningún archivo y no hay archivo almacenado.'], 400);
+        }
+
+        $csv = Reader::createFromPath($file_csv, 'r');
+        $csv->setHeaderOffset(0);
+
+        $encabezado = $csv->getHeader();
+        $numColumnas = 14;
+        if (count($encabezado) !== $numColumnas) {
+            $errors = ['El archivo no tiene el número esperado de columnas.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error',
+                'errors' => $errors
+            ], 422);
+        }
+
+        // Conteo de registros
+        $registrosColumna = 1;
+        $records = $csv->getRecords();
+        $conteo = 0;
+
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$registrosColumna])) {
+                $conteo++;
+            }
+        }
+
+        // Comparación de la primera columna
+        $nombreColumna = 0; 
+        $columnaComparar = [];
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$nombreColumna])) {
+                $columnaComparar[] = $record[$nombreColumna];
+            }
+        }
+        
+        $columnaComparar = array_unique($columnaComparar);
+        $tableName = 'cat_almacenes'; 
+        $columnCompara = 'clave_almacen'; 
+        
+        $datoNoEncontrado = [];
+        foreach ($columnaComparar as $value) {
+            $existente = DB::table($tableName)->where($columnCompara, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado[] = $value;
+            }
+        }
+        
+        $numDatosNoEncontrados = count($datoNoEncontrado);
+
+        // Comparación de la tercera columna
+        $numColumna3 = 3; 
+        $columnaComparar3 = [];
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$numColumna3])) {
+                $columnaComparar3[] = $record[$numColumna3];
+            }
+        }
+        
+        $columnaComparar3 = array_unique($columnaComparar3);
+        $tableCatUME = 'cat_unidad_medidas'; 
+        $columnCompara3 = 'clave_unidad_medida'; 
+        
+        $datoNoEncontrado3 = []; 
+        foreach ($columnaComparar3 as $value) {
+            $existente = DB::table($tableCatUME)->where($columnCompara3, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado3[] = $value;
+            }
+        }
+        
+        $numDatosNoEncontrados3 = count($datoNoEncontrado3);
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $numColumna4 = 4; 
+        $columnaComparar4 = [];
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$numColumna4])) {
+                $columnaComparar4[] = $record[$numColumna4];
+            }
+        }
+        
+        $columnaComparar4 = array_unique($columnaComparar4);
+        $tableCatGpo = 'cat_gpo_familias'; 
+        $columnCompara4 = 'clave_gpo_familia'; 
+        
+        $datoNoEncontrado4 = []; 
+        foreach ($columnaComparar4 as $value) {
+            $existente = DB::table($tableCatGpo)->where($columnCompara4, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado4[] = $value;
+            }
+        }
+        
+        $numDatosNoEncontrados4 = count($datoNoEncontrado4);
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $numColumna2 = 2; 
+        $columnaComparar2 = [];
+        
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$numColumna2])) {
+                $columnaComparar2[] = mb_convert_encoding($record[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
+            }
+        }
+        
+        $columnaComparar2 = array_unique($columnaComparar2);
+        $tableCatProducto = 'cat_productos'; 
+        $columnCompara2 = 'descripcion_producto_material'; 
+        
+        $datoNoEncontrado2 = []; 
+        foreach ($columnaComparar2 as $value) {
+            $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
+            $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado2[] = $value;
+            }
+        }
+        
+        $numDatosNoEncontrados2 = count($datoNoEncontrado2);
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+       
+        $agregar = $numDatosNoEncontrados + $numDatosNoEncontrados2 + $numDatosNoEncontrados3 + $numDatosNoEncontrados4;
+        $VoBo = ($conteo - $agregar) + $conteo;
+        $total = $conteo - 0;
+
+     
+        $ultimaCarga = DB::table('tab_detalle_cargas')
+            ->select('cve_carga')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($ultimaCarga) {
+            $ultimoNumero = (int)substr($ultimaCarga->cve_carga, -4);
+            $nuevoNumero = str_pad($ultimoNumero + 1, 4, '0', STR_PAD_LEFT);
+            $nuevaCveCarga = 'AT-CA-' . $nuevoNumero;
+        } else {
+            $nuevaCveCarga = 'AT-CA-0001';
+        }
+
+        
+        $detalleArchivo = new tab_detalle_carga();
+        $detalleArchivo->cve_carga = $nuevaCveCarga;
+        $detalleArchivo->fecha_asignacion = $request->input('fecha_asignacion') ? \Carbon\Carbon::parse($request->input('fecha_asignacion')) : now();
+        $detalleArchivo->fecha_inicio_conteo = $request->input('fecha_inicio_conteo') ? \Carbon\Carbon::parse($request->input('fecha_inicio_conteo')) : null;
+        $detalleArchivo->fecha_fin_conteo = $request->input('fecha_fin_conteo') ? \Carbon\Carbon::parse($request->input('fecha_fin_conteo')) : null;
+        $detalleArchivo->id_usuario = $request->input('id_users') ? (int) $request->input('id_users') : null;
+        $detalleArchivo->nombre_archivo = $nombreArchivo;
+        $detalleArchivo->Reg_Archivo = $conteo;
+        $detalleArchivo->reg_VoBo = $VoBo;
+        $detalleArchivo->reg_excluidos = 0;
+        $detalleArchivo->reg_incorporar = $agregar;
+        $detalleArchivo->Reg_total = $total;
+        $detalleArchivo->num_conteo = $request->input('num_conteo'); 
+        $detalleArchivo->id_estatus = (int) $request->input('id_estatus');
+        $detalleArchivo->observaciones = $request->input('observaciones');
+        $detalleArchivo->habilitado = $request->input('habilitado', true);
+        
+        $detalleArchivo->save();
+
+        return response()->json(['success' => true, 'message' => 'Datos guardados correctamente']);
+        
+    }
+}
