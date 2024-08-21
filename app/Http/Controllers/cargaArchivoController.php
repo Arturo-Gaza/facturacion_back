@@ -108,31 +108,6 @@ class cargaArchivoController extends Controller
                 $datoNoEncontrado2[] = $value;
             }
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        $nombreColumna3 = 2;
-        $columnaComparar3 = [];
-
-        foreach ($records as $record) {
-            if (!empty($record[$nombreColumna3])) {
-                $columnaComparar3[] = $record[$nombreColumna3];
-            }
-        }
-
-        $columnaComparar3 = array_unique($columnaComparar3);
-
-        $tableproducto = 'cat_productos';
-        $columnaCampara3 = 'descripcion_producto_material';
-
-        $datoNoEncontrado3 = [];
-        foreach ($columnaComparar3 as $value) {
-            $existente = DB::table($tableproducto)->where($columnaCampara3, $value)->exists();
-            if (!$existente) {
-                $datoNoEncontrado3[] = $value;
-            }
-        }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna4 = 4;
         $columnaComparar4 = [];
@@ -156,14 +131,42 @@ class cargaArchivoController extends Controller
                 $datoNoEncontrado4[] = $value;
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        $nombreColumna3 = 2;
+        $columnaComparar3 = [];
+
+        foreach ($records as $record) {
+            $record = array_values($record);
+            if (!empty($record[$nombreColumna3])) {
+                $columnaComparar3[] = $record[$nombreColumna3];
+            }
+        }
+
+        $columnaComparar3 = array_unique($columnaComparar3);
+
+        $tableproducto = 'cat_productos';
+        $columnaCampara3 = 'descripcion_producto_material';
+
+        $datoNoEncontrado3 = [];
+        foreach ($columnaComparar3 as $value) {
+            $existente = DB::table($tableproducto)->where($columnaCampara3, $value)->exists();
+            if (!$existente) {
+                $datoNoEncontrado3[] = $value;
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna5 = 1;
         $columnaComparar5 = [];
+        $columnaProductosAll = [];
 
         foreach ($records as $record) {
             $record = array_values($record);
             if (!empty($record[$nombreColumna5])) {
                 $columnaComparar5[] = $record[$nombreColumna5];
+                $columnaProductosAll[] = $record[$nombreColumna5]." - ".$record[2] ;
             }
         }
 
@@ -180,7 +183,6 @@ class cargaArchivoController extends Controller
             }
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////
-
         // Retorna resultados
         return response()->json([
             'num_registros' => $conteo,
@@ -188,7 +190,8 @@ class cargaArchivoController extends Controller
             'dtno_Unidades_medida' => $datoNoEncontrado2,
             'dtno_Productos' => $datoNoEncontrado3,
             'dtno_Grupo_articulos' => $datoNoEncontrado4,
-            'dtno_Clave Material' => $datoNoEncontrado5,
+            'dtno_Clave_Material' => $datoNoEncontrado5,
+            'dtno_ProductosAll' => $columnaProductosAll,
             'success' => true,
             'message' => 'Los siguientes datos no se encuentran en los catálogos correspondientes.',
         ]);
@@ -265,54 +268,52 @@ class cargaArchivoController extends Controller
     public function insertarDatosSiNoExisten()
     {
         $datos = DB::table('tab_archivo_completos')
-        ->join('cat_almacenes', 'tab_archivo_completos.clave_almacen', '=', 'cat_almacenes.clave_almacen')
-        ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
-        ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
-        ->select(
-            'tab_archivo_completos.material AS clave_producto',
-            'tab_archivo_completos.texto_breve_material AS descripcion_producto_material',
-            'cat_almacenes.id AS id_cat_almacenes',
-            'cat_unidad_medidas.id AS id_unidad_medida',
-            'cat_gpo_familias.id AS id_gpo_familia'
-        )
-        ->distinct()
-        ->get();
-    
-    
-    $datosInsertados = [];
-    
-    
-    foreach ($datos as $dato) {
-        $existe = DB::table('cat_productos')
-            ->where('clave_producto', $dato->clave_producto)
-            ->where('descripcion_producto_material', $dato->descripcion_producto_material)
-            ->where('id_cat_almacenes', $dato->id_cat_almacenes)
-            ->where('id_unidad_medida', $dato->id_unidad_medida)
-            ->where('id_gpo_familia', $dato->id_gpo_familia)
-            ->exists();
-    
-        
-        if (!$existe) {
-            DB::table('cat_productos')->insert([
-                'clave_producto' => $dato->clave_producto,
-                'descripcion_producto_material' => $dato->descripcion_producto_material,
-                'id_cat_almacenes' => $dato->id_cat_almacenes,
-                'id_unidad_medida' => $dato->id_unidad_medida,
-                'id_gpo_familia' => $dato->id_gpo_familia,
-                'habilitado' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-    
-           
-            $datosInsertados[] = $dato;
-            Log::info('Dato insertado: ', (array) $dato);
-        }
-    }
-    
-    
-    return response()->json($datosInsertados);
-    }
+            ->join('cat_almacenes', 'tab_archivo_completos.clave_almacen', '=', 'cat_almacenes.clave_almacen')
+            ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
+            ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
+            ->select(
+                'tab_archivo_completos.material AS clave_producto',
+                'tab_archivo_completos.texto_breve_material AS descripcion_producto_material',
+                'cat_almacenes.id AS id_cat_almacenes',
+                'cat_unidad_medidas.id AS id_unidad_medida',
+                'cat_gpo_familias.id AS id_gpo_familia'
+            )
+            ->distinct()
+            ->get();
 
-  
+
+        $datosInsertados = [];
+
+
+        foreach ($datos as $dato) {
+            $existe = DB::table('cat_productos')
+                ->where('clave_producto', $dato->clave_producto)
+                ->where('descripcion_producto_material', $dato->descripcion_producto_material)
+                ->where('id_cat_almacenes', $dato->id_cat_almacenes)
+                ->where('id_unidad_medida', $dato->id_unidad_medida)
+                ->where('id_gpo_familia', $dato->id_gpo_familia)
+                ->exists();
+
+
+            if (!$existe) {
+                DB::table('cat_productos')->insert([
+                    'clave_producto' => $dato->clave_producto,
+                    'descripcion_producto_material' => $dato->descripcion_producto_material,
+                    'id_cat_almacenes' => $dato->id_cat_almacenes,
+                    'id_unidad_medida' => $dato->id_unidad_medida,
+                    'id_gpo_familia' => $dato->id_gpo_familia,
+                    'habilitado' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+
+                $datosInsertados[] = $dato;
+                Log::info('Dato insertado: ', (array) $dato);
+            }
+        }
+
+
+        return response()->json($datosInsertados);
+    }
 }
