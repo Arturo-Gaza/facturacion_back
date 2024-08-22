@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tab_conteo', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_carga')->constrained('tab_detalle_cargas');
+            $table->foreignId('id_producto')->nullable()->constrained('cat_productos');
             $table->string('codigo');
             $table->string('descripcion');
             $table->string('ume');

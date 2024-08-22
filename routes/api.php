@@ -28,11 +28,6 @@ Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'getCargasByUsuario']);
 
-//Rutas Tabla Conteo
-Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
-Route::post('TabConteo/register', [TabConteoController::class, 'store']);
-Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
-Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
 
 Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
 
@@ -84,10 +79,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
 
-
-
     //Ruta api archivo csv
-
 
     //Rutas Carga detalle
     Route::get('tabCargaDetalle/getAll', [TabDetalleCargaController::class, 'getAll']);
@@ -100,4 +92,10 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('tabDetalleArchivo/getById/{id}', [TabArchivoDetalleController::class, 'getById']);
     Route::post('tabDetalleArchivo/register', [TabArchivoDetalleController::class, 'store']);
     Route::put('tabDetalleArchivo/update/{id}', [TabArchivoDetalleController::class, 'update']);
+
+    //Rutas Tabla Conteo
+    Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
+    Route::post('TabConteo/register', [TabConteoController::class, 'store']);
+    Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
+    Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
 });

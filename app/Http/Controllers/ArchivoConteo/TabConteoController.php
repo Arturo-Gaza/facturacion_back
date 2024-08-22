@@ -46,6 +46,7 @@ class TabConteoController extends Controller
         try {
             $data = [
                 'id_carga'=> $cat->id_carga,
+                'id_producto'=> $cat->id_producto,
                 'codigo'=> $cat->codigo,
                 'descripcion'=>$cat->descripcion,
                 'ume'=> $cat->ume,
@@ -67,6 +68,7 @@ class TabConteoController extends Controller
         try {
             $data = [
                 'id_carga'=> $cat->id_carga,
+                'id_producto'=> $cat->id_producto,
                 'codigo'=> $cat->codigo,
                 'descripcion'=>$cat->descripcion,
                 'ume'=> $cat->ume,

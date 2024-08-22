@@ -11,6 +11,7 @@ class TabConteo extends Model
     protected $table = 'tab_conteo';
     protected $fillable = [
             'id_carga',
+            'id_producto',
             'codigo',
             'descripcion',
             'ume',
