@@ -60,7 +60,6 @@ class cargaArchivoController extends Controller
         //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna = 0;
-        $records = $csv->getRecords();
         $columnaComparar = [];
 
         foreach ($records as $record) {
@@ -85,7 +84,6 @@ class cargaArchivoController extends Controller
         /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna2 = 3;
-        $records = $csv->getRecords();
         $columnaComparar2 = [];
 
         foreach ($records as $record) {
@@ -236,20 +234,20 @@ class cargaArchivoController extends Controller
         foreach ($csv->getRecords() as $record) {
             DB::table('tab_archivo_completos')->insert([
                 'id_detalle_carga' => $claveCarga,
-                'almacen' => trim($record['Almacén']),
-                'material' => trim($record['Material']),
-                'texto_breve_material' => mb_convert_encoding(trim($record['Texto breve de material']), 'UTF-8', 'ISO-8859-1'),
-                'ume' => trim($record['UME']),
-                'grupo_articulos' => mb_convert_encoding(trim($record['Grupo de artículos']), 'UTF-8', 'ISO-8859-1'),
-                'libre_utilizacion' => $this->limpiarFormatoMoneda(trim($record['Libre utilización'])),
-                'en_control_calidad' =>  $this->limpiarFormatoMoneda(trim($record['En control calidad'])),
-                'bloqueado' =>  $this->limpiarFormatoMoneda(trim($record['Bloqueado'])),
-                'valor_libre_util' => $this->limpiarFormatoMoneda(trim($record['Valor libre util.'])),
-                'valor_insp_cal' =>  $this->limpiarFormatoMoneda(trim($record['Valor en insp.cal.'])),
-                'valor_stock_bloq' =>  $this->limpiarFormatoMoneda(trim($record['Valor stock bloq.'])),
-                'cantidad_total' =>  $this->limpiarFormatoMoneda(trim($record['Cantidad total (SAP)'])),
-                'importe_unitario' => $this->limpiarFormatoMoneda(trim($record['Importe unitario'])),
-                'importe_total' =>  $this->limpiarFormatoMoneda(trim($record['Importe total'])),
+                'almacen' => trim($record[0]),
+                'material' => trim($record[1]),
+                'texto_breve_material' => mb_convert_encoding(trim($record[2]), 'UTF-8', 'ISO-8859-1'),
+                'ume' => trim($record[3]),
+                'grupo_articulos' => mb_convert_encoding(trim($record[4]), 'UTF-8', 'ISO-8859-1'),
+                'libre_utilizacion' => $this->limpiarFormatoMoneda(trim($record[5])),
+                'en_control_calidad' =>  $this->limpiarFormatoMoneda(trim($record[6])),
+                'bloqueado' =>  $this->limpiarFormatoMoneda(trim($record[7])),
+                'valor_libre_util' => $this->limpiarFormatoMoneda(trim($record[8])),
+                'valor_insp_cal' =>  $this->limpiarFormatoMoneda(trim($record[9])),
+                'valor_stock_bloq' =>  $this->limpiarFormatoMoneda(trim($record[10])),
+                'cantidad_total' =>  $this->limpiarFormatoMoneda(trim($record[11])),
+                'importe_unitario' => $this->limpiarFormatoMoneda(trim($record[12])),
+                'importe_total' =>  $this->limpiarFormatoMoneda(trim($record[13])),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
