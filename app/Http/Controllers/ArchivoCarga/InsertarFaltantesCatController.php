@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class InsertarFaltantesCatController extends Controller
 {
@@ -14,13 +13,13 @@ class InsertarFaltantesCatController extends Controller
 
     public function procesoInsertar(Request $request)
     {
-       
+
         $file_csv = $request->file('csv_file')->getRealPath();
-    
+
         $handle = fopen($file_csv, 'r');
-    
+
         stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-    
+
         $csv = Reader::createFromStream($handle);
         $csv->setHeaderOffset(0);
         $encabezado = $csv->getHeader();
@@ -37,10 +36,12 @@ class InsertarFaltantesCatController extends Controller
 
         $records = $csv->getRecords();
 
-        $nombreColumna = 'Almacén';
+        $nombreColumna = 0;
+        $records = $csv->getRecords();
         $columnaComparar = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna])) {
                 $columnaComparar[] = $record[$nombreColumna];
             }
@@ -59,11 +60,12 @@ class InsertarFaltantesCatController extends Controller
         }
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna2 = 'UME'; // Nombre de la columna a comparar
+        $nombreColumna2 = 3;
         $records = $csv->getRecords();
         $columnaComparar2 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna2])) {
                 $columnaComparar2[] = $record[$nombreColumna2];
             }
@@ -72,7 +74,7 @@ class InsertarFaltantesCatController extends Controller
         $columnaComparar2 = array_unique($columnaComparar2);
 
         $tableUM = 'cat_unidad_medidas';
-        $columnaCampara2 = 'descripcion_unidad_medida';
+        $columnaCampara2 = 'clave_unidad_medida';
 
         $datoNoEncontrado2 = [];
         foreach ($columnaComparar2 as $value) {
@@ -83,10 +85,11 @@ class InsertarFaltantesCatController extends Controller
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna3 = 'Grupo de artículos';
+        $nombreColumna3 = 4;
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna3])) {
                 $columnaComparar3[] = $record[$nombreColumna3];
             }
@@ -94,7 +97,7 @@ class InsertarFaltantesCatController extends Controller
 
         $columnaComparar3 = array_unique($columnaComparar3);
 
-        $tableproducto ='cat_gpo_familias';
+        $tableproducto = 'cat_gpo_familias';
         $columnaCampara3 = 'clave_gpo_familia';
 
         $datoNoEncontrado3 = [];
@@ -107,10 +110,11 @@ class InsertarFaltantesCatController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $nombreColumna4 = 'Texto breve de material';
+        $nombreColumna4 = 2;
         $columnaComparar4 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna4])) {
                 $columnaComparar4[] = $record[$nombreColumna4];
             }
@@ -118,7 +122,7 @@ class InsertarFaltantesCatController extends Controller
 
         $columnaComparar4 = array_unique($columnaComparar4);
 
-        $tableproducto = 'cat_materiales';
+        $tableproducto = 'cat_productos';
         $columnaCampara4 = 'descripcion_producto_material';
 
         $datoNoEncontrado4 = [];
@@ -130,10 +134,11 @@ class InsertarFaltantesCatController extends Controller
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        $nombreColumna5 = 'Material';
+        $nombreColumna5 = 1;
         $columnaComparar5 = [];
 
         foreach ($records as $record) {
+            $record = array_values($record);
             if (!empty($record[$nombreColumna5])) {
                 $columnaComparar5[] = $record[$nombreColumna5];
             }
@@ -141,7 +146,7 @@ class InsertarFaltantesCatController extends Controller
 
         $columnaComparar5 = array_unique($columnaComparar5);
 
-        $tableproducto = 'cat_materiales';
+        $tableproducto = 'cat_productos';
         $columnaCampara5 = 'clave_producto';
 
         $datoNoEncontrado5 = [];
@@ -156,10 +161,11 @@ class InsertarFaltantesCatController extends Controller
         $this->insertTabAlmacenes($datoNoEncontrado);
         $this->insertTabUniMedidas($datoNoEncontrado2);
         $this->insetarTabGrupoFam($datoNoEncontrado3);
-        $this->insertTabProductos($datoNoEncontrado4,$datoNoEncontrado5);
+        $this->insertTabProductos($datoNoEncontrado4, $datoNoEncontrado5);
+        $this->insertCatProductos();
 
         return response()->json([
-            'dtno_Almacenes' => $datoNoEncontrado,
+            'dtno_Almacenes' => $datoNoEncontrado, $datoNoEncontrado4,
             'success' => true,
             'message' => 'Los siguientes datos se insertaron en los catálogos correspondientes.',
         ]);
@@ -170,10 +176,10 @@ class InsertarFaltantesCatController extends Controller
         foreach ($datos as $dato) {
             DB::table('cat_almacenes')->insert([
                 'clave_almacen' => $dato,
-                'descripcion_almacen' => $this->generateClaveAlmacen(), 
-                'habilitado' => true, 
-                'created_at' => now(), 
-                'updated_at' => now(), 
+                'descripcion_almacen' => $this->generateClaveAlmacen(),
+                'habilitado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
         return response()->json([
@@ -183,23 +189,30 @@ class InsertarFaltantesCatController extends Controller
 
     private function generateClaveAlmacen()
     {
-        
+
         return 'Almacen';
     }
 
     private function insertTabUniMedidas(array $datos)
     {
         foreach ($datos as $dato) {
-            DB::table('cat_unidad_medidas')->insert([
-                'clave_unidad_medida' => $dato,
-                'descripcion_unidad_medida' => $this->generarUnidadMedida(), 
-                'habilitado' => true, 
-                'created_at' => now(), 
-                'updated_at' => now(), 
-            ]);
+            $exists = DB::table('cat_unidad_medidas')
+                ->where('clave_unidad_medida', $dato)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('cat_unidad_medidas')->insert([
+                    'clave_unidad_medida' => $dato,
+                    'descripcion_unidad_medida' => $this->generarUnidadMedida(),
+                    'habilitado' => true,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
+
         return response()->json([
-            'message' => 'Los siguientes datos no se insertaron en los catálogos correspondientes.',
+            'message' => 'Los datos se han procesado correctamente.',
         ]);
     }
 
@@ -212,11 +225,11 @@ class InsertarFaltantesCatController extends Controller
     {
         foreach ($datos as $dato) {
             DB::table('cat_gpo_familias')->insert([
-            'clave_gpo_familia' => $dato,
-            'descripcion_gpo_familia'=> $this->generarGpoFamilia(),
-            'habilitado' => true, 
-            'created_at' => now(), 
-            'updated_at' => now(), 
+                'clave_gpo_familia' => $dato,
+                'descripcion_gpo_familia' => $this->generarGpoFamilia(),
+                'habilitado' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
         }
         return response()->json([
@@ -235,16 +248,57 @@ class InsertarFaltantesCatController extends Controller
 
         for ($i = 0; $i < count($productos); $i++) {
             $insertData[] = [
-            'clave_producto' => $clave[$i], 
-            'descripcion_producto_material' => $productos[$i], 
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
+                'clave_producto' => $clave[$i],
+                'descripcion_producto_material' => $productos[$i],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        DB::table('cat_materiales')->insert($insertData);
     }
 
-    DB::table('cat_materiales')->insert($insertData);
+    ///////////////////////////////////////////////////////Insertar productos///////////////////////////////////////////////
+    public function insertCatProductos()
+{
     
-    
+    $data = DB::table('tab_archivo_completos')
+        ->join('cat_almacenes', 'tab_archivo_completos.almacen', '=', 'cat_almacenes.clave_almacen')
+        ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
+        ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
+        ->select(
+            'tab_archivo_completos.material',
+            'tab_archivo_completos.texto_breve_material',
+            'cat_almacenes.id AS id_almacen',
+            'cat_unidad_medidas.id AS id_unidad_medidas',
+            'cat_gpo_familias.id AS id_gpo_familias'
+        )
+        ->get();
 
+
+    foreach ($data as $row) {
+        $exists = DB::table('cat_productos')
+            ->where('clave_producto', $row->material)
+            ->where('descripcion_producto_material', $row->texto_breve_material)
+            ->exists();
+
+        if (!$exists) {
+            DB::table('cat_productos')->insert([
+                'clave_producto' => $row->material,
+                'descripcion_producto_material' => $row->texto_breve_material,
+                'id_cat_almacenes' => $row->id_almacen,
+                'id_unidad_medida' => $row->id_unidad_medidas,
+                'id_gpo_familia' => $row->id_gpo_familias,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'habilitado' => true,
+            ]);
+        }
+    }
+
+    return response()->json([
+        'message' => 'Datos insertados correctamente en la tabla cat_productos.',
+        'success' => true,
+    ]);
 }
 }

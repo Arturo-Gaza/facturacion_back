@@ -208,7 +208,7 @@ class cargaArchivoController extends Controller
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public function cargarArchivoCompleto(Request $request)
     {
-        // Ruta al archivo
+       
         $file_csv = $request->file('csv_file')->getRealPath();
 
         $handle = fopen($file_csv, 'r');
@@ -218,7 +218,7 @@ class cargaArchivoController extends Controller
         $csv = Reader::createFromStream($handle);
         $csv->setHeaderOffset(0);
 
-        // Verificar el número de columnas
+        
         $encabezado = $csv->getHeader();
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {

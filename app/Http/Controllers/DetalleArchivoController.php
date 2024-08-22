@@ -178,11 +178,11 @@ class DetalleArchivoController extends Controller
         $detalleArchivo->id_usuario = $request->input('id_users') ? (int) $request->input('id_users') : null;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
-        $detalleArchivo->reg_VoBo = $VoBo;
+        $detalleArchivo->reg_vobo = $VoBo;
         $detalleArchivo->reg_excluidos = 0;
-        $detalleArchivo->reg_incorporar = $agregar;
-        $detalleArchivo->Reg_total = $total;
-        $detalleArchivo->num_conteo = $request->input('num_conteo'); 
+        $detalleArchivo->reg_incorpora = $agregar;
+        $detalleArchivo->Reg_a_Contar = $total;
+        $detalleArchivo->conteo = $request->input('num_conteo'); 
         $detalleArchivo->id_estatus = (int) $request->input('id_estatus');
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
