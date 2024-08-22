@@ -53,7 +53,7 @@ class DetalleArchivoController extends Controller
         }
 
         // Comparación de la primera columna
-        $nombreColumna = 0; 
+        $nombreColumna = 0;
         $columnaComparar = [];
         foreach ($records as $record) {
             $record = array_values($record);
@@ -61,11 +61,11 @@ class DetalleArchivoController extends Controller
                 $columnaComparar[] = $record[$nombreColumna];
             }
         }
-        
+
         $columnaComparar = array_unique($columnaComparar);
-        $tableName = 'cat_almacenes'; 
-        $columnCompara = 'clave_almacen'; 
-        
+        $tableName = 'cat_almacenes';
+        $columnCompara = 'clave_almacen';
+
         $datoNoEncontrado = [];
         foreach ($columnaComparar as $value) {
             $existente = DB::table($tableName)->where($columnCompara, $value)->exists();
@@ -73,11 +73,11 @@ class DetalleArchivoController extends Controller
                 $datoNoEncontrado[] = $value;
             }
         }
-        
+
         $numDatosNoEncontrados = count($datoNoEncontrado);
 
         // Comparación de la tercera columna
-        $numColumna3 = 3; 
+        $numColumna3 = 3;
         $columnaComparar3 = [];
         foreach ($records as $record) {
             $record = array_values($record);
@@ -85,23 +85,23 @@ class DetalleArchivoController extends Controller
                 $columnaComparar3[] = $record[$numColumna3];
             }
         }
-        
+
         $columnaComparar3 = array_unique($columnaComparar3);
-        $tableCatUME = 'cat_unidad_medidas'; 
-        $columnCompara3 = 'clave_unidad_medida'; 
-        
-        $datoNoEncontrado3 = []; 
+        $tableCatUME = 'cat_unidad_medidas';
+        $columnCompara3 = 'clave_unidad_medida';
+
+        $datoNoEncontrado3 = [];
         foreach ($columnaComparar3 as $value) {
             $existente = DB::table($tableCatUME)->where($columnCompara3, $value)->exists();
             if (!$existente) {
                 $datoNoEncontrado3[] = $value;
             }
         }
-        
+
         $numDatosNoEncontrados3 = count($datoNoEncontrado3);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $numColumna4 = 4; 
+        $numColumna4 = 4;
         $columnaComparar4 = [];
         foreach ($records as $record) {
             $record = array_values($record);
@@ -109,37 +109,37 @@ class DetalleArchivoController extends Controller
                 $columnaComparar4[] = $record[$numColumna4];
             }
         }
-        
+
         $columnaComparar4 = array_unique($columnaComparar4);
-        $tableCatGpo = 'cat_gpo_familias'; 
-        $columnCompara4 = 'clave_gpo_familia'; 
-        
-        $datoNoEncontrado4 = []; 
+        $tableCatGpo = 'cat_gpo_familias';
+        $columnCompara4 = 'clave_gpo_familia';
+
+        $datoNoEncontrado4 = [];
         foreach ($columnaComparar4 as $value) {
             $existente = DB::table($tableCatGpo)->where($columnCompara4, $value)->exists();
             if (!$existente) {
                 $datoNoEncontrado4[] = $value;
             }
         }
-        
+
         $numDatosNoEncontrados4 = count($datoNoEncontrado4);
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $numColumna2 = 2; 
+        $numColumna2 = 2;
         $columnaComparar2 = [];
-        
+
         foreach ($records as $record) {
             $record = array_values($record);
             if (!empty($record[$numColumna2])) {
                 $columnaComparar2[] = mb_convert_encoding($record[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             }
         }
-        
+
         $columnaComparar2 = array_unique($columnaComparar2);
-        $tableCatProducto = 'cat_productos'; 
-        $columnCompara2 = 'descripcion_producto_material'; 
-        
-        $datoNoEncontrado2 = []; 
+        $tableCatProducto = 'cat_productos';
+        $columnCompara2 = 'descripcion_producto_material';
+
+        $datoNoEncontrado2 = [];
         foreach ($columnaComparar2 as $value) {
             $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
@@ -147,15 +147,15 @@ class DetalleArchivoController extends Controller
                 $datoNoEncontrado2[] = $value;
             }
         }
-        
+
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-       
+
         $agregar = $numDatosNoEncontrados + $numDatosNoEncontrados2 + $numDatosNoEncontrados3 + $numDatosNoEncontrados4;
         $VoBo = ($conteo - $agregar) + $conteo;
         $total = $conteo - 0;
 
-     
+
         $ultimaCarga = DB::table('tab_detalle_cargas')
             ->select('cve_carga')
             ->orderBy('id', 'desc')
@@ -169,27 +169,27 @@ class DetalleArchivoController extends Controller
             $nuevaCveCarga = 'AT-CA-0001';
         }
 
-        
+
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
         $detalleArchivo->fecha_asignacion = $request->input('fecha_asignacion') ? \Carbon\Carbon::parse($request->input('fecha_asignacion')) : now();
         $detalleArchivo->fecha_inicio_conteo = $request->input('fecha_inicio_conteo') ? \Carbon\Carbon::parse($request->input('fecha_inicio_conteo')) : null;
         $detalleArchivo->fecha_fin_conteo = $request->input('fecha_fin_conteo') ? \Carbon\Carbon::parse($request->input('fecha_fin_conteo')) : null;
-        $detalleArchivo->id_usuario = $request->input('id_users') ? (int) $request->input('id_users') : null;
+        $detalleArchivo->id_usuario = null;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
         $detalleArchivo->reg_excluidos = 0;
         $detalleArchivo->reg_incorpora = $agregar;
         $detalleArchivo->Reg_a_Contar = $total;
-        $detalleArchivo->conteo = $request->input('num_conteo'); 
-        $detalleArchivo->id_estatus = (int) $request->input('id_estatus');
+        $detalleArchivo->conteo = $request->input('num_conteo');
+        $detalleArchivo->id_estatus = 1;
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
-        
+
         $detalleArchivo->save();
 
         return response()->json(['success' => true, 'message' => 'Datos guardados correctamente']);
-        
+
     }
 }

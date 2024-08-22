@@ -26,8 +26,8 @@ return new class extends Migration
             $table->integer('reg_incorpora')->nullable();
             $table->text('observaciones')->nullable();
             $table->boolean('habilitado');
-            $table->foreignId('id_estatus')->constrained('cat_estatuses');
-            $table->foreignId('id_usuario')->constrained('users');
+            $table->foreignId('id_estatus')->nullable()->constrained('cat_estatuses');
+            $table->foreignId('id_usuario')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

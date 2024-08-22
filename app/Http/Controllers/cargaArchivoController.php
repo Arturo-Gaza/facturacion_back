@@ -163,7 +163,7 @@ class cargaArchivoController extends Controller
             $record = array_values($record);
             if (!empty($record[$nombreColumna5])) {
                 $columnaComparar5[] = $record[$nombreColumna5];
-                $columnaProductosAll[] = $record[$nombreColumna5]." - ".$record[2] ;
+                $columnaProductosAll[] = $record[$nombreColumna5] . " - " . $record[2];
             }
         }
 
@@ -206,7 +206,7 @@ class cargaArchivoController extends Controller
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public function cargarArchivoCompleto(Request $request)
     {
-       
+
         $file_csv = $request->file('csv_file')->getRealPath();
 
         $handle = fopen($file_csv, 'r');
@@ -216,7 +216,7 @@ class cargaArchivoController extends Controller
         $csv = Reader::createFromStream($handle);
         $csv->setHeaderOffset(0);
 
-        
+
         $encabezado = $csv->getHeader();
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
@@ -232,27 +232,28 @@ class cargaArchivoController extends Controller
 
 
         foreach ($csv->getRecords() as $record) {
+            $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([
                 'id_detalle_carga' => $claveCarga,
-                'almacen' => trim($record[0]),
-                'material' => trim($record[1]),
-                'texto_breve_material' => mb_convert_encoding(trim($record[2]), 'UTF-8', 'ISO-8859-1'),
-                'ume' => trim($record[3]),
-                'grupo_articulos' => mb_convert_encoding(trim($record[4]), 'UTF-8', 'ISO-8859-1'),
-                'libre_utilizacion' => $this->limpiarFormatoMoneda(trim($record[5])),
-                'en_control_calidad' =>  $this->limpiarFormatoMoneda(trim($record[6])),
-                'bloqueado' =>  $this->limpiarFormatoMoneda(trim($record[7])),
-                'valor_libre_util' => $this->limpiarFormatoMoneda(trim($record[8])),
-                'valor_insp_cal' =>  $this->limpiarFormatoMoneda(trim($record[9])),
-                'valor_stock_bloq' =>  $this->limpiarFormatoMoneda(trim($record[10])),
-                'cantidad_total' =>  $this->limpiarFormatoMoneda(trim($record[11])),
-                'importe_unitario' => $this->limpiarFormatoMoneda(trim($record[12])),
-                'importe_total' =>  $this->limpiarFormatoMoneda(trim($record[13])),
+                'almacen' => $record[0],
+                'material' => $record[1],
+                'texto_breve_material' => $record[2],
+                'ume' => $record[3],
+                'grupo_articulos' => $record[4],
+                'libre_utilizacion' => $record[5],
+                'en_control_calidad' =>  $record[6],
+                'bloqueado' =>  $record[7],
+                'valor_libre_util' => $record[8],
+                'valor_insp_cal' =>  $record[9],
+                'valor_stock_bloq' =>  $record[10],
+                'cantidad_total' =>  $record[11],
+                'importe_unitario' => $record[12],
+                'importe_total' =>  $record[13],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         }
-       
+
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
