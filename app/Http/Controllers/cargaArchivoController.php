@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class cargaArchivoController extends Controller
 {
@@ -236,7 +235,8 @@ class cargaArchivoController extends Controller
 
         foreach ($csv->getRecords() as $record) {
             DB::table('tab_archivo_completos')->insert([
-                'clave_almacen' => trim($record['Almacén']),
+                'id_detalle_carga' => $claveCarga,
+                'almacen' => trim($record['Almacén']),
                 'material' => trim($record['Material']),
                 'texto_breve_material' => mb_convert_encoding(trim($record['Texto breve de material']), 'UTF-8', 'ISO-8859-1'),
                 'ume' => trim($record['UME']),
@@ -254,7 +254,7 @@ class cargaArchivoController extends Controller
                 'updated_at' => now(),
             ]);
         }
-        $this->insertarDatosSiNoExisten();
+       
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,55 +265,4 @@ class cargaArchivoController extends Controller
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public function insertarDatosSiNoExisten()
-    {
-        $datos = DB::table('tab_archivo_completos')
-            ->join('cat_almacenes', 'tab_archivo_completos.clave_almacen', '=', 'cat_almacenes.clave_almacen')
-            ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
-            ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
-            ->select(
-                'tab_archivo_completos.material AS clave_producto',
-                'tab_archivo_completos.texto_breve_material AS descripcion_producto_material',
-                'cat_almacenes.id AS id_cat_almacenes',
-                'cat_unidad_medidas.id AS id_unidad_medida',
-                'cat_gpo_familias.id AS id_gpo_familia'
-            )
-            ->distinct()
-            ->get();
-
-
-        $datosInsertados = [];
-
-
-        foreach ($datos as $dato) {
-            $existe = DB::table('cat_productos')
-                ->where('clave_producto', $dato->clave_producto)
-                ->where('descripcion_producto_material', $dato->descripcion_producto_material)
-                ->where('id_cat_almacenes', $dato->id_cat_almacenes)
-                ->where('id_unidad_medida', $dato->id_unidad_medida)
-                ->where('id_gpo_familia', $dato->id_gpo_familia)
-                ->exists();
-
-
-            if (!$existe) {
-                DB::table('cat_productos')->insert([
-                    'clave_producto' => $dato->clave_producto,
-                    'descripcion_producto_material' => $dato->descripcion_producto_material,
-                    'id_cat_almacenes' => $dato->id_cat_almacenes,
-                    'id_unidad_medida' => $dato->id_unidad_medida,
-                    'id_gpo_familia' => $dato->id_gpo_familia,
-                    'habilitado' => true,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-
-
-                $datosInsertados[] = $dato;
-                Log::info('Dato insertado: ', (array) $dato);
-            }
-        }
-
-
-        return response()->json($datosInsertados);
-    }
 }
