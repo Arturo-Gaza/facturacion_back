@@ -12,7 +12,7 @@ class DetalleArchivoController extends Controller
 {
     protected $nombreArchivoCSV = 'archivoCargado.csv';
 
-    public function detalleArchivo(Request $request)
+    public function detalleArchivo(Request $request, $idUser)
     {
         if ($request->hasFile('csv_file')) {
             $archivo = $request->file('csv_file');
@@ -172,14 +172,14 @@ class DetalleArchivoController extends Controller
 
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
-        $detalleArchivo->id_usuario = null;
+        $detalleArchivo->id_usuario = $idUser;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
         $detalleArchivo->reg_excluidos = 0;
         $detalleArchivo->reg_incorpora = $agregar;
         $detalleArchivo->Reg_a_Contar = $total;
-        $detalleArchivo->conteo = $request->input('num_conteo');
+        $detalleArchivo->conteo = 0;
         $detalleArchivo->id_estatus = 1;
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
