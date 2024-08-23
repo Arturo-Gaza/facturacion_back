@@ -19,15 +19,15 @@ return new class extends Migration
             $table->string('texto_breve_material');
             $table->string('ume');
             $table->string('grupo_articulos');
-            $table->decimal('libre_utilizacion', 10, 2);
-            $table->decimal('en_control_calidad', 10, 2);
-            $table->decimal('bloqueado', 10, 2);
-            $table->decimal('valor_libre_util', 10, 2);
-            $table->decimal('valor_insp_cal', 10, 2);
-            $table->decimal('valor_stock_bloq', 10, 2);
-            $table->decimal('cantidad_total', 10, 2);
-            $table->decimal('importe_unitario', 10, 2);
-            $table->decimal('importe_total', 10, 2);
+            $table->string('libre_utilizacion', 15);
+            $table->string('en_control_calidad', 15);
+            $table->string('bloqueado', 15);
+            $table->string('valor_libre_util', 15);
+            $table->string('valor_insp_cal', 15);
+            $table->string('valor_stock_bloq', 15);
+            $table->string('cantidad_total', 15);
+            $table->string('importe_unitario', 15);
+            $table->string('importe_total', 15);
             $table->timestamps();
         });
     }

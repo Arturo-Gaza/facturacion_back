@@ -86,6 +86,7 @@ class InsertarFaltantesCatController extends Controller
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna3 = 4;
+        $records = $csv->getRecords();
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -111,6 +112,7 @@ class InsertarFaltantesCatController extends Controller
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna4 = 2;
+        $records = $csv->getRecords();
         $columnaComparar4 = [];
 
         foreach ($records as $record) {
@@ -122,12 +124,12 @@ class InsertarFaltantesCatController extends Controller
 
         $columnaComparar4 = array_unique($columnaComparar4);
 
-        $tableproducto = 'cat_productos';
+        $tableproducto1 = 'cat_productos';
         $columnaCampara4 = 'descripcion_producto_material';
 
         $datoNoEncontrado4 = [];
         foreach ($columnaComparar4 as $value) {
-            $existente = DB::table($tableproducto)->where($columnaCampara4, $value)->exists();
+            $existente = DB::table($tableproducto1)->where($columnaCampara4, $value)->exists();
             if (!$existente) {
                 $datoNoEncontrado4[] = $value;
             }
@@ -135,6 +137,7 @@ class InsertarFaltantesCatController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna5 = 1;
+        $records = $csv->getRecords();
         $columnaComparar5 = [];
 
         foreach ($records as $record) {
@@ -161,7 +164,7 @@ class InsertarFaltantesCatController extends Controller
         $this->insertTabAlmacenes($datoNoEncontrado);
         $this->insertTabUniMedidas($datoNoEncontrado2);
         $this->insetarTabGrupoFam($datoNoEncontrado3);
-        $this->insertTabProductos($datoNoEncontrado4, $datoNoEncontrado5);
+        //$this->insertTabProductos($datoNoEncontrado4, $datoNoEncontrado5);
         $this->insertCatProductos();
 
         return response()->json([
@@ -255,27 +258,25 @@ class InsertarFaltantesCatController extends Controller
             ];
         }
 
-        DB::table('cat_materiales')->insert($insertData);
+        DB::table('cat_produtos')->insert($insertData);
     }
 
     ///////////////////////////////////////////////////////Insertar productos///////////////////////////////////////////////
     public function insertCatProductos()
 {
-    
     $data = DB::table('tab_archivo_completos')
-        ->join('cat_almacenes', 'tab_archivo_completos.almacen', '=', 'cat_almacenes.clave_almacen')
-        ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
-        ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
-        ->select(
-            'tab_archivo_completos.material',
-            'tab_archivo_completos.texto_breve_material',
-            'cat_almacenes.id AS id_almacen',
-            'cat_unidad_medidas.id AS id_unidad_medidas',
-            'cat_gpo_familias.id AS id_gpo_familias'
-        )
-        ->get();
-
-
+    ->join('cat_almacenes', 'tab_archivo_completos.almacen', '=', 'cat_almacenes.clave_almacen')
+    ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
+    ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
+    ->select(
+        'tab_archivo_completos.material',
+        'tab_archivo_completos.texto_breve_material',
+        'cat_almacenes.id AS id_almacen',
+        'cat_unidad_medidas.id AS id_unidad_medidas',
+        'cat_gpo_familias.id AS id_gpo_familias'
+    )
+    ->get();
+    
     foreach ($data as $row) {
         $exists = DB::table('cat_productos')
             ->where('clave_producto', $row->material)
@@ -300,5 +301,6 @@ class InsertarFaltantesCatController extends Controller
         'message' => 'Datos insertados correctamente en la tabla cat_productos.',
         'success' => true,
     ]);
+        
 }
 }
