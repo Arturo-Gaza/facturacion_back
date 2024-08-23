@@ -48,11 +48,6 @@ class StoreTabArchivoDetalleRequest extends FormRequest
             'cve_carga.required' => 'La clave de carga es obligatoria.',
             'cve_carga.string' => 'La clave de carga debe ser una cadena de texto.',
             'cve_carga.max' => 'La clave de carga no debe exceder los 10 caracteres.',
-
-            'fecha_asignacion.date' => 'La fecha de asignación debe ser una fecha válida.',
-            'fecha_inicio_conteo.date' => 'La fecha de inicio del conteo debe ser una fecha válida.',
-            'fecha_fin_conteo.date' => 'La fecha de fin del conteo debe ser una fecha válida.',
-
             'conteo.integer' => 'El conteo debe ser un número entero.',
 
             'nombre_archivo.required' => 'El nombre del archivo es obligatorio.',

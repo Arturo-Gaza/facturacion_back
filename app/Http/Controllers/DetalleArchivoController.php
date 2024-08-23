@@ -172,9 +172,6 @@ class DetalleArchivoController extends Controller
 
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
-        $detalleArchivo->fecha_asignacion = $request->input('fecha_asignacion') ? \Carbon\Carbon::parse($request->input('fecha_asignacion')) : now();
-        $detalleArchivo->fecha_inicio_conteo = $request->input('fecha_inicio_conteo') ? \Carbon\Carbon::parse($request->input('fecha_inicio_conteo')) : null;
-        $detalleArchivo->fecha_fin_conteo = $request->input('fecha_fin_conteo') ? \Carbon\Carbon::parse($request->input('fecha_fin_conteo')) : null;
         $detalleArchivo->id_usuario = null;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;

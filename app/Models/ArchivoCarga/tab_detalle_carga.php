@@ -11,9 +11,6 @@ class tab_detalle_carga extends Model
     protected $table = 'tab_detalle_cargas';
     protected $fillable = [
         'cve_carga',
-        'fecha_asignacion',
-        'fecha_inicio_conteo',
-        'fecha_fin_conteo',
         'conteo',
         'nombre_archivo',
         'id_usuario',

@@ -46,9 +46,6 @@ class TabDetalleCargaController extends Controller
         try {
             $data = [
                 'cve_carga' => $request->cve_carga,
-                'fecha_asignacion' => $request->fecha_asignacion,
-                'fecha_inicio_conteo' => $request->fecha_inicio_conteo,
-                'fecha_fin_conteo' => $request->fecha_fin_conteo,
                 'conteo' => $request->conteo,
                 'nombre_archivo' => $request->nombre_archivo,
                 'id_usuario' => $request->id_usuario,
@@ -77,9 +74,6 @@ class TabDetalleCargaController extends Controller
         try {
             $data = [
                 'cve_carga' => $request->cve_carga,
-                'fecha_asignacion' => $request->fecha_asignacion,
-                'fecha_inicio_conteo' => $request->fecha_inicio_conteo,
-                'fecha_fin_conteo' => $request->fecha_fin_conteo,
                 'conteo' => $request->conteo,
                 'nombre_archivo' => $request->nombre_archivo,
                 'id_usuario' => $request->id_usuario,

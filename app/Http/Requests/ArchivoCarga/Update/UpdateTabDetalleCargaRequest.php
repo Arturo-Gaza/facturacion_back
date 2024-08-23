@@ -22,9 +22,6 @@ class UpdateTabDetalleCargaRequest extends FormRequest
     {
         return [
             'cve_carga' => 'required|string|max:10',
-            'fecha_asignacion' => 'nullable|date',
-            'fecha_inicio_conteo' => 'nullable|date',
-            'fecha_fin_conteo' => 'nullable|date',
             'conteo' => 'nullable|integer',
             'nombre_archivo' => 'required|string|max:255',
             'id_usuario' => 'required|exists:users,id',
@@ -44,10 +41,6 @@ class UpdateTabDetalleCargaRequest extends FormRequest
             'cve_carga.required' => 'La clave de carga es obligatoria.',
             'cve_carga.string' => 'La clave de carga debe ser una cadena de texto.',
             'cve_carga.max' => 'La clave de carga no debe exceder los 10 caracteres.',
-
-            'fecha_asignacion.date' => 'La fecha de asignación debe ser una fecha válida.',
-            'fecha_inicio_conteo.date' => 'La fecha de inicio del conteo debe ser una fecha válida.',
-            'fecha_fin_conteo.date' => 'La fecha de fin del conteo debe ser una fecha válida.',
 
             'conteo.integer' => 'El conteo debe ser un número entero.',
 

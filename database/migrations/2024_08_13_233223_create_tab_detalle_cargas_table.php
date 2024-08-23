@@ -14,9 +14,6 @@ return new class extends Migration
         Schema::create('tab_detalle_cargas', function (Blueprint $table) {
             $table->id();
             $table->string('cve_carga');
-            $table->date('fecha_asignacion')->nullable();
-            $table->date('fecha_inicio_conteo')->nullable();
-            $table->date('fecha_fin_conteo')->nullable();
             $table->integer('conteo')->nullable();
             $table->string('nombre_archivo');
             $table->integer('Reg_Archivo')->nullable();
