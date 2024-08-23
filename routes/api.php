@@ -6,6 +6,7 @@ use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoCompletoController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
+use App\Http\Controllers\AsignacionCarga\TabAsignacionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
@@ -36,13 +37,6 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 
 Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
-
-Route::post('/detalleArchivo', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
-Route::post('/cargarArchivoCompleto', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
-Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']); //INSERTAR PRODUCTOS_2
-
-
-
 
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
@@ -104,6 +98,12 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('TabConteo/register', [TabConteoController::class, 'store']);
     Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
     Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
+
+    //Rutas Tabla Asignacion
+    Route::get('TabAsignacion/getById/{id}', [TabAsignacionController::class, 'getById']);
+    Route::post('TabAsignacion/register', [TabAsignacionController::class, 'store']);
+    Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
+    Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
 
     Route::post('/detalleArchivo', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
     Route::post('/cargarArchivoCompleto', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
