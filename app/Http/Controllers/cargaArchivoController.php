@@ -289,7 +289,7 @@ class cargaArchivoController extends Controller
 
         DB::table('tab_detalle_archivos')->insert($datosArray);
 
-        DB::table('tab_archivo_completos')->delete();
+       // DB::table('tab_archivo_completos')->delete();
 
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
