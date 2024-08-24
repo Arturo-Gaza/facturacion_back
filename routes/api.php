@@ -106,7 +106,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
 
     Route::post('/detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
-    Route::post('/cargarArchivoCompleto', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
+    Route::post('/cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
     Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']); //INSERTAR PRODUCTOS_2
 
 

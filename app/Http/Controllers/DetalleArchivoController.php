@@ -186,7 +186,7 @@ class DetalleArchivoController extends Controller
 
         $detalleArchivo->save();
 
-        return response()->json(['success' => true, 'message' => 'Datos guardados correctamente']);
+        return response()->json(['success' => true, 'message' => 'Datos guardados correctamente', 'data' => $detalleArchivo], 200);
 
     }
 }
