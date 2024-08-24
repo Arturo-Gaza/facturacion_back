@@ -15,6 +15,7 @@ use App\Http\Controllers\Catalogos\CatProductosController;
 use App\Http\Controllers\Catalogos\CatRolesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\DetalleArchivoController;
+use App\Http\Controllers\noInsertarFaltantesController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\ArchivoCarga\tab_detalle_carga;
@@ -38,6 +39,7 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
 
+Route::post('/noInsertarFaltantes',[noInsertarFaltantesController::class, 'detalleArchivo']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
