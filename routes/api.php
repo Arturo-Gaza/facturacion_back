@@ -117,4 +117,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
     Route::post('nombreArchivoExi', [cargaArchivoController::class, 'archivoRepetido']);
+
+    Route::get('usuario/getAllUserAlmacen/{idCarga}', [UsuarioController::class, 'getAllUserAlmacen']);
+    Route::get('usuario/getAllUserAsignado/{idCarga}', [UsuarioController::class, 'getAllUserAsignado']);
 });

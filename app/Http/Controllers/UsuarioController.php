@@ -22,6 +22,26 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
 
+    public function getAllUserAlmacen($idCarga)
+    {
+        try {
+            $getAllUserAlmacen = $this->usuario->getAllUserAlmacen($idCarga);
+            return ApiResponseHelper::sendResponse($getAllUserAlmacen, 'Usuarios obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
+    public function getAllUserAsignado($idCarga)
+    {
+        try {
+            $getAllUserAsignado = $this->usuario->getAllUserAsignado($idCarga);
+            return ApiResponseHelper::sendResponse($getAllUserAsignado, 'Usuarios obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
     public function getById($id)
     {
         try {

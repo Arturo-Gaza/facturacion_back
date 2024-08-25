@@ -3,20 +3,82 @@
 namespace App\Repositories\Usuario;
 
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
+use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\User;
 use App\Models\UserSistema;
 use App\Models\UsuarioRol;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioRepository implements UsuarioRepositoryInterface
 {
     public function getAll()
     {
-        $usuario = User::select('users.id', 'users.user', 'users.name', 'users.apellidoP', 'users.apellidoM', 'users.email', 'users.idRol','users.habilitado', 'cat_roles.nombre')
+        $usuario = User::select('users.id', 'users.user', 'users.name', 'users.apellidoP', 'users.apellidoM', 'users.email', 'users.idRol', 'users.habilitado', 'cat_roles.nombre')
             ->join('cat_roles', 'cat_roles.id', '=', 'users.idRol')->get();
         return $usuario;
-
     }
+
+    public function getAllUserAlmacen($idCarga)
+    {
+        $usuario = User::select(
+            'users.id',
+            'users.user',
+            'users.name',
+            'users.apellidoP',
+            'users.apellidoM',
+            'users.email',
+            'users.idRol',
+            'users.habilitado',
+        )
+            ->leftJoin('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
+            ->where(function ($query) use ($idCarga) {
+                $query->where('tab_asignacions.id_usuario', null)
+                    ->orWhere('tab_asignacions.habilitado', 0)
+                    ->orWhere('tab_asignacions.id_carga', '!=', $idCarga);
+            })
+            ->groupBy('users.id')
+            ->get()->filter(function ($user) {
+                return $user->idRol == 2;
+            });
+
+        $results = array();
+        foreach ($usuario as $val) {
+            $results[] = $val;
+        }
+
+        return $results;
+    }
+
+    public function getAllUserAsignado($idCarga)
+    {
+        $usuario = User::select(
+            'users.id',
+            'users.user',
+            'users.name',
+            'users.apellidoP',
+            'users.apellidoM',
+            'users.email',
+            'users.idRol',
+            'users.habilitado',
+            'tab_asignacions.habilitado AS asigHabilitado',
+        )
+            ->join('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
+            ->orWhere('tab_asignacions.id_carga', '=', $idCarga)
+            ->groupBy('users.id')
+            ->groupBy('tab_asignacions.habilitado')
+            ->get()->filter(function ($user) {
+                return $user->asigHabilitado == 1 && $user->idRol == 2;
+            });
+
+        $results = array();
+        foreach ($usuario as $val) {
+            $results[] = $val;
+        }
+
+        return $results;
+    }
+
 
     public function getByID($id): ?User
     {
