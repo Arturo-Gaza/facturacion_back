@@ -35,11 +35,7 @@ Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'ge
 Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
 
 //Ruta para insertar datos faltantes
-
-Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
-
-Route::post('/noInsertarFaltantes',[noInsertarFaltantesController::class, 'detalleArchivo']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
@@ -107,10 +103,12 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
 
-    Route::post('/detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
-    Route::post('/cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
+    Route::post('detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
+    Route::post('cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
     Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']); //INSERTAR PRODUCTOS_2
+    Route::post('noInsertarFaltantes/{idUser}',[noInsertarFaltantesController::class, 'detalleArchivo']);
 
-
+    Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
+    Route::post('nombreArchivoExi', [cargaArchivoController::class, 'archivoRepetido']);
 
 });

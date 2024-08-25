@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
 
@@ -316,5 +317,20 @@ class cargaArchivoController extends Controller
                 DB::raw('true as habilitado')
             )
             ->get();
+    }
+
+
+    public function archivoRepetido(Request $nameArchivo)
+    {
+        $nameArchivo = $nameArchivo->name;
+        $tabledetalle = 'tab_detalle_cargas';
+        $columnaCampara3 = 'nombre_archivo';
+
+        $existente = DB::table($tabledetalle)->where($columnaCampara3, $nameArchivo)->exists();
+        if (!$existente) {
+            return response()->json(['message' => 'El nombre archivo no existe'], 201);
+        } else {
+            return response()->json(['message' => 'El nombre archivo ya existe'], 422);
+        }
     }
 }

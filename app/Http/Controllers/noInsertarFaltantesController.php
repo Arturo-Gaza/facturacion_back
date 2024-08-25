@@ -12,7 +12,7 @@ class noInsertarFaltantesController extends Controller
 {
     protected $nombreArchivoCSV = 'archivoCargado.csv';
 
-    public function detalleArchivo(Request $request)
+    public function detalleArchivo(Request $request, $idUser)
     {
         if ($request->hasFile('csv_file')) {
             $archivo = $request->file('csv_file');
@@ -172,7 +172,7 @@ class noInsertarFaltantesController extends Controller
 
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
-        $detalleArchivo->id_usuario = 1;
+        $detalleArchivo->id_usuario = $idUser;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
@@ -185,23 +185,16 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->habilitado = $request->input('habilitado', true);
 
         $detalleArchivo->save();
-        $this->cargarArchivoCompleto($request);
+        $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public function obtenerNuevoId()
-    {
-        $ultimoId = DB::table('tab_detalle_cargas')
-            ->orderBy('id', 'desc')
-            ->value('id');
 
-        return $ultimoId;
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public function cargarArchivoCompleto(Request $request)
+    public function cargarArchivoCompleto(Request $request, $detalleArchivo)
     {
 
         $file_csv = $request->file('csv_file')->getRealPath();
@@ -225,13 +218,12 @@ class noInsertarFaltantesController extends Controller
             ], 422);
         }
 
-        $claveCarga = $this->obtenerNuevoId();
 
         foreach ($csv->getRecords() as $record) {
 
             $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([
-                'id_detalle_carga' => $claveCarga,
+                'id_detalle_carga' => $detalleArchivo->id,
                 'almacen' => $record[0],
                 'material' => $record[1],
                 'texto_breve_material' => $record[2],
