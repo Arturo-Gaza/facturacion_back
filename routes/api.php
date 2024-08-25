@@ -4,6 +4,7 @@ use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
 use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
 use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
+use App\Http\Controllers\ArchivoCarga\TabObservacionesController;
 use App\Http\Controllers\ArchivoCompletoController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AsignacionCarga\TabAsignacionController;
@@ -36,6 +37,12 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 
 //Ruta para insertar datos faltantes
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
+
+//Ruta para tabla Observaciones
+Route::get('tabObsercaiones/getAll', [TabObservacionesController::class, 'getAll']);
+Route::get('tabObsercaiones/getById/{id}', [TabObservacionesController::class, 'getById']);
+Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
+Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
@@ -106,9 +113,8 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
     Route::post('cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
     Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']); //INSERTAR PRODUCTOS_2
-    Route::post('noInsertarFaltantes/{idUser}',[noInsertarFaltantesController::class, 'detalleArchivo']);
+    Route::post('noInsertarFaltantes/{idUser}', [noInsertarFaltantesController::class, 'detalleArchivo']);
 
     Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
     Route::post('nombreArchivoExi', [cargaArchivoController::class, 'archivoRepetido']);
-
 });
