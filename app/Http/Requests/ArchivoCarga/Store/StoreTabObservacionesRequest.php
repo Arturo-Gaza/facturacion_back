@@ -25,7 +25,7 @@ class StoreTabObservacionesRequest extends FormRequest
     {
         return [
             'id_usuario' => 'required|exists:users,id',
-            'id_detalle_carga' => 'required|exists:tab_detalle_carga,id',
+            'id_detalle_carga' => 'required|exists:tab_detalle_cargas,id',
             'observaciones' => 'nullable|string',
         ];
     }
