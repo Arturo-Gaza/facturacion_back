@@ -26,7 +26,8 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-
+Route::get('cargaArchivo/{id}', [ObtenerCargaIdController::class, 'getByDetalleCargaId']);
+Route::put('ActualizarStatus/{id}', [ActualizarStatusController::class, 'actualizarEstatus']);
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
