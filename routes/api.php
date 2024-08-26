@@ -36,8 +36,6 @@ Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'getCargasByUsuario']);
 
-Route::get('detalleUsuario', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
-
 Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
 
 //Ruta para insertar datos faltantes
@@ -127,4 +125,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     Route::get('usuario/getAllUserAlmacen/{idCarga}', [UsuarioController::class, 'getAllUserAlmacen']);
     Route::get('usuario/getAllUserAsignado/{idCarga}', [UsuarioController::class, 'getAllUserAsignado']);
+
+    Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
 });
+
