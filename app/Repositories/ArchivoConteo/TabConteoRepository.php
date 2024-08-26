@@ -29,4 +29,12 @@ class TabConteoRepository implements TabConteoRepositoryInterface
         $tabConteo->update($data);
         return $tabConteo;
     }
+    public function storeConteoDup( $data)
+    {
+        TabConteo::insert($data->toArray());
+
+    }
+
+
+
 }

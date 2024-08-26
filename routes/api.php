@@ -106,6 +106,8 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Rutas Tabla Asignacion
     Route::get('TabAsignacion/getById/{id}', [TabAsignacionController::class, 'getById']);
+    Route::post('TabAsignacion/Asignacion', [TabAsignacionController::class, 'Asignacion']);
+    Route::post('TabAsignacion/Designacion/{idUserDesig}', [TabAsignacionController::class, 'Designacion']);
     Route::post('TabAsignacion/register', [TabAsignacionController::class, 'store']);
     Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);

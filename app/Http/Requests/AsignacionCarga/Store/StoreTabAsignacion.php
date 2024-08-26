@@ -26,7 +26,7 @@ class StoreTabAsignacion extends FormRequest
         return [
             'id_carga' => 'required|exists:tab_detalle_cargas,id',
             'id_usuario' => 'required|exists:users,id',
-            'id_estatus' => 'required|exists:cat_estatuses,id',
+            'id_estatus' => 'nullable|exists:cat_estatuses,id',
             'conteo' => 'required|integer|max:3',
             'fecha_asignacion' => 'nullable|date',
             'fecha_inicio_conteo'  => 'nullable|date',
