@@ -126,7 +126,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     //Ruta para tabla Observaciones
     Route::get('tabObsercaiones/getAll', [TabObservacionesController::class, 'getAll']);
     Route::get('tabObsercaiones/getById/{id}', [TabObservacionesController::class, 'getById']);
+    Route::get('tabObsercaiones/getByIdCarga/{idCarga}', [TabObservacionesController::class, 'getByIDCarga']);
     Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
     Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
 });
-Route::get('tabObsercaiones/getByIdCarga/{idCarga}', [TabObservacionesController::class, 'getByIDCarga']);
