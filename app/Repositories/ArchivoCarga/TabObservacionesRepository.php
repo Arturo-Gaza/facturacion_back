@@ -2,10 +2,10 @@
 
 namespace App\Repositories\ArchivoCarga;
 
-use App\Interfaces\ArchivoCarga\TabObservacionesRepositoryInterface; 
+use App\Interfaces\ArchivoCarga\TabObservacionesRepositoryInterface;
 use App\Models\ArchivoCarga\TabObservaciones;
 
-class TabObservacionesRepository implements TabObservacionesRepositoryInterface 
+class TabObservacionesRepository implements TabObservacionesRepositoryInterface
 {
     public function getAll()
     {
@@ -16,6 +16,12 @@ class TabObservacionesRepository implements TabObservacionesRepositoryInterface
     {
         return TabObservaciones::where('id', $id)->first();
     }
+
+    public function getByIDCarga($idCarga)
+    {
+        return TabObservaciones::where('id_detalle_carga', $idCarga)->get();
+    }
+
 
     public function store(array $data)
     {

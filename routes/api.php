@@ -129,3 +129,4 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
     Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
 });
+Route::get('tabObsercaiones/getByIdCarga/{idCarga}', [TabObservacionesController::class, 'getByIDCarga']);
