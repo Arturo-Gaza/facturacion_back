@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ArchivoCarga\ActualizarStatusController;
 use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
 use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
+use App\Http\Controllers\ArchivoCarga\ObtenerCargaIdController;
 use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoCarga\TabObservacionesController;
@@ -18,6 +20,7 @@ use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\DetalleArchivoController;
 use App\Http\Controllers\noInsertarFaltantesController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\UsuarioDetalleCargaController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\ArchivoCarga\tab_detalle_carga;
 use App\Models\ArchivoConteo\TabConteo;
@@ -33,6 +36,7 @@ Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'getCargasByUsuario']);
 
+Route::get('detalleUsuario', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
 
 Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
 
