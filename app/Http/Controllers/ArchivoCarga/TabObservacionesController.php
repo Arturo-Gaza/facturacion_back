@@ -47,7 +47,7 @@ class TabObservacionesController extends Controller
             $data = [
                 'id_usuario' => $request->id_usuario,
                 'id_detalle_carga' => $request->id_detalle_carga,
-                'observaciones' => $request->observaciones,
+                'observacion' => $request->observacion,
                 'habilitado' => $request->habilitado,
             ];
 
@@ -67,7 +67,7 @@ class TabObservacionesController extends Controller
             $data = [
                 'id_usuario' => $request->id_usuario,
                 'id_detalle_carga' => $request->id_detalle_carga,
-                'observaciones' => $request->observaciones,
+                'observacion' => $request->observacion,
                 'habilitado' => $request->habilitado,
             ];
             $this->_tabObservaciones->update($data, $id);

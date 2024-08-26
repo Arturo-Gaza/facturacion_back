@@ -41,11 +41,6 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 //Ruta para insertar datos faltantes
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
 
-//Ruta para tabla Observaciones
-Route::get('tabObsercaiones/getAll', [TabObservacionesController::class, 'getAll']);
-Route::get('tabObsercaiones/getById/{id}', [TabObservacionesController::class, 'getById']);
-Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
-Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
 
@@ -127,5 +122,10 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('usuario/getAllUserAsignado/{idCarga}', [UsuarioController::class, 'getAllUserAsignado']);
 
     Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
-});
 
+    //Ruta para tabla Observaciones
+    Route::get('tabObsercaiones/getAll', [TabObservacionesController::class, 'getAll']);
+    Route::get('tabObsercaiones/getById/{id}', [TabObservacionesController::class, 'getById']);
+    Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
+    Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
+});

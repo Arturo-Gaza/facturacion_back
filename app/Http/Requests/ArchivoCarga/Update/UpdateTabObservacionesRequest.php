@@ -25,7 +25,7 @@ class UpdateTabObservacionesRequest extends FormRequest
     {
         return [
             'id_usuario' => 'required|exists:users,id',
-            'id_detalle_carga' => 'required|exists:tab_detalle_carga,id',
+            'id_detalle_carga' => 'required|exists:tab_detalle_cargas,id',
             'observaciones' => 'nullable|string',
         ];
     }
@@ -33,7 +33,7 @@ class UpdateTabObservacionesRequest extends FormRequest
     public function messages(): array
     {
         return [
-           
+
             'id_usuario.required' => 'El usuario es obligatorio.',
             'id_usuario.exists' => 'El usuario seleccionado no es válido.',
 
