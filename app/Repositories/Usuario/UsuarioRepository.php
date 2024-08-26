@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserSistema;
 use App\Models\UsuarioRol;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioRepository implements UsuarioRepositoryInterface
@@ -22,6 +23,23 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function getAllUserAlmacen($idCarga)
     {
         $usuario = User::select(
+            'id',
+            'user',
+            'name',
+            'apellidoP',
+            'apellidoM',
+            'email',
+            'idRol',
+            'habilitado',
+        )
+            ->where('idRol', 2)->get();
+
+        $data1 = array();
+        foreach ($usuario as $val) {
+            $data1[] = $val;
+        }
+
+        $usuarioAsigndo = User::select(
             'users.id',
             'users.user',
             'users.name',
@@ -30,24 +48,64 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'users.email',
             'users.idRol',
             'users.habilitado',
+            'tab_asignacions.habilitado AS asigHabilitado',
         )
-            ->leftJoin('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
-            ->where(function ($query) use ($idCarga) {
-                $query->where('tab_asignacions.id_usuario', null)
-                    ->orWhere('tab_asignacions.habilitado', 0)
-                    ->orWhere('tab_asignacions.id_carga', '!=', $idCarga);
-            })
+            ->join('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
+            ->orWhere('tab_asignacions.id_carga', '=', $idCarga)
             ->groupBy('users.id')
+            ->groupBy('tab_asignacions.habilitado')
             ->get()->filter(function ($user) {
-                return $user->idRol == 2;
+                return $user->asigHabilitado == 1 && $user->idRol == 2;
             });
 
-        $results = array();
-        foreach ($usuario as $val) {
-            $results[] = $val;
+        $data2 = array();
+        foreach ($usuarioAsigndo as $val) {
+            $data2[] = $val;
         }
 
+        $idsData2 = array_column($data2, 'id');
+        $resultadoArr = array_diff($data1, array_filter($data1, function ($item) use ($idsData2) {
+            return in_array($item['id'], $idsData2);
+        }));
+
+        $results = array();
+        foreach ($resultadoArr as $val) {
+            $results[] = $val;
+        }
         return $results;
+
+        //POR SI SE OCUPA EN OTRO LADO
+        // $usuario = User::select(
+        //     'users.id',
+        //     'users.user',
+        //     'users.name',
+        //     'users.apellidoP',
+        //     'users.apellidoM',
+        //     'users.email',
+        //     'users.idRol',
+        //     'users.habilitado',
+        //     'tab_asignacions.habilitado AS habilitadoTabAsig',
+        //     'tab_asignacions.id_carga'
+        // )
+        //     ->leftJoin('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
+        //     ->where(function ($query) use ($idCarga) {
+        //         $query->where('tab_asignacions.id_usuario', null)
+        //             ->orWhere('tab_asignacions.habilitado', 0)
+        //             ->orWhere('tab_asignacions.id_carga', '!=', $idCarga);
+        //     })
+        //     ->groupBy('users.id')
+        //     ->groupBy('tab_asignacions.habilitado')
+        //     ->groupBy('tab_asignacions.id_carga')
+        //     ->get()->filter(function ($user) {
+        //         return $user->idRol == 2;
+        //     });
+
+        // $results = array();
+        // foreach ($usuario as $val) {
+        //     $results[] = $val;
+        // }
+
+        // return $results;
     }
 
     public function getAllUserAsignado($idCarga)
