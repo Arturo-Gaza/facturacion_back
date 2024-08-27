@@ -40,6 +40,7 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 
 //Ruta para insertar datos faltantes
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
+Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
 
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
