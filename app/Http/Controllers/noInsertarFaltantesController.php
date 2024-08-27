@@ -187,7 +187,7 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->save();
         $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
-        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo]);
+        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
