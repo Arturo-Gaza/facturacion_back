@@ -63,6 +63,38 @@ class TabObservacionesRepository implements TabObservacionesRepositoryInterface
         //     ->get();
     }
 
+    public function getByIDCargaIDUser($idCarga, $idUser)
+    {
+
+        $data = TabObservaciones::select(
+            'tab_observaciones.id',
+            'tab_observaciones.id_usuario',
+            'tab_detalle_cargas.cve_carga',
+            'users.name',
+            'users.apellidoP',
+            'users.apellidoM',
+            'users.user',
+            'cat_roles.nombre',
+            'tab_observaciones.observacion',
+            'tab_observaciones.habilitado',
+            'tab_observaciones.created_at',
+
+        )
+            ->join('users', 'users.id', '=', 'tab_observaciones.id_usuario')
+            ->join('tab_detalle_cargas', 'tab_detalle_cargas.id', '=', 'tab_observaciones.id_detalle_carga')
+            ->join('cat_roles', 'cat_roles.id', '=', 'users.idRol')
+            ->orWhere('tab_observaciones.id_detalle_carga', '=', $idCarga)
+            ->get()->filter(function ($user) use ($idUser) {
+                return $user->id_usuario == $idUser;
+            });
+
+        $results = array();
+        foreach ($data as $val) {
+            $results[] = $val;
+        }
+        return $results;
+    }
+
 
     public function store(array $data)
     {

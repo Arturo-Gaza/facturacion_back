@@ -7,6 +7,7 @@ interface TabObservacionesRepositoryInterface
     public function getAll();
     public function getByID($id);
     public function getByIDCarga($idCarga);
+    public function getByIDCargaIDUser($idCarga, $idUser);
     public function store(array $data);
     public function update(array $data, $id);
 }

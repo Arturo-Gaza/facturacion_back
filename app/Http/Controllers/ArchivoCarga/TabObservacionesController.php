@@ -50,6 +50,16 @@ class TabObservacionesController extends Controller
         }
     }
 
+    public function getByIDCargaIDUser($idCarga, $idUser)
+    {
+        try {
+            $getByIDCarga = $this->_tabObservaciones->getByIDCargaIDUser($idCarga, $idUser);
+            return ApiResponseHelper::sendResponse($getByIDCarga, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(StoreTabObservacionesRequest $request)
     {
         DB::beginTransaction();
