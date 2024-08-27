@@ -8,6 +8,7 @@ use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
 use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
 use App\Http\Controllers\ArchivoCarga\TabObservacionesController;
 use App\Http\Controllers\ArchivoCompletoController;
+use App\Http\Controllers\ArchivoCompletoDetalleController;
 use App\Http\Controllers\ArchivoConteo\TabConteoController;
 use App\Http\Controllers\AsignacionCarga\TabAsignacionController;
 use App\Http\Controllers\AuthController;
@@ -41,6 +42,8 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 //Ruta para insertar datos faltantes
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
 Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
+
+Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
 
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
