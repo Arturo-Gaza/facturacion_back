@@ -185,13 +185,14 @@ class ArchivoCompletoDetalleController extends Controller
         $detalleArchivo->habilitado = $request->input('habilitado', true);
 
         $detalleArchivo->save();
-        $this->cargarArchivoCompleto($request, $detalleArchivo);
-        $this->procesoInsertar($request);
+        
+        $this->procesoInsertar($request,$detalleArchivo);
+        
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
     }
 
 
-    public function procesoInsertar(Request $request)
+    public function procesoInsertar(Request $request, $detalleArchivo)
     {
 
         $file_csv = $request->file('csv_file')->getRealPath();
@@ -344,6 +345,7 @@ class ArchivoCompletoDetalleController extends Controller
         $this->insertTabAlmacenes($datoNoEncontrado);
         $this->insertTabUniMedidas($datoNoEncontrado2);
         $this->insetarTabGrupoFam($datoNoEncontrado3);
+        $this->cargarArchivoCompleto($request, $detalleArchivo);
         
 
 
@@ -474,8 +476,50 @@ class ArchivoCompletoDetalleController extends Controller
                 'updated_at' => now(),
             ]);
         }
+        $this->insertCatProductos();
         $this->insertarDetalleArchivos();
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
+    }
+
+    public function insertCatProductos()
+    {
+        $data = DB::table('tab_archivo_completos')
+            ->join('cat_almacenes', 'tab_archivo_completos.almacen', '=', 'cat_almacenes.clave_almacen')
+            ->join('cat_unidad_medidas', 'tab_archivo_completos.ume', '=', 'cat_unidad_medidas.clave_unidad_medida')
+            ->join('cat_gpo_familias', 'tab_archivo_completos.grupo_articulos', '=', 'cat_gpo_familias.clave_gpo_familia')
+            ->select(
+                'tab_archivo_completos.material',
+                'tab_archivo_completos.texto_breve_material',
+                'cat_almacenes.id AS id_almacen',
+                'cat_unidad_medidas.id AS id_unidad_medidas',
+                'cat_gpo_familias.id AS id_gpo_familias'
+            )
+            ->get();
+
+        foreach ($data as $row) {
+            $exists = DB::table('cat_productos')
+                ->where('clave_producto', $row->material)
+                ->where('descripcion_producto_material', $row->texto_breve_material)
+                ->exists();
+
+            if (!$exists) {
+                DB::table('cat_productos')->insert([
+                    'clave_producto' => $row->material,
+                    'descripcion_producto_material' => $row->texto_breve_material,
+                    'id_cat_almacenes' => $row->id_almacen,
+                    'id_unidad_medida' => $row->id_unidad_medidas,
+                    'id_gpo_familia' => $row->id_gpo_familias,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'habilitado' => true,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Datos insertados correctamente en la tabla cat_productos.',
+            'success' => true,
+        ]);
     }
 
     public function insertarDetalleArchivos()

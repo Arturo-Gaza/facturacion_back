@@ -43,7 +43,7 @@ Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArch
 Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
 Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
 
-Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
+
 
 
 Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
@@ -134,4 +134,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('tabObsercaiones/getByIdCargaIdUser/{idCarga}/{idUser}', [TabObservacionesController::class, 'getByIDCargaIDUser']);
     Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
     Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
+
+    //Ruta para insertar catalogos y cargar completas
+    Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
 });
