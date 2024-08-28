@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActualizarEstatusAsignacionController;
 use App\Http\Controllers\ArchivoCarga\ActualizarStatusController;
 use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
 use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
@@ -26,7 +27,7 @@ use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\ArchivoCarga\tab_detalle_carga;
 use App\Models\ArchivoConteo\TabConteo;
 use Illuminate\Support\Facades\Route;
-
+Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
