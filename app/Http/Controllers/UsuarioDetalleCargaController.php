@@ -26,6 +26,7 @@ class UsuarioDetalleCargaController extends Controller
             'tab_detalle_cargas.reg_vobo',
             'tab_detalle_cargas.reg_excluidos',
             'tab_detalle_cargas.reg_incorpora',
+            'tab_asignacions.id_estatus',
             'cat_estatuses.nombre as status_nombre',
             'tab_detalle_cargas.habilitado'
         )
