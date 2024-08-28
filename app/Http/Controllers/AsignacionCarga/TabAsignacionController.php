@@ -47,6 +47,16 @@ class TabAsignacionController extends Controller
         }
     }
 
+    public function getByIdCargaIdUserPer($idCarga, $idUser)
+    {
+        try {
+            $getById = $this->_tabAsignacion->getByIdCargaIdUserPer($idCarga, $idUser);
+            return ApiResponseHelper::sendResponse($getById, 'Asignacion obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(StoreTabAsignacion $tab)
     {
         DB::beginTransaction();

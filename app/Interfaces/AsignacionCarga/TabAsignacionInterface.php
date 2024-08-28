@@ -9,4 +9,5 @@ interface TabAsignacionInterface
     public function store(array $data);
     public function update(array $data, $id);
     public function getByIdCargaIdUser($idCarga, $idUser);
+    public function getByIdCargaIdUserPer($idCarga, $idUser);
 }
