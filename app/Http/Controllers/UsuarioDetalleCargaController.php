@@ -11,8 +11,8 @@ class UsuarioDetalleCargaController extends Controller
     {
         $resultados = DB::table('tab_asignacions')
         ->join('tab_detalle_cargas', 'tab_detalle_cargas.id', '=', 'tab_asignacions.id_carga')
-        ->join('cat_estatuses', 'cat_estatuses.id', '=', 'tab_detalle_cargas.id_estatus')
-        ->where('tab_asignacions.id_usuario', $idUser)  
+        ->join('cat_estatuses', 'cat_estatuses.id', '=', 'tab_asignacions.id_estatus')
+        ->where('tab_asignacions.id_usuario', $idUser)
         ->where('tab_asignacions.habilitado', true)
         ->select(
             'tab_detalle_cargas.id',

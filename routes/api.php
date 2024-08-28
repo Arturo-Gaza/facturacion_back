@@ -113,6 +113,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('TabAsignacion/register', [TabAsignacionController::class, 'store']);
     Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
+    Route::put('TabAsignacion/CerrarAll/{idCarga}', [TabAsignacionController::class, 'CerrarAll']);
 
     Route::post('detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
     Route::post('cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3

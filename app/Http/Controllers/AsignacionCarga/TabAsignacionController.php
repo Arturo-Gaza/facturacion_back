@@ -10,6 +10,7 @@ use App\Interfaces\ArchivoConteo\TabConteoRepositoryInterface;
 use App\Interfaces\AsignacionCarga\TabAsignacionInterface;
 use App\Models\ArchivoConteo\TabConteo;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -110,10 +111,10 @@ class TabAsignacionController extends Controller
                     'id_carga' => $Asignacion->id_carga,
                     'id_usuario' => $Asignacion->id_usuario,
                     'conteo' => $Asignacion->conteo,
-                    'fecha_asignacion' => $Asignacion->fecha_asignacion,
-                    'fecha_inicio_conteo' => $Asignacion->fecha_inicio_conteo,
-                    'fecha_fin_conteo' => $Asignacion->fecha_fin_conteo,
-                    'id_estatus' => $Asignacion->id_estatus,
+                    'fecha_asignacion' => Carbon::now(),
+                    'fecha_inicio_conteo' => null,
+                    'fecha_fin_conteo' => null,
+                    'id_estatus' => 6,
                     'habilitado' => $Asignacion->habilitado
                 ];
                 $asignacion = $this->_tabAsignacion->store($data);
@@ -128,6 +129,9 @@ class TabAsignacionController extends Controller
             DB::beginTransaction();
             try {
                 $data = [
+                    'fecha_inicio_conteo' => null,
+                    'fecha_fin_conteo' => null,
+                    'id_estatus' => 6,
                     'habilitado' => $Asignacion->habilitado
                 ];
                 $this->_tabAsignacion->update($data, $requesAsig->id);
@@ -160,10 +164,10 @@ class TabAsignacionController extends Controller
                     'id_carga' => $Asignacion->id_carga,
                     'id_usuario' => $Asignacion->id_usuario,
                     'conteo' => $Asignacion->conteo,
-                    'fecha_asignacion' => $Asignacion->fecha_asignacion,
-                    'fecha_inicio_conteo' => $Asignacion->fecha_inicio_conteo,
-                    'fecha_fin_conteo' => $Asignacion->fecha_fin_conteo,
-                    'id_estatus' => $Asignacion->id_estatus,
+                    'fecha_asignacion' => Carbon::now(),
+                    'fecha_inicio_conteo' => null,
+                    'fecha_fin_conteo' => null,
+                    'id_estatus' => 6,
                     'habilitado' => $Asignacion->habilitado
                 ];
                 $asignacion = $this->_tabAsignacion->store($data);
@@ -181,7 +185,11 @@ class TabAsignacionController extends Controller
             DB::beginTransaction();
             try {
                 $data = [
-                    'habilitado' => true
+                    'fecha_asignacion' => Carbon::now(),
+                    'fecha_inicio_conteo' => null,
+                    'fecha_fin_conteo' => null,
+                    'id_estatus' => 6,
+                    'habilitado' => true,
                 ];
                 $this->_tabAsignacion->update($data, $requesAsig->id);
                 $this->DesignacionUserHabilitado($idCarga, $idUserDesig);
@@ -204,6 +212,9 @@ class TabAsignacionController extends Controller
         DB::beginTransaction();
         try {
             $data = [
+                'fecha_inicio_conteo' => Carbon::now(),
+                'fecha_fin_conteo' => Carbon::now(),
+                'id_estatus' => 4,
                 'habilitado' => false
             ];
             $this->_tabAsignacion->update($data, $requesAsigDes->id);
@@ -237,5 +248,20 @@ class TabAsignacionController extends Controller
             ]);
         }
         return $getallconteo;
+    }
+
+
+    public function CerrarAll($idCarga) // este solo se va a ejecutar en la api desig
+    {
+
+        $allAsigCarga = DB::table('tab_asignacions')->where('id_carga', $idCarga)
+            ->get();
+
+        foreach ($allAsigCarga as $record) {
+            DB::table('tab_asignacions')->where('id_carga', $idCarga)->update([
+                "id_estatus" => 4,
+            ]);
+        }
+        return $allAsigCarga;
     }
 }
