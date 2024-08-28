@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_carga')->constrained('tab_detalle_cargas');
             $table->foreignId('id_usuario')->nullable()->constrained('users');
+            $table->foreignId('id_almacen')->nullable()->constrained('cat_almacenes');
+            $table->foreignId('id_unidadmedida')->nullable()->constrained('cat_unidad_medidas');
+            $table->foreignId('id_grupofamilia')->nullable()->constrained('cat_gpo_familias');
             $table->foreignId('id_producto')->nullable()->constrained('cat_productos');
             $table->string('codigo');
             $table->string('descripcion');
@@ -22,6 +25,7 @@ return new class extends Migration
             $table->integer('cantidad');
             $table->string('ubicacion');
             $table->text('observaciones')->nullable();
+            $table->boolean('habilitado');
             $table->timestamps();
         });
     }

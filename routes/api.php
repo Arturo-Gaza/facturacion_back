@@ -27,6 +27,7 @@ use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\ArchivoCarga\tab_detalle_carga;
 use App\Models\ArchivoConteo\TabConteo;
 use Illuminate\Support\Facades\Route;
+
 Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
@@ -106,6 +107,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('TabConteo/register', [TabConteoController::class, 'store']);
     Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
     Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
+
 
     //Rutas Tabla Asignacion
     Route::get('TabAsignacion/getById/{id}', [TabAsignacionController::class, 'getById']);

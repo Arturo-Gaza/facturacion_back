@@ -246,6 +246,9 @@ class TabAsignacionController extends Controller
             DB::table('tab_conteo')->insert([
                 "id_carga" => $idCarga,
                 "id_usuario" => $idUser,
+                "id_almacen" => $record->id_almacen,
+                "id_unidadmedida" => $record->id_unidadmedida,
+                "id_grupofamilia" => $record->id_grupofamilia,
                 "id_producto" => $record->id_producto,
                 "codigo" => $record->codigo,
                 "descripcion" => $record->descripcion,
@@ -253,6 +256,7 @@ class TabAsignacionController extends Controller
                 "cantidad" => $record->cantidad,
                 "ubicacion" => $record->ubicacion,
                 "observaciones" => $record->observaciones,
+                "habilitado" => $record->habilitado,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -12,6 +12,9 @@ class TabConteo extends Model
     protected $fillable = [
             'id_carga',
             'id_usuario',
+            'id_almacen',
+            'id_unidadmedida',
+            'id_grupofamilia',
             'id_producto',
             'codigo',
             'descripcion',
@@ -19,5 +22,6 @@ class TabConteo extends Model
             'cantidad',
             'ubicacion',
             'observaciones',
+            'habilitado',
     ];
 }

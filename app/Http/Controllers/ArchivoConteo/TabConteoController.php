@@ -24,10 +24,9 @@ class TabConteoController extends Controller
     {
         try {
             $getAll = $this->_TabConteo->getAll();
-            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
-        }
-        catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -41,47 +40,57 @@ class TabConteoController extends Controller
         }
     }
 
-    public function store(StoreTabConteoRequest $cat){
+    public function store(StoreTabConteoRequest $cat)
+    {
         DB::beginTransaction();
         try {
             $data = [
-                'id_carga'=> $cat->id_carga,
-                'id_usuario'=> $cat->id_usuario,
-                'id_producto'=> $cat->id_producto,
-                'codigo'=> $cat->codigo,
-                'descripcion'=>$cat->descripcion,
-                'ume'=> $cat->ume,
-                'cantidad'=> $cat->cantidad,
-                'ubicacion'=> $cat->ubicacion,
-                'observaciones'=> $cat->observaciones
+                'id_carga' => $cat->id_carga,
+                'id_usuario' => $cat->id_usuario,
+                'id_almacen' => $cat->id_almacen,
+                'id_unidadmedida' => $cat->id_unidadmedida,
+                'id_grupofamilia' => $cat->id_grupofamilia,
+                'id_producto' => $cat->id_producto,
+                'codigo' => $cat->codigo,
+                'descripcion' => $cat->descripcion,
+                'ume' => $cat->ume,
+                'cantidad' => $cat->cantidad,
+                'ubicacion' => $cat->ubicacion,
+                'observaciones' => $cat->observaciones,
+                'habilitado'=> $cat->habilitado,
             ];
             $_TabConteo = $this->_TabConteo->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente',201);
+            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
         }
     }
 
-    public function update(UpdateTabConteoRequest $cat,$id){
+    public function update(UpdateTabConteoRequest $cat, $id)
+    {
         DB::beginTransaction();
         try {
             $data = [
-                'id_carga'=> $cat->id_carga,
-                'id_usuario'=> $cat->id_usuario,
-                'id_producto'=> $cat->id_producto,
-                'codigo'=> $cat->codigo,
-                'descripcion'=>$cat->descripcion,
-                'ume'=> $cat->ume,
-                'cantidad'=> $cat->cantidad,
-                'ubicacion'=> $cat->ubicacion,
-                'observaciones'=> $cat->observaciones
+                'id_carga' => $cat->id_carga,
+                'id_usuario' => $cat->id_usuario,
+                'id_almacen' => $cat->id_almacen,
+                'id_unidadmedida' => $cat->id_unidadmedida,
+                'id_grupofamilia' => $cat->id_grupofamilia,
+                'id_producto' => $cat->id_producto,
+                'codigo' => $cat->codigo,
+                'descripcion' => $cat->descripcion,
+                'ume' => $cat->ume,
+                'cantidad' => $cat->cantidad,
+                'ubicacion' => $cat->ubicacion,
+                'observaciones' => $cat->observaciones,
+                'habilitado'=> $cat->habilitado,
             ];
 
-            $this->_TabConteo->update($data,$id);
+            $this->_TabConteo->update($data, $id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
