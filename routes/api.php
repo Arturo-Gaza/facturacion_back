@@ -87,6 +87,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
+    Route::get('catProductos/getAllPersonalizado', [CatProductosController::class, 'getAllPersonalizado']);
 
     //Ruta api archivo csv
 
@@ -107,6 +108,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('TabConteo/register', [TabConteoController::class, 'store']);
     Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
     Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
+    Route::get('TabConteo/getByIDCargaIDUser/{idCarga}/{idUser}', [TabConteoController::class, 'getByIDCargaIDUser']);
 
 
     //Rutas Tabla Asignacion

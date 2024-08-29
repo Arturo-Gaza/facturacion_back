@@ -30,6 +30,17 @@ class CatProductosController extends Controller
         }
     }
 
+    public function getAllPersonalizado()
+    {
+        try {
+            $getAllPersonalizado = $this->_catProductos->getAllPersonalizado();
+            return ApiResponseHelper::sendResponse($getAllPersonalizado, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
+
     public function getById($id)
     {
         try {

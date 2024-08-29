@@ -30,6 +30,16 @@ class TabConteoController extends Controller
         }
     }
 
+    public function getByIDCargaIDUser($idCarga, $idUser)
+    {
+        try {
+            $getByIDCargaIDUser = $this->_TabConteo->getByIDCargaIDUser($idCarga, $idUser);
+            return ApiResponseHelper::sendResponse($getByIDCargaIDUser, 'Conteo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
     public function getById($id)
     {
         try {
@@ -61,7 +71,7 @@ class TabConteoController extends Controller
             ];
             $_TabConteo = $this->_TabConteo->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente', 201);
+            return ApiResponseHelper::sendResponse(null, 'Conteo creado correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
@@ -90,7 +100,7 @@ class TabConteoController extends Controller
 
             $this->_TabConteo->update($data, $id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente', 200);
+            return ApiResponseHelper::sendResponse(null, 'Conteo actualizado correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
