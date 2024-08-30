@@ -28,7 +28,6 @@ use App\Models\ArchivoCarga\tab_detalle_carga;
 use App\Models\ArchivoConteo\TabConteo;
 use Illuminate\Support\Facades\Route;
 
-Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
@@ -144,4 +143,9 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Ruta para insertar catalogos y cargar completas
     Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
+
+    //ACTUALIZAR ESTATUS CONTEO FECHA
+    Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
+    Route::put('actualizarEstatusFechaInicio/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaInicio']);
+    Route::put('actualizarEstatusFin/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaFin']);
 });
