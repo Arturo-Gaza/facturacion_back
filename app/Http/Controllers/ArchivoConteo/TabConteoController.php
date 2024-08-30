@@ -30,6 +30,16 @@ class TabConteoController extends Controller
         }
     }
 
+    public function getByIDCarga($idCarga)
+    {
+        try {
+            $getByIDCarga = $this->_TabConteo->getByIDCarga($idCarga);
+            return ApiResponseHelper::sendResponse($getByIDCarga, 'Conteo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
     public function getByIDCargaIDUser($idCarga, $idUser)
     {
         try {
