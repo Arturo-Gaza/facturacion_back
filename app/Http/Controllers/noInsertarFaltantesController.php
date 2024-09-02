@@ -151,11 +151,6 @@ class noInsertarFaltantesController extends Controller
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        
-       
-       
-
-
         $ultimaCarga = DB::table('tab_detalle_cargas')
             ->select('cve_carga')
             ->orderBy('id', 'desc')
@@ -187,8 +182,8 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
 
-        $detalleArchivo->save();
-        $this->cargarArchivoCompleto($request, $detalleArchivo);
+        //$detalleArchivo->save();
+       
         $this->insertCatProductos();
         $this->contarRegistros($ultimoId);
 
@@ -211,6 +206,7 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo2->habilitado = $request->input('habilitado', true);
 
         $detalleArchivo2->save();
+        $this->cargarArchivoCompleto($request, $detalleArchivo2);
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $totalRegistros, 'data' => $detalleArchivo]);
     }
 
