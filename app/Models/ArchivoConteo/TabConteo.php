@@ -23,5 +23,6 @@ class TabConteo extends Model
             'ubicacion',
             'observaciones',
             'habilitado',
+            'conteo',
     ];
 }

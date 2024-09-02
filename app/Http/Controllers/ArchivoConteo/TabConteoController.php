@@ -78,6 +78,7 @@ class TabConteoController extends Controller
                 'ubicacion' => $cat->ubicacion,
                 'observaciones' => $cat->observaciones,
                 'habilitado'=> $cat->habilitado,
+                'conteo'=> $cat->conteo,
             ];
             $_TabConteo = $this->_TabConteo->store($data);
             DB::commit();
@@ -106,6 +107,7 @@ class TabConteoController extends Controller
                 'ubicacion' => $cat->ubicacion,
                 'observaciones' => $cat->observaciones,
                 'habilitado'=> $cat->habilitado,
+                'conteo'=> $cat->conteo,
             ];
 
             $this->_TabConteo->update($data, $id);

@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('ubicacion');
             $table->text('observaciones')->nullable();
             $table->boolean('habilitado');
+            $table->integer('conteo')->nullable();
             $table->timestamps();
         });
     }

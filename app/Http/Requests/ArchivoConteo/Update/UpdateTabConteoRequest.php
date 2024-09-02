@@ -30,6 +30,7 @@ public function rules(): array
         'cantidad' => 'required|integer',
         'ubicacion' => 'required|string|max:100',
         'observaciones' => 'nullable|string|max:500',
+        'conteo'=> 'required|integer',
     ];
 }
 
@@ -59,6 +60,9 @@ public function messages(): array
 
         'observaciones.string' => 'El campo Observaciones debe ser una cadena de texto.',
         'observaciones.max' => 'El campo Observaciones no debe exceder los 500 caracteres.',
+
+        'conteo.required' => 'El campo Conteo debe ser reqierido',
+        'conteo.integer' => 'El campo Conteo debe ser un entero',
     ];
 }
 

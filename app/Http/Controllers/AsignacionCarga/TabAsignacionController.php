@@ -257,6 +257,7 @@ class TabAsignacionController extends Controller
                 "ubicacion" => $record->ubicacion,
                 "observaciones" => $record->observaciones,
                 "habilitado" => $record->habilitado,
+                'conteo'=> $record->conteo,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
