@@ -119,6 +119,9 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
     Route::put('TabAsignacion/CerrarAll/{idCarga}', [TabAsignacionController::class, 'CerrarAll']);
     Route::get('TabAsignacion/getAllPersonalizado/{idCarga}/{idUsuario}', [TabAsignacionController::class, 'getByIdCargaIdUserPer']);
+    Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
+    Route::put('actualizarEstatusFechaInicio/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaInicio']);
+    Route::put('actualizarEstatusFechaFin/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaFin']);
 
     Route::post('detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
     Route::post('cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
@@ -143,9 +146,4 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Ruta para insertar catalogos y cargar completas
     Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
-
-    //ACTUALIZAR ESTATUS CONTEO FECHA
-    Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
-    Route::put('actualizarEstatusFechaInicio/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaInicio']);
-    Route::put('actualizarEstatusFin/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaFin']);
 });
