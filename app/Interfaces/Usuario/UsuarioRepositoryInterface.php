@@ -7,6 +7,7 @@ use App\Models\User;
 interface UsuarioRepositoryInterface
 {
     public function getAll();
+    public function getAllUser();
     public function getAllUserAlmacen($idCarga);
     public function getAllUserAsignado($idCarga);
     public function getByID($id);

@@ -108,6 +108,29 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         // return $results;
     }
 
+    public function getAllUser()
+    {
+        $usuario = User::select(
+            'id',
+            'user',
+            'name',
+            'apellidoP',
+            'apellidoM',
+            'email',
+            'idRol',
+            'habilitado',
+        )
+            ->where('idRol', 2)->get();
+
+        $data1 = array();
+        foreach ($usuario as $val) {
+            $data1[] = $val;
+        }
+
+
+        return $data1;
+    }
+
     public function getAllUserAsignado($idCarga)
     {
         $usuario = User::select(
@@ -120,13 +143,15 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'users.idRol',
             'users.habilitado',
             'tab_asignacions.habilitado AS asigHabilitado',
+            'tab_asignacions.id_estatus'
         )
             ->join('tab_asignacions', 'tab_asignacions.id_usuario', '=', 'users.id')
             ->orWhere('tab_asignacions.id_carga', '=', $idCarga)
             ->groupBy('users.id')
             ->groupBy('tab_asignacions.habilitado')
+            ->groupBy('tab_asignacions.id_estatus')
             ->get()->filter(function ($user) {
-                return $user->asigHabilitado == 1 && $user->idRol == 2;
+                return $user->asigHabilitado == 1 && $user->idRol == 2 && $user->id_estatus != 3;
             });
 
         $results = array();

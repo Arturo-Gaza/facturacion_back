@@ -132,6 +132,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('nombreArchivoExi', [cargaArchivoController::class, 'archivoRepetido']);
 
     Route::get('usuario/getAllUserAlmacen/{idCarga}', [UsuarioController::class, 'getAllUserAlmacen']);
+    Route::get('usuario/getAllUser', [UsuarioController::class, 'getAllUser']);
     Route::get('usuario/getAllUserAsignado/{idCarga}', [UsuarioController::class, 'getAllUserAsignado']);
 
     Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
