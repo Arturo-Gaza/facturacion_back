@@ -151,9 +151,9 @@ class noInsertarFaltantesController extends Controller
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        
-       
-       
+        $agregar = $numDatosNoEncontrados + $numDatosNoEncontrados2 + $numDatosNoEncontrados3 + $numDatosNoEncontrados4;
+        $VoBo = ($conteo - $agregar) + $conteo;
+        $total = $conteo - $numDatosNoEncontrados2;
 
 
         $ultimaCarga = DB::table('tab_detalle_cargas')
@@ -169,19 +169,16 @@ class noInsertarFaltantesController extends Controller
             $nuevaCveCarga = 'AT-CA-0001';
         }
 
-        global $totalRegistros;
-        global $ultimoId; 
-        
-        
+
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
         $detalleArchivo->id_usuario = $idUser;
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
-        $detalleArchivo->reg_vobo = 0;
-        $detalleArchivo->reg_excluidos = 0;
+        $detalleArchivo->reg_vobo = $VoBo;
+        $detalleArchivo->reg_excluidos = $agregar;
         $detalleArchivo->reg_incorpora = 0;
-        $detalleArchivo->Reg_a_Contar = 0;
+        $detalleArchivo->Reg_a_Contar = $total;
         $detalleArchivo->conteo = 0;
         $detalleArchivo->id_estatus = 1;
         $detalleArchivo->observaciones = $request->input('observaciones');
@@ -190,35 +187,14 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->save();
         $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
-        $this->contarRegistros($ultimoId);
-
-        $total = $conteo - $totalRegistros;
-        $agregar = $conteo - $total;
-        $VoBo = ($conteo - $agregar) + $conteo;
-
-        $detalleArchivo2= new tab_detalle_carga();
-        $detalleArchivo2->cve_carga = $nuevaCveCarga;
-        $detalleArchivo2->id_usuario = $idUser;
-        $detalleArchivo2->nombre_archivo = $nombreArchivo;
-        $detalleArchivo2->Reg_Archivo = $conteo;
-        $detalleArchivo2->reg_vobo = $VoBo;
-        $detalleArchivo2->reg_excluidos = $total;
-        $detalleArchivo2->reg_incorpora = 0;
-        $detalleArchivo2->Reg_a_Contar = $totalRegistros;
-        $detalleArchivo2->conteo = 0;
-        $detalleArchivo2->id_estatus = 1;
-        $detalleArchivo2->observaciones = $request->input('observaciones');
-        $detalleArchivo2->habilitado = $request->input('habilitado', true);
-
-        $detalleArchivo2->save();
-        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $totalRegistros, 'data' => $detalleArchivo]);
+        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    public function cargarArchivoCompleto(Request $request, $detalleArchivo2)
+    public function cargarArchivoCompleto(Request $request, $detalleArchivo)
     {
 
         $file_csv = $request->file('csv_file')->getRealPath();
@@ -242,13 +218,12 @@ class noInsertarFaltantesController extends Controller
             ], 422);
         }
 
-        global  $registrosInsertadosEnTabla1;
-        $registrosInsertadosEnTabla1 = 0;
+
         foreach ($csv->getRecords() as $record) {
 
             $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([
-                'id_detalle_carga' => $detalleArchivo2->id,
+                'id_detalle_carga' => $detalleArchivo->id,
                 'almacen' => $record[0],
                 'material' => $record[1],
                 'texto_breve_material' => $record[2],
@@ -266,11 +241,8 @@ class noInsertarFaltantesController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            $registrosInsertadosEnTabla1++;
         }
-
         $this->insertarDetalleArchivos();
-        $this->obtenerUltimoId();
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
     }
 
@@ -351,26 +323,5 @@ class noInsertarFaltantesController extends Controller
 
         DB::table('tab_detalle_archivos')->insert($datosArray);
         DB::table('tab_archivo_completos')->delete();
-    }
-
-    public function obtenerUltimoId()
-    {
-        global $ultimoId; 
-        $ultimoId = DB::table('tab_detalle_archivos')
-            ->latest('id_carga_cab') 
-            ->value('id_carga_cab'); 
-
-        return response()->json(['ultimo_id' => $ultimoId]);
-        
-    }
-
-    public function contarRegistros($id)
-    {
-        global $totalRegistros;
-        $totalRegistros = DB::table('tab_detalle_archivos')
-            ->where('id_carga_cab', $id)
-            ->count();
-
-        return response()->json(['total' => $totalRegistros]);
     }
 }
