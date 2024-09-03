@@ -128,26 +128,30 @@ class ArchivoCompletoDetalleController extends Controller
         $numColumna2 = 2;
         $columnaComparar2 = [];
 
+        // Itera sobre los registros y extrae el valor de la columna especificada.
         foreach ($records as $record) {
             $record = array_values($record);
             if (!empty($record[$numColumna2])) {
-                $columnaComparar2[] = mb_convert_encoding($record[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
+                $columnaComparar2[] = $record[$numColumna2];
             }
         }
 
+        // Elimina duplicados en la columna a comparar.
         $columnaComparar2 = array_unique($columnaComparar2);
         $tableCatProducto = 'cat_productos';
         $columnCompara2 = 'descripcion_producto_material';
 
         $datoNoEncontrado2 = [];
+
+        // Verifica si los valores de la columna existen en la tabla especificada.
         foreach ($columnaComparar2 as $value) {
-            $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
                 $datoNoEncontrado2[] = $value;
             }
         }
 
+        // Cuenta cuántos datos no fueron encontrados en la tabla.
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -176,19 +180,19 @@ class ArchivoCompletoDetalleController extends Controller
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
-        $detalleArchivo->reg_excluidos = $agregar;
-        $detalleArchivo->reg_incorpora = 0;
-        $detalleArchivo->Reg_a_Contar = $total;
+        $detalleArchivo->reg_excluidos = 0;
+        $detalleArchivo->reg_incorpora =  $agregar;
+        $detalleArchivo->Reg_a_Contar = $conteo;
         $detalleArchivo->conteo = 0;
         $detalleArchivo->id_estatus = 1;
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
 
         $detalleArchivo->save();
-        
-        $this->procesoInsertar($request,$detalleArchivo);
-        
-        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
+
+        $this->procesoInsertar($request, $detalleArchivo);
+
+        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $numDatosNoEncontrados2, $conteo, 'data' => $detalleArchivo]);
     }
 
 
@@ -346,7 +350,7 @@ class ArchivoCompletoDetalleController extends Controller
         $this->insertTabUniMedidas($datoNoEncontrado2);
         $this->insetarTabGrupoFam($datoNoEncontrado3);
         $this->cargarArchivoCompleto($request, $detalleArchivo);
-        
+
 
 
         return response()->json([
@@ -420,7 +424,6 @@ class ArchivoCompletoDetalleController extends Controller
         return response()->json([
             'message' => 'Los siguientes datos no se insertaron en los catálogos correspondientes.',
         ]);
-        
     }
 
     private function generarGpoFamilia()
