@@ -151,7 +151,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->groupBy('tab_asignacions.habilitado')
             ->groupBy('tab_asignacions.id_estatus')
             ->get()->filter(function ($user) {
-                return $user->asigHabilitado == 1 && $user->idRol == 2 && $user->id_estatus != 3;
+                return $user->asigHabilitado == 1 && $user->idRol == 2;
             });
 
         $results = array();
