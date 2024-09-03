@@ -4,7 +4,7 @@ namespace App\Repositories\ArchivoConteo;
 
 use App\Interfaces\ArchivoConteo\TabConteoRepositoryInterface;
 use App\Models\ArchivoConteo\TabConteo;
-
+use Illuminate\Support\Facades\DB;
 
 class TabConteoRepository implements TabConteoRepositoryInterface
 {
@@ -117,6 +117,34 @@ class TabConteoRepository implements TabConteoRepositoryInterface
         return $data1;
     }
 
+    public function reporteDiferencias($idCarga)
+    {
+        $products = DB::table('tab_conteo')
+        ->join('users', 'tab_conteo.id_usuario', '=', 'users.id')  // INNER JOIN con la tabla users
+        ->join('cat_productos','tab_conteo.id_producto', '=', 'cat_productos.id')
+        ->select(
+            'tab_conteo.id_producto',
+            'cat_productos.clave_producto',
+            'cat_productos.descripcion_producto_material',
+            'tab_conteo.id_grupofamilia',
+            'tab_conteo.ubicacion',
+            'tab_conteo.id_usuario',
+            'users.name as usuario_nombre',  // Selecciona el nombre del usuario desde la tabla users
+            'tab_conteo.cantidad'
+        )
+        ->where('tab_conteo.id_carga', $idCarga)  // Condición WHERE
+        ->groupBy(
+            'tab_conteo.id_producto',
+            'tab_conteo.id_grupofamilia',
+            'tab_conteo.ubicacion',
+            'tab_conteo.id_usuario',
+            'users.name',
+            'cat_productos.clave_producto',
+            'cat_productos.descripcion_producto_material',
+            'tab_conteo.cantidad'
+        )
+        ->get();
 
-
+    return response()->json($products);
+    }
 }
