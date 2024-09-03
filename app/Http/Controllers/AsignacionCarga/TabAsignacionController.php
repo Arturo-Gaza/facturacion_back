@@ -164,7 +164,7 @@ class TabAsignacionController extends Controller
 
         $existente = DB::table('tab_asignacions')->where('id_carga', $idCarga)
             ->where('id_usuario', $idUsuario)
-            ->where('habilitado', 0)
+            // ->where('habilitado', 0) revisar ya que sin esto va a garrar a todos
             ->exists();
 
         if (!$existente) {
