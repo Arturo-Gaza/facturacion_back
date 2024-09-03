@@ -77,8 +77,8 @@ class TabConteoController extends Controller
                 'cantidad' => $cat->cantidad,
                 'ubicacion' => $cat->ubicacion,
                 'observaciones' => $cat->observaciones,
-                'habilitado'=> $cat->habilitado,
-                'conteo'=> $cat->conteo,
+                'habilitado' => $cat->habilitado,
+                'conteo' => $cat->conteo,
             ];
             $_TabConteo = $this->_TabConteo->store($data);
             DB::commit();
@@ -106,8 +106,8 @@ class TabConteoController extends Controller
                 'cantidad' => $cat->cantidad,
                 'ubicacion' => $cat->ubicacion,
                 'observaciones' => $cat->observaciones,
-                'habilitado'=> $cat->habilitado,
-                'conteo'=> $cat->conteo,
+                'habilitado' => $cat->habilitado,
+                'conteo' => $cat->conteo,
             ];
 
             $this->_TabConteo->update($data, $id);
@@ -117,5 +117,26 @@ class TabConteoController extends Controller
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
         }
+    }
+
+
+    public function DeleteAll($idCarga, $idUsuario, $numConteo)
+    {
+        $allconteo = DB::table('tab_conteo')
+            ->where('id_carga', $idCarga)
+            ->where('id_usuario', $idUsuario)
+            ->where('conteo', $numConteo)
+            ->get();
+
+        foreach ($allconteo as $record) {
+            DB::table('tab_conteo')
+                ->where('id_carga', $idCarga)
+                ->where('id_usuario', $idUsuario)
+                ->where('conteo', $numConteo)
+                ->delete();
+        }
+
+        //return $allconteo;
+        return ApiResponseHelper::sendResponse($allconteo, 'Se eliminaron correctamente los registros', 201);
     }
 }
