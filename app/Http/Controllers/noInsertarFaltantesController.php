@@ -151,9 +151,9 @@ class noInsertarFaltantesController extends Controller
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $agregar = $numDatosNoEncontrados + $numDatosNoEncontrados2 + $numDatosNoEncontrados3 + $numDatosNoEncontrados4;
-        $VoBo = ($conteo - $agregar) + $conteo;
-        $total = $conteo - $numDatosNoEncontrados2;
+        $excluidos = $numDatosNoEncontrados2;
+        $VoBo = $conteo - $excluidos;
+        $total = $conteo - $excluidos;
 
 
         $ultimaCarga = DB::table('tab_detalle_cargas')
@@ -176,7 +176,7 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
-        $detalleArchivo->reg_excluidos = $agregar;
+        $detalleArchivo->reg_excluidos = $excluidos;
         $detalleArchivo->reg_incorpora = 0;
         $detalleArchivo->Reg_a_Contar = $total;
         $detalleArchivo->conteo = 0;

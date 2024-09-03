@@ -29,6 +29,8 @@ class ArchivoCompletoDetalleController extends Controller
         $csv = Reader::createFromPath($file_csv, 'r');
         $csv->setHeaderOffset(0);
 
+        $conteoGeneral = 0;
+
         $encabezado = $csv->getHeader();
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
@@ -153,13 +155,11 @@ class ArchivoCompletoDetalleController extends Controller
 
         // Cuenta cuántos datos no fueron encontrados en la tabla.
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
+        $conteoGeneral = $numDatosNoEncontrados2;
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $agregar = $numDatosNoEncontrados + $numDatosNoEncontrados2 + $numDatosNoEncontrados3 + $numDatosNoEncontrados4;
-        $VoBo = ($conteo - $agregar) + $conteo;
-        $total = $conteo - $numDatosNoEncontrados2;
-
-
+        $VoBo = $conteo - $conteoGeneral;
+       
         $ultimaCarga = DB::table('tab_detalle_cargas')
             ->select('cve_carga')
             ->orderBy('id', 'desc')
@@ -181,7 +181,7 @@ class ArchivoCompletoDetalleController extends Controller
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
         $detalleArchivo->reg_excluidos = 0;
-        $detalleArchivo->reg_incorpora =  $agregar;
+        $detalleArchivo->reg_incorpora =  $conteoGeneral;
         $detalleArchivo->Reg_a_Contar = $conteo;
         $detalleArchivo->conteo = 0;
         $detalleArchivo->id_estatus = 1;
