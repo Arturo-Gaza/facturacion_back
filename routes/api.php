@@ -119,6 +119,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
     Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
     Route::put('TabAsignacion/CerrarAll/{idCarga}', [TabAsignacionController::class, 'CerrarAll']);
+    Route::put('TabAsignacion/NuevoConteoAsignacion/{idCarga}', [TabAsignacionController::class, 'NuevoConteoAsignacion']);
     Route::get('TabAsignacion/getAllPersonalizado/{idCarga}/{idUsuario}', [TabAsignacionController::class, 'getByIdCargaIdUserPer']);
     Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
     Route::put('actualizarEstatusFechaInicio/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaInicio']);
@@ -149,3 +150,4 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     //Ruta para insertar catalogos y cargar completas
     Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
 });
+

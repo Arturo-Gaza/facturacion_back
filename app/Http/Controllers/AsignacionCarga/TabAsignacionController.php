@@ -259,7 +259,7 @@ class TabAsignacionController extends Controller
                 "ubicacion" => $record->ubicacion,
                 "observaciones" => $record->observaciones,
                 "habilitado" => $record->habilitado,
-                'conteo'=> $record->conteo,
+                'conteo' => $record->conteo,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
@@ -277,6 +277,23 @@ class TabAsignacionController extends Controller
         foreach ($allAsigCarga as $record) {
             DB::table('tab_asignacions')->where('id_carga', $idCarga)->update([
                 "id_estatus" => 4,
+            ]);
+        }
+        return $allAsigCarga;
+    }
+
+    public function NuevoConteoAsignacion($idCarga) // este solo se va a ejecutar en la api desig
+    {
+
+        $allAsigCarga = DB::table('tab_asignacions')->where('id_carga', $idCarga)
+            ->get();
+
+        foreach ($allAsigCarga as $record) {
+            DB::table('tab_asignacions')->where('id_carga', $idCarga)->update([
+                'fecha_inicio_conteo' => null,
+                'fecha_fin_conteo' => null,
+                "id_estatus" => 6,
+                'habilitado' => false,
             ]);
         }
         return $allAsigCarga;
