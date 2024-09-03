@@ -110,6 +110,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
     Route::get('TabConteo/getByIDCargaIDUser/{idCarga}/{idUser}', [TabConteoController::class, 'getByIDCargaIDUser']);
     Route::get('TabConteo/getByIDCarga/{idCarga}', [TabConteoController::class, 'getByIDCarga']);
+    Route::get('TabConteo/getConteos/{idCarga}', [TabConteoController::class, 'getConteos']);
     Route::delete('TabConteo/deleteConteoAllByIDCargaIDUser/{idCarga}/{idUser}/{conteo}', [TabConteoController::class, 'DeleteAll']);
 
     //Rutas Tabla Asignacion
