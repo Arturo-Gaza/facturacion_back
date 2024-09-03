@@ -94,4 +94,26 @@ class TabDetalleCargaController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
+
+
+    public function updateConte($id)
+    {
+        DB::beginTransaction();
+        $conteo = DB::table('tab_detalle_cargas')
+            ->where('id', $id)
+            ->value('conteo') + 1;
+
+        try {
+            $data = [
+                'conteo' => $conteo,
+                'id_estatus' => 6,
+            ];
+            $this->_tabDetalleArchivo->update($data, $id);
+            DB::commit();
+            return ApiResponseHelper::sendResponse($conteo, 'Catálogo actualizado correctamente', 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
 }

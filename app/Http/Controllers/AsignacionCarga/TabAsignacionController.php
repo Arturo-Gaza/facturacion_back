@@ -139,6 +139,7 @@ class TabAsignacionController extends Controller
             DB::beginTransaction();
             try {
                 $data = [
+                    'conteo' => $Asignacion->conteo,
                     'fecha_inicio_conteo' => null,
                     'fecha_fin_conteo' => null,
                     'id_estatus' => 6,
@@ -195,6 +196,7 @@ class TabAsignacionController extends Controller
             DB::beginTransaction();
             try {
                 $data = [
+                    'conteo' => $Asignacion->conteo,
                     'fecha_asignacion' => Carbon::now(),
                     'fecha_inicio_conteo' => null,
                     'fecha_fin_conteo' => null,

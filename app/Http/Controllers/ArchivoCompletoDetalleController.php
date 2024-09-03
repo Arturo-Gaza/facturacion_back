@@ -132,7 +132,7 @@ class ArchivoCompletoDetalleController extends Controller
         foreach ($records as $record) {
             $record = array_values($record);
             if (!empty($record[$numColumna2])) {
-                $columnaComparar2[] = $record[$numColumna2];
+                $columnaComparar2[] = mb_convert_encoding($record[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             }
         }
 
