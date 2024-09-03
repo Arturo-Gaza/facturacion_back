@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('id_carga')->nullable()->constrained('tab_detalle_cargas');
             $table->foreignId('id_usuario')->nullable()->constrained('users');
             $table->integer('conteo')->nullable();
-            $table->date('fecha_asignacion')->nullable();
-            $table->date('fecha_inicio_conteo')->nullable();
-            $table->date('fecha_fin_conteo')->nullable();
+            $table->timestamp('fecha_asignacion')->nullable();
+            $table->timestamp('fecha_inicio_conteo')->nullable();
+            $table->timestamp('fecha_fin_conteo')->nullable();
             $table->foreignId('id_estatus')->nullable()->constrained('cat_estatuses');
             $table->boolean('habilitado');
             $table->timestamps();
