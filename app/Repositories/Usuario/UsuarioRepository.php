@@ -193,9 +193,15 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function update(array $data, $id)
     {
+        return User::whereId($id)->update($data);
+    }
+
+    public function updatePassword(array $data, $id)
+    {
         $data['password'] = Hash::make($data['password']);
         return User::whereId($id)->update($data);
     }
+
 
     public function aumentarIntento(int $intentos, $id)
     {

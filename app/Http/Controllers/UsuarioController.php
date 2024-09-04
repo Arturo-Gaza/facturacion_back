@@ -71,9 +71,35 @@ class UsuarioController extends Controller
 
     public function update(Request $request, string $id)
     {
+        if ($request->password == null) {
+            $data = [
+                'name' => $request->name,
+                'apellidoP' => $request->apellidoP,
+                'apellidoM' => $request->apellidoM,
+                'email' => $request->email,
+                'user' => $request->user,
+                'habilitado' => $request->habilitado,
+                'idRol' => $request->idRol,
+            ];
+        } else {
+            $data = [
+                'name' => $request->name,
+                'apellidoP' => $request->apellidoP,
+                'apellidoM' => $request->apellidoM,
+                'email' => $request->email,
+                'password' => $request->password,
+                'user' => $request->user,
+                'habilitado' => $request->habilitado,
+                'idRol' => $request->idRol,
+            ];
+        }
         DB::beginTransaction();
         try {
-            $this->usuario->update($request->all(), $id);
+            if ($request->password == null) {
+                $this->usuario->update($data, $id);
+            } else {
+                $this->usuario->updatePassword($data, $id);
+            }
             DB::commit();
             return ApiResponseHelper::sendResponse(null, 'Usuario actualizado correctamente', 200);
         } catch (Exception $ex) {

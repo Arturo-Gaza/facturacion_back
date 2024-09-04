@@ -17,6 +17,7 @@ interface UsuarioRepositoryInterface
     public function aumentarIntento(int $intentos, $id);
     public function store(array $data);
     public function update(array $data, $id);
+    public function updatePassword(array $data, $id);
     public function generateToken(User $user): string;
     public function loginActive(int $id);
     public function loginInactive(int $id);
