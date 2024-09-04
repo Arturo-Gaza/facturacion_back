@@ -138,22 +138,24 @@ class noInsertarFaltantesController extends Controller
         $columnaComparar2 = array_unique($columnaComparar2);
         $tableCatProducto = 'cat_productos';
         $columnCompara2 = 'descripcion_producto_material';
+        $excluidos = 0;
 
         $datoNoEncontrado2 = [];
         foreach ($columnaComparar2 as $value) {
             $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
+                    $excluidos++;
                 $datoNoEncontrado2[] = $value;
             }
+            
         }
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        $excluidos = $numDatosNoEncontrados2;
-        $VoBo = $conteo - $excluidos;
-        $total = $conteo - $excluidos;
+        $excluido = $excluidos + 1;
+        $VoBo = $conteo - $excluido;
+        $total = $conteo - $excluido;
 
 
         $ultimaCarga = DB::table('tab_detalle_cargas')
@@ -176,7 +178,7 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->nombre_archivo = $nombreArchivo;
         $detalleArchivo->Reg_Archivo = $conteo;
         $detalleArchivo->reg_vobo = $VoBo;
-        $detalleArchivo->reg_excluidos = $excluidos;
+        $detalleArchivo->reg_excluidos = $excluido;
         $detalleArchivo->reg_incorpora = 0;
         $detalleArchivo->Reg_a_Contar = $total;
         $detalleArchivo->conteo = 0;
