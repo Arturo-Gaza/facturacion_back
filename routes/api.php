@@ -96,6 +96,8 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('tabCargaDetalle/register', [TabDetalleCargaController::class, 'store']);
     Route::put('tabCargaDetalle/update/{id}', [TabDetalleCargaController::class, 'update']);
     Route::put('tabCargaDetalle/updateConteo/{id}', [TabDetalleCargaController::class, 'updateConte']);
+    Route::put('tabCargaDetalle/updateValidarCierre', [TabDetalleCargaController::class, 'ValidarCierre']);
+    Route::get('tabCargaDetalle/ValidarCierreUsuarios/{idCarga}', [TabDetalleCargaController::class, 'ValidarCierreUsuarios']);
 
     //Rutas detalle archivo
     Route::get('tabDetalleArchivo/getAll', [TabArchivoDetalleController::class, 'getAll']);

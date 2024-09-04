@@ -276,7 +276,8 @@ class TabAsignacionController extends Controller
 
         foreach ($allAsigCarga as $record) {
             DB::table('tab_asignacions')->where('id_carga', $idCarga)->update([
-                "id_estatus" => 4,
+                "id_estatus" => 3,
+                'fecha_fin_conteo' => Carbon::now(),
             ]);
         }
         return $allAsigCarga;

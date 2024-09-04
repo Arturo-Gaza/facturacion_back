@@ -116,4 +116,62 @@ class TabDetalleCargaController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
+
+    public function ValidarCierre()
+    {
+        $idsCargas = DB::table('tab_detalle_cargas')
+            ->select(
+                'id as id_carga'
+            )->where('id_estatus', '!=', 3)
+            ->get();
+
+        $results = array();
+        foreach ($idsCargas as $record) {
+
+            $exists = DB::table('tab_asignacions')
+                ->where('id_carga', $record->id_carga)
+                ->where('id_estatus', '!=', 3)
+                ->where('habilitado', true)
+                ->exists();
+
+            if (!$exists) {
+                DB::beginTransaction();
+                try {
+                    $data = [
+                        'id_estatus' => 7,
+                    ];
+                    $detalleCarga = $this->_tabDetalleArchivo->update($data, $record->id_carga);
+                    DB::commit();
+                    $results[] = $detalleCarga;
+                    // return ApiResponseHelper::sendResponse($detalleCarga, 'Catálogo actualizado correctamente', 200);
+                } catch (Exception $ex) {
+                    DB::rollBack();
+                    return ApiResponseHelper::rollback($ex);
+                }
+            }
+        }
+        return  $results;
+    }
+
+    public function ValidarCierreUsuarios($idCarga)
+    {
+        $results = DB::table('tab_asignacions')
+            ->join('users', 'users.id', '=', 'tab_asignacions.id_usuario')
+            ->join('cat_estatuses', 'cat_estatuses.id', '=', 'tab_asignacions.id_estatus')
+            ->where('tab_asignacions.id_carga', $idCarga)
+            ->where('tab_asignacions.id_estatus', '!=', 3)
+            ->where('tab_asignacions.habilitado', true)
+            ->select(
+                'users.name',
+                'users.apellidoP',
+                'users.apellidoM',
+                'users.email',
+                'users.user',
+                'tab_asignacions.id_estatus',
+                'cat_estatuses.nombre as status_nombre'
+            )
+            ->get();
+
+        return  $results;
+    }
 }
