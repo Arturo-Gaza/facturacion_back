@@ -106,7 +106,7 @@ class TabDetalleCargaController extends Controller
         try {
             $data = [
                 'conteo' => $conteo,
-                'id_estatus' => 6,
+                'id_estatus' => 8,
             ];
             $this->_tabDetalleArchivo->update($data, $id);
             DB::commit();
@@ -123,6 +123,8 @@ class TabDetalleCargaController extends Controller
             ->select(
                 'id as id_carga'
             )->where('id_estatus', '!=', 3)
+            ->where('id_estatus', '!=', 1) // omitimos el cargado
+            ->where('id_estatus', '!=', 8) // omitimos el cargado
             ->get();
 
         $results = array();
