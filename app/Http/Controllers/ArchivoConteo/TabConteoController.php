@@ -186,4 +186,14 @@ class TabConteoController extends Controller
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
     }
+
+    public function getNoConteosByCarga($idCarga)
+    {
+        try {
+            $getConteos = $this->_TabConteo->getConteoByIdCarga($idCarga);
+            return ApiResponseHelper::sendResponse($getConteos, 'Lista de conteos obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
 }
