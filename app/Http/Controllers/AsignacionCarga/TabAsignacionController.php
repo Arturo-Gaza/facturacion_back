@@ -252,6 +252,7 @@ class TabAsignacionController extends Controller
                 "id_unidadmedida" => $record->id_unidadmedida,
                 "id_grupofamilia" => $record->id_grupofamilia,
                 "id_producto" => $record->id_producto,
+                'id_ubicacion' => $record->id_ubicacion,
                 "codigo" => $record->codigo,
                 "descripcion" => $record->descripcion,
                 "ume" => $record->ume,

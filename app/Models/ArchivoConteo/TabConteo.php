@@ -16,6 +16,7 @@ class TabConteo extends Model
             'id_unidadmedida',
             'id_grupofamilia',
             'id_producto',
+            'id_ubicacion',
             'codigo',
             'descripcion',
             'ume',

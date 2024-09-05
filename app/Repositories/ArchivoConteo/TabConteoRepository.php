@@ -29,10 +29,9 @@ class TabConteoRepository implements TabConteoRepositoryInterface
         $tabConteo->update($data);
         return $tabConteo;
     }
-    public function storeConteoDup( $data)
+    public function storeConteoDup($data)
     {
         TabConteo::insert($data->toArray());
-
     }
 
     public function getByIDCargaIDUser($idCarga, $idUser)
@@ -45,6 +44,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
             'tab_conteo.id_unidadmedida',
             'tab_conteo.id_grupofamilia',
             'tab_conteo.id_producto',
+            'tab_conteo.id_ubicacion',
             'tab_conteo.codigo',
             'tab_conteo.descripcion',
             'tab_conteo.ume',
@@ -84,6 +84,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
             'tab_conteo.id_unidadmedida',
             'tab_conteo.id_grupofamilia',
             'tab_conteo.id_producto',
+            'tab_conteo.id_ubicacion',
             'tab_conteo.codigo',
             'tab_conteo.descripcion',
             'tab_conteo.ume',
@@ -120,78 +121,78 @@ class TabConteoRepository implements TabConteoRepositoryInterface
     public function reporteGeneral($idCarga, $conteo)
     {
         $products = DB::table('tab_conteo')
-        ->join('users', 'tab_conteo.id_usuario', '=', 'users.id')  // INNER JOIN con la tabla users
-        ->join('cat_productos','tab_conteo.id_producto', '=', 'cat_productos.id')
-        ->select(
-            'tab_conteo.id_producto',
-            'cat_productos.clave_producto',
-            'cat_productos.descripcion_producto_material',
-            'tab_conteo.id_grupofamilia',
-            'tab_conteo.ubicacion',
-            'tab_conteo.id_usuario',
-            'users.name as usuario_nombre',  // Selecciona el nombre del usuario desde la tabla users
-            'tab_conteo.cantidad',
-            'tab_conteo.observaciones',
-        )
-        ->where('tab_conteo.id_carga', $idCarga)  // Condición WHERE
-        ->where('tab_conteo.conteo', $conteo)
-        ->groupBy(
-            'tab_conteo.id_producto',
-            'tab_conteo.id_grupofamilia',
-            'tab_conteo.ubicacion',
-            'tab_conteo.id_usuario',
-            'users.name',
-            'cat_productos.clave_producto',
-            'cat_productos.descripcion_producto_material',
-            'tab_conteo.cantidad',
-            'tab_conteo.observaciones',
-        )
-        ->get();
+            ->join('users', 'tab_conteo.id_usuario', '=', 'users.id')  // INNER JOIN con la tabla users
+            ->join('cat_productos', 'tab_conteo.id_producto', '=', 'cat_productos.id')
+            ->select(
+                'tab_conteo.id_producto',
+                'cat_productos.clave_producto',
+                'cat_productos.descripcion_producto_material',
+                'tab_conteo.id_grupofamilia',
+                'tab_conteo.ubicacion',
+                'tab_conteo.id_usuario',
+                'users.name as usuario_nombre',  // Selecciona el nombre del usuario desde la tabla users
+                'tab_conteo.cantidad',
+                'tab_conteo.observaciones',
+            )
+            ->where('tab_conteo.id_carga', $idCarga)  // Condición WHERE
+            ->where('tab_conteo.conteo', $conteo)
+            ->groupBy(
+                'tab_conteo.id_producto',
+                'tab_conteo.id_grupofamilia',
+                'tab_conteo.ubicacion',
+                'tab_conteo.id_usuario',
+                'users.name',
+                'cat_productos.clave_producto',
+                'cat_productos.descripcion_producto_material',
+                'tab_conteo.cantidad',
+                'tab_conteo.observaciones',
+            )
+            ->get();
 
-    return response()->json($products);
+        return response()->json($products);
     }
 
     public function reporteDiferencias($idCarga, $conteo)
     {
         $sapTotals = DB::table('tab_detalle_archivos')
-        ->select(
-            'id_cat_prod',
-            DB::raw('CAST(cantidad_total AS DECIMAL(10, 2)) AS total_sap'),
-            DB::raw('CAST(importe_unitario AS DECIMAL(10, 2)) AS importe_unitario'),
-            DB::raw('CAST(importe_total AS DECIMAL(10, 2)) AS importe_total')
-        )
+            ->select(
+                'id_cat_prod',
+                DB::raw('CAST(cantidad_total AS DECIMAL(10, 2)) AS total_sap'),
+                DB::raw('CAST(importe_unitario AS DECIMAL(10, 2)) AS importe_unitario'),
+                DB::raw('CAST(importe_total AS DECIMAL(10, 2)) AS importe_total')
+            )
             ->groupBy('id_cat_prod', 'importe_unitario', 'importe_total', 'cantidad_total');
 
         $fisicoTotals = DB::table('tab_conteo')
-        ->select(
-            'id_producto',
-            DB::raw('SUM(cantidad) AS total_fisico')
-        )
+            ->select(
+                'id_producto',
+                DB::raw('SUM(cantidad) AS total_fisico')
+            )
             ->where('id_carga', $idCarga)
             ->where('conteo', $conteo)
             ->groupBy('id_producto');
 
         $query = DB::table('tab_conteo as a')
-        ->join('cat_gpo_familias as b', 'a.id_grupofamilia', '=', 'b.id')
-        ->joinSub($sapTotals, 'sap', function ($join) {
-            $join->on('a.id_producto', '=', 'sap.id_cat_prod');
-        })
-        ->joinSub($fisicoTotals, 'fisico', function ($join) {
-            $join->on('a.id_producto', '=', 'fisico.id_producto');
-        })
-        ->select(
-            'a.id_producto',
-            'a.codigo',
-            'a.descripcion',
-            'a.ume',
-            'b.clave_gpo_familia',
-            DB::raw('sap.total_sap AS "SAP"'),
-            DB::raw('fisico.total_fisico AS "Fisico"'),
-            DB::raw('(fisico.total_fisico - sap.total_sap) AS "DiferenciaCantidad"'),
-            DB::raw('sap.importe_unitario AS "importe_unitario"'),
-            DB::raw('(sap.importe_unitario * (fisico.total_fisico - sap.total_sap)) AS "DiferenciaMoneda"'),
-            DB::raw('sap.importe_total AS "ImporteTotal"')
-        )
+            ->join('cat_gpo_familias as b', 'a.id_grupofamilia', '=', 'b.id')
+            ->joinSub($sapTotals, 'sap', function ($join) {
+                $join->on('a.id_producto', '=', 'sap.id_cat_prod');
+            })
+            ->joinSub($fisicoTotals, 'fisico', function ($join) {
+                $join->on('a.id_producto', '=', 'fisico.id_producto');
+            })
+            ->select(
+                'a.id_producto',
+                'a.codigo',
+                'a.descripcion',
+                'a.ume',
+                'b.clave_gpo_familia',
+                DB::raw('sap.total_sap AS "SAP"'),
+                DB::raw('fisico.total_fisico AS "Fisico"'),
+                DB::raw('(fisico.total_fisico - sap.total_sap) AS "DiferenciaCantidad"'),
+                DB::raw('sap.importe_unitario AS "importe_unitario"'),
+                DB::raw('(sap.importe_unitario * (fisico.total_fisico - sap.total_sap)) AS "DiferenciaMoneda"'),
+                DB::raw('sap.importe_total AS "ImporteTotal"')
+            )
             ->where('a.id_carga', $idCarga)
             ->where('conteo', $conteo)
             ->groupBy(

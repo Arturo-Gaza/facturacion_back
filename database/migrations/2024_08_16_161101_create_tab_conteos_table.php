@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('id_unidadmedida')->nullable()->constrained('cat_unidad_medidas');
             $table->foreignId('id_grupofamilia')->nullable()->constrained('cat_gpo_familias');
             $table->foreignId('id_producto')->nullable()->constrained('cat_productos');
+            $table->foreignId('id_ubicacion')->nullable()->constrained('cat_ubicaciones');
             $table->string('codigo');
             $table->string('descripcion');
             $table->string('ume');

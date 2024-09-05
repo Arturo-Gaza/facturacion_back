@@ -62,6 +62,31 @@ class TabConteoController extends Controller
 
     public function store(StoreTabConteoRequest $cat)
     {
+        // $exists = DB::table('tab_conteo')
+        //         ->where('id_carga', $cat->id_carga)
+        //         ->orWhere('id_usuario', $cat->id_usuario)
+        //         ->orWhere('id_producto', $cat->id_producto)
+        //         ->orWhere('ubicacion', $cat->ubicacion)
+        //         ->exists();
+
+        $exists = DB::table('tab_conteo')
+            ->where('id_carga', $cat->id_carga)
+            ->where('id_usuario', $cat->id_usuario)
+            ->where('conteo', $cat->conteo)
+            ->where('id_producto', $cat->id_producto)
+            ->where('ubicacion', $cat->ubicacion)
+            ->get();
+
+        if ($exists->count() != 0) {
+            $errors = ['Ya se cuenta con este registro.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error',
+                'errors' => $errors,
+                'data' => $exists,
+            ], 422);
+        }
+
         DB::beginTransaction();
         try {
             $data = [
@@ -71,6 +96,7 @@ class TabConteoController extends Controller
                 'id_unidadmedida' => $cat->id_unidadmedida,
                 'id_grupofamilia' => $cat->id_grupofamilia,
                 'id_producto' => $cat->id_producto,
+                'id_ubicacion' => $cat->id_ubicacion,
                 'codigo' => $cat->codigo,
                 'descripcion' => $cat->descripcion,
                 'ume' => $cat->ume,
@@ -82,7 +108,7 @@ class TabConteoController extends Controller
             ];
             $_TabConteo = $this->_TabConteo->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Conteo creado correctamente', 201);
+            return ApiResponseHelper::sendResponse(true, 'Conteo creado correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
@@ -100,6 +126,7 @@ class TabConteoController extends Controller
                 'id_unidadmedida' => $cat->id_unidadmedida,
                 'id_grupofamilia' => $cat->id_grupofamilia,
                 'id_producto' => $cat->id_producto,
+                'id_ubicacion' => $cat->id_ubicacion,
                 'codigo' => $cat->codigo,
                 'descripcion' => $cat->descripcion,
                 'ume' => $cat->ume,
@@ -140,20 +167,20 @@ class TabConteoController extends Controller
         return ApiResponseHelper::sendResponse($allconteo, 'Se eliminaron correctamente los registros', 201);
     }
 
-    public function getConteosGeneral($idCarga,$conteo)
+    public function getConteosGeneral($idCarga, $conteo)
     {
         try {
-            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga,$conteo);
+            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga, $conteo);
             return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
-    public function getDiferenciasConteo($idCarga,$conteo)
+    public function getDiferenciasConteo($idCarga, $conteo)
     {
         try {
-            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga,$conteo);
+            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga, $conteo);
             return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
