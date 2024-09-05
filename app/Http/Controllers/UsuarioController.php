@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Exception;
 use App\Classes\ApiResponseHelper;
+use App\Http\Requests\UpdateUsuarioRequest;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
@@ -69,8 +70,9 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
 
-    public function update(Request $request, string $id)
+    public function update(UpdateUsuarioRequest $request, string $id)
     {
+       
         if ($request->password == null) {
             $data = [
                 'name' => $request->name,

@@ -22,6 +22,7 @@ use App\Http\Controllers\Catalogos\CatUbicaionesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\DetalleArchivoController;
 use App\Http\Controllers\noInsertarFaltantesController;
+use App\Http\Controllers\subirCatalogoUbicacionesController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\UsuarioDetalleCargaController;
 use App\Http\Middleware\AcceptJsonMiddleware;
@@ -32,6 +33,9 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+//ruta para insertar ubicacion
+route::get('importUbicaciones', [subirCatalogoUbicacionesController::class, 'importUbicaciones']);
+
 Route::get('cargaArchivo/{id}', [ObtenerCargaIdController::class, 'getByDetalleCargaId']);
 Route::put('ActualizarStatus/{id}', [ActualizarStatusController::class, 'actualizarEstatus']);
 
