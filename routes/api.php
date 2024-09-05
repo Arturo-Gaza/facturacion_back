@@ -80,13 +80,14 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('catGpoFamilia/getById/{id}', [CatGpoFamiliaController::class, 'getById']);
     Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
     Route::put('catGpoFamilia/update/{id}', [CatGpoFamiliaController::class, 'update']);
+    Route::get('catGpoFamilia/getAllPersonalizado/{idCarga}', [CatGpoFamiliaController::class, 'getAllPersonalizado']);
 
     //Rutas Catalogo Productos
     Route::get('catProductos/getAll', [CatProductosController::class, 'getAll']);
     Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
-    Route::get('catProductos/getAllPersonalizado', [CatProductosController::class, 'getAllPersonalizado']);
+    Route::get('catProductos/getAllPersonalizado/{idCarga}', [CatProductosController::class, 'getAllPersonalizado']);
 
     //Ruta api archivo csv
 

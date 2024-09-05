@@ -20,7 +20,7 @@ class CatGpoFamiliaController extends Controller
     {
         $this->_catGpoFamilia = $catGpoFamilia;
     }
-    
+
     public function getAll()
     {
         try {
@@ -29,6 +29,16 @@ class CatGpoFamiliaController extends Controller
         }
         catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+        }
+    }
+
+    public function getAllPersonalizado($idCarga)
+    {
+        try {
+            $getAllPersonalizado = $this->_catGpoFamilia->getAllPersonalizado($idCarga);
+            return ApiResponseHelper::sendResponse($getAllPersonalizado, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
         }
     }
 

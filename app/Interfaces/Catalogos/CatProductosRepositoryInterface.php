@@ -8,5 +8,5 @@ interface CatProductosRepositoryInterface
     public function getByID($id);
     public function store(array $data);
     public function update(array $data, $id);
-    public function getAllPersonalizado();
+    public function getAllPersonalizado($idCarga);
 }
