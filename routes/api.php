@@ -18,6 +18,7 @@ use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
 use App\Http\Controllers\Catalogos\CatProductosController;
 use App\Http\Controllers\Catalogos\CatRolesController;
+use App\Http\Controllers\Catalogos\CatUbicaionesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
 use App\Http\Controllers\DetalleArchivoController;
 use App\Http\Controllers\noInsertarFaltantesController;
@@ -88,6 +89,12 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
     Route::get('catProductos/getAllPersonalizado/{idCarga}', [CatProductosController::class, 'getAllPersonalizado']);
+
+    //Ruta de catalogo ubicaciones
+    Route::get('catUbicaciones/getAll', [CatUbicaionesController::class, 'getAll']);
+    Route::get('catUbicaciones/getById/{id}', [CatUbicaionesController::class, 'getById']);
+    Route::post('catUbicaciones/register', [CatUbicaionesController::class, 'store']);
+    Route::put('catUbicaciones/update/{id}', [CatUbicaionesController::class, 'update']);
 
     //Ruta api archivo csv
 

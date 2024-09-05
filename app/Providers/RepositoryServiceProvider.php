@@ -17,6 +17,7 @@ use App\Repositories\Catalogos\CatUnidadMedidasRepository;
 use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
 use App\Interfaces\Catalogos\CatGpoFamiliaRepositoryInterface;
 use App\Interfaces\Catalogos\CatProductosRepositoryInterface;
+use App\Interfaces\Catalogos\CatUbicacionesRepositoryInterface;
 use App\Repositories\ArchivoCarga\TabArchivoDetalleRepository;
 use App\Repositories\ArchivoCarga\TabDetalleCargasRerpository;
 use App\Repositories\ArchivoCarga\TabObservacionesRepository;
@@ -25,6 +26,7 @@ use App\Repositories\AsignacionCarga\TabAsigancionRepository;
 use App\Repositories\Catalogos\CatAlmacenesRepository;
 use App\Repositories\Catalogos\CatGpoFamiliaRepository;
 use App\Repositories\Catalogos\CatProductosRepository;
+use App\Repositories\Catalogos\CatUbicacionesRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -44,6 +46,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TabConteoRepositoryInterface::class, TabConteoRepository::class);
         $this->app->bind(TabAsignacionInterface::class, TabAsigancionRepository::class);
         $this->app->bind(TabObservacionesRepositoryInterface::class, TabObservacionesRepository::class);
+        $this->app->bind(CatUbicacionesRepositoryInterface::class, CatUbicacionesRepository::class);
     }
 
     /**
