@@ -140,10 +140,20 @@ class TabConteoController extends Controller
         return ApiResponseHelper::sendResponse($allconteo, 'Se eliminaron correctamente los registros', 201);
     }
 
-    public function getConteos($idCarga)
+    public function getConteosGeneral($idCarga,$conteo)
     {
         try {
-            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga);
+            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga,$conteo);
+            return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
+    public function getDiferenciasConteo($idCarga,$conteo)
+    {
+        try {
+            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga,$conteo);
             return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);

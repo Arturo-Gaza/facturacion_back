@@ -11,5 +11,6 @@ interface TabConteoRepositoryInterface
     public function getByIDCargaIDUser($idCarga, $idUser);
     public function getByIDCarga($idCarga);
     public function storeConteoDup($data);
-    public function reporteDiferencias($idCarga);
+    public function reporteDiferencias($idCarga,$conteo);
+    public function reporteGeneral($idCarga,$conteo);
 }
