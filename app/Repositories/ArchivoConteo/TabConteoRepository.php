@@ -209,4 +209,20 @@ class TabConteoRepository implements TabConteoRepositoryInterface
 
         return response()->json($query);
     }
+
+    public function getConteoByIdCarga($idCarga)
+    {
+        $products = DB::table('tab_conteo')
+        ->select(
+            'tab_conteo.conteo',
+        )
+        ->where('tab_conteo.id_carga', $idCarga)
+        ->groupBy(
+            'tab_conteo.id_carga',
+            'tab_conteo.conteo'
+        )
+        ->get();
+
+    return response()->json($products);
+    }
 }
