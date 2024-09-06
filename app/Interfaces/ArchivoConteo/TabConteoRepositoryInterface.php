@@ -14,4 +14,5 @@ interface TabConteoRepositoryInterface
     public function reporteDiferencias($idCarga,$conteo);
     public function reporteGeneral($idCarga,$conteo);
     public function getConteoByIdCarga($idCarga);
+    public function reporteConcentrado($idCarga,$numConteo);
 }

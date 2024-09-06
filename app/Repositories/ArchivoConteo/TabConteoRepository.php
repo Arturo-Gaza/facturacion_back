@@ -226,4 +226,15 @@ class TabConteoRepository implements TabConteoRepositoryInterface
 
     return response()->json($products);
     }
+
+    public function reporteConcentrado($idCarga, $numconteo)
+    {
+        $conteo = TabConteo::select('id_producto', 'codigo', 'descripcion', DB::raw('SUM(cantidad) as Total'))
+        ->where('id_carga', $idCarga)
+        ->where('conteo', $numconteo)
+        ->groupBy('id_producto', 'codigo', 'descripcion')
+        ->get();
+
+        return response()->json($conteo);
+    }
 }

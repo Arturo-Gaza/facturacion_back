@@ -170,7 +170,7 @@ class TabConteoController extends Controller
     public function getConteosGeneral($idCarga, $conteo)
     {
         try {
-            $getConteos = $this->_TabConteo->reporteDiferencias($idCarga, $conteo);
+            $getConteos = $this->_TabConteo->reporteGeneral($idCarga, $conteo);
             return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
@@ -192,6 +192,16 @@ class TabConteoController extends Controller
         try {
             $getConteos = $this->_TabConteo->getConteoByIdCarga($idCarga);
             return ApiResponseHelper::sendResponse($getConteos, 'Lista de conteos obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
+    public function getConteoConcentrado($idCarga,$numConteo)
+    {
+        try {
+            $getConteos = $this->_TabConteo->reporteConcentrado($idCarga,$numConteo);
+            return ApiResponseHelper::sendResponse($getConteos, 'Lista del condentrado de conteos obtenidos', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
