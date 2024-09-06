@@ -143,6 +143,9 @@ class ArchivoCompletoDetalleController extends Controller
         $tableCatProducto = 'cat_productos';
         $columnCompara2 = 'descripcion_producto_material';
 
+        $conteoGeneral2 = 0;
+        $conteoGeneral = 0;
+
         $datoNoEncontrado2 = [];
 
         // Verifica si los valores de la columna existen en la tabla especificada.
@@ -150,16 +153,16 @@ class ArchivoCompletoDetalleController extends Controller
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
                 $datoNoEncontrado2[] = $value;
+                $conteoGeneral2++;
             }
+            $conteoGeneral++;
         }
 
         // Cuenta cuántos datos no fueron encontrados en la tabla.
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
-        $conteoGeneral = $numDatosNoEncontrados2;
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        $VoBo = $conteo - $conteoGeneral;
-       
         $ultimaCarga = DB::table('tab_detalle_cargas')
             ->select('cve_carga')
             ->orderBy('id', 'desc')
@@ -173,25 +176,51 @@ class ArchivoCompletoDetalleController extends Controller
             $nuevaCveCarga = 'AT-CA-0001';
         }
 
+        $conteo2 = $conteo - 1;
 
-        $detalleArchivo = new tab_detalle_carga();
-        $detalleArchivo->cve_carga = $nuevaCveCarga;
-        $detalleArchivo->id_usuario = $idUser;
-        $detalleArchivo->nombre_archivo = $nombreArchivo;
-        $detalleArchivo->Reg_Archivo = $conteo;
-        $detalleArchivo->reg_vobo = $VoBo;
-        $detalleArchivo->reg_excluidos = 0;
-        $detalleArchivo->reg_incorpora =  $conteoGeneral;
-        $detalleArchivo->Reg_a_Contar = $conteo;
-        $detalleArchivo->conteo = 0;
-        $detalleArchivo->id_estatus = 1;
-        $detalleArchivo->observaciones = $request->input('observaciones');
-        $detalleArchivo->habilitado = $request->input('habilitado', true);
+        if ($conteoGeneral2 <= $conteo2 && $conteoGeneral2 > 1) {
+            $conteoGeneral2++;
+            $VoBo = $conteo - $conteoGeneral2;
+            $total = $VoBo + $conteoGeneral2;
 
-        $detalleArchivo->save();
+            $detalleArchivo = new tab_detalle_carga();
+            $detalleArchivo->cve_carga = $nuevaCveCarga;
+            $detalleArchivo->id_usuario = $idUser;
+            $detalleArchivo->nombre_archivo = $nombreArchivo;
+            $detalleArchivo->Reg_Archivo = $conteo;
+            $detalleArchivo->reg_vobo =   $VoBo;
+            $detalleArchivo->reg_excluidos = 0;
+            $detalleArchivo->reg_incorpora =  $conteoGeneral2;
+            $detalleArchivo->Reg_a_Contar = $total;
+            $detalleArchivo->conteo = 0;
+            $detalleArchivo->id_estatus = 1;
+            $detalleArchivo->observaciones = $request->input('observaciones');
+            $detalleArchivo->habilitado = $request->input('habilitado', true);
 
-        $this->procesoInsertar($request, $detalleArchivo);
+            $detalleArchivo->save();
 
+            $this->procesoInsertar($request, $detalleArchivo);
+        } else {
+            $VoBo = $conteo;
+            $detalleArchivo = new tab_detalle_carga();
+            $detalleArchivo->cve_carga = $nuevaCveCarga;
+            $detalleArchivo->id_usuario = $idUser;
+            $detalleArchivo->nombre_archivo = $nombreArchivo;
+            $detalleArchivo->Reg_Archivo = $conteo;
+            $detalleArchivo->reg_vobo =   $VoBo;
+            $detalleArchivo->reg_excluidos = 0;
+            $detalleArchivo->reg_incorpora =  0;
+            $detalleArchivo->Reg_a_Contar = $VoBo;
+            $detalleArchivo->conteo = 0;
+            $detalleArchivo->id_estatus = 1;
+            $detalleArchivo->observaciones = $request->input('observaciones');
+            $detalleArchivo->habilitado = $request->input('habilitado', true);
+
+            $detalleArchivo->save();
+
+            $this->procesoInsertar($request, $detalleArchivo);
+        }
+        
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $numDatosNoEncontrados2, $conteo, 'data' => $detalleArchivo]);
     }
 
