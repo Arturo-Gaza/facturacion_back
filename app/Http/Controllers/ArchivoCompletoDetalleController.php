@@ -178,8 +178,9 @@ class ArchivoCompletoDetalleController extends Controller
 
         $conteo2 = $conteo - 1;
 
-        if ($conteoGeneral2 <= $conteo2 && $conteoGeneral2 > 1) {
+        if ($conteoGeneral2 <= $conteo2 && $conteoGeneral2 >= 1) {
             $conteoGeneral2++;
+            
             $VoBo = $conteo - $conteoGeneral2;
             $total = $VoBo + $conteoGeneral2;
 
@@ -201,16 +202,19 @@ class ArchivoCompletoDetalleController extends Controller
 
             $this->procesoInsertar($request, $detalleArchivo);
         } else {
-            $VoBo = $conteo;
+            $VoBo = $conteo - $conteoGeneral2;
+            $incorpora = $conteoGeneral2;
+            $total = $VoBo + $conteoGeneral2;
+
             $detalleArchivo = new tab_detalle_carga();
             $detalleArchivo->cve_carga = $nuevaCveCarga;
             $detalleArchivo->id_usuario = $idUser;
             $detalleArchivo->nombre_archivo = $nombreArchivo;
             $detalleArchivo->Reg_Archivo = $conteo;
-            $detalleArchivo->reg_vobo =   $VoBo;
+            $detalleArchivo->reg_vobo =    $VoBo;
             $detalleArchivo->reg_excluidos = 0;
-            $detalleArchivo->reg_incorpora =  0;
-            $detalleArchivo->Reg_a_Contar = $VoBo;
+            $detalleArchivo->reg_incorpora =  $incorpora;
+            $detalleArchivo->Reg_a_Contar = $total;
             $detalleArchivo->conteo = 0;
             $detalleArchivo->id_estatus = 1;
             $detalleArchivo->observaciones = $request->input('observaciones');

@@ -145,9 +145,10 @@ class noInsertarFaltantesController extends Controller
             $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
-                $excluidos++;
                 $datoNoEncontrado2[] = $value;
+                $excluidos++;
             }
+            
         }
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
@@ -170,7 +171,11 @@ class noInsertarFaltantesController extends Controller
             $nuevaCveCarga = 'AT-CA-0001';
         }
 
-
+        if($total < 0){
+            $VoBo = 0;
+            $excluido = $conteo;
+            $total = $total + 1;
+        }
 
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
@@ -194,11 +199,11 @@ class noInsertarFaltantesController extends Controller
                 'errors' => $errors,
             ], 422);
         }
-
         $detalleArchivo->save();
+        
         $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
-        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $numDatosNoEncontrados2, $conteo, 'data' => $detalleArchivo]);
+        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
