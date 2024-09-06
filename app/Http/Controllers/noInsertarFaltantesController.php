@@ -145,10 +145,9 @@ class noInsertarFaltantesController extends Controller
             $value = mb_convert_encoding($value, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
-                    $excluidos++;
+                $excluidos++;
                 $datoNoEncontrado2[] = $value;
             }
-            
         }
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
@@ -172,6 +171,7 @@ class noInsertarFaltantesController extends Controller
         }
 
 
+
         $detalleArchivo = new tab_detalle_carga();
         $detalleArchivo->cve_carga = $nuevaCveCarga;
         $detalleArchivo->id_usuario = $idUser;
@@ -186,10 +186,19 @@ class noInsertarFaltantesController extends Controller
         $detalleArchivo->observaciones = $request->input('observaciones');
         $detalleArchivo->habilitado = $request->input('habilitado', true);
 
+        if ($conteo == $excluido) {
+            $errors = ['Se excluyeron todos los registro de la carga,  No se insertó ningún registro.'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error',
+                'errors' => $errors,
+            ], 422);
+        }
+
         $detalleArchivo->save();
         $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
-        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
+        return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $numDatosNoEncontrados2, $conteo, 'data' => $detalleArchivo]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
