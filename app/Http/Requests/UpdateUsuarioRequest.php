@@ -29,8 +29,7 @@ class UpdateUsuarioRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'apellidoP' => ['required', 'string', 'max:255'],
             'apellidoM' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'user' => 'required|string|min:6|unique:users,user'
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
         ];
     }
 
@@ -56,10 +55,6 @@ class UpdateUsuarioRequest extends FormRequest
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
             'email.max' => 'El campo correo electrónico no debe exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado.',
-            'user.required' => 'El campo usuario es obligatorio.',
-            'user.string' => 'El campo usuario debe ser una cadena de texto.',
-            'user.min' => 'El campo usuario debe tener al menos 6 caracteres.',
-            'user.unique' => 'El nombre de usuario ya está registrado.',
         ];
     }
 
