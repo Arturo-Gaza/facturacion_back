@@ -124,7 +124,7 @@ class ArchivoCompletoDetalleController extends Controller
                 $datoNoEncontrado2[] = $value;
                 $conteoGeneral2++;
             }
-            $conteoGeneral++;
+                $conteoGeneral++;
         }
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
@@ -149,8 +149,9 @@ class ArchivoCompletoDetalleController extends Controller
         if ($conteoGeneral2 <= $conteo2 && $conteoGeneral2 >= 1) {
             $conteoGeneral2++;
 
-            $VoBo = $conteo - $conteoGeneral2;
-            $total = $VoBo + $conteoGeneral2;
+            $VoBo = $conteo;
+            $total = $VoBo;
+            $incorpora = $VoBo - $total;
 
             $detalleArchivo = new tab_detalle_carga();
             $detalleArchivo->cve_carga = $nuevaCveCarga;
@@ -159,7 +160,7 @@ class ArchivoCompletoDetalleController extends Controller
             $detalleArchivo->Reg_Archivo = $conteo;
             $detalleArchivo->reg_vobo =   $VoBo;
             $detalleArchivo->reg_excluidos = 0;
-            $detalleArchivo->reg_incorpora =  $conteoGeneral2;
+            $detalleArchivo->reg_incorpora =  $incorpora;
             $detalleArchivo->Reg_a_Contar = $total;
             $detalleArchivo->conteo = 0;
             $detalleArchivo->id_estatus = 1;
@@ -170,9 +171,11 @@ class ArchivoCompletoDetalleController extends Controller
 
             $this->procesoInsertar($request, $detalleArchivo);
         } else {
-            $VoBo = $conteo - $conteoGeneral2;
-            $incorpora = $conteoGeneral2;
-            $total = $VoBo + $conteoGeneral2;
+            //cuando no hay registros en los catalogos
+
+            $VoBo = $conteo - $conteo;
+            $incorpora = $conteoGeneral2 - 1;
+            $total = $incorpora;
 
             $detalleArchivo = new tab_detalle_carga();
             $detalleArchivo->cve_carga = $nuevaCveCarga;

@@ -158,7 +158,7 @@ class noInsertarFaltantesController extends Controller
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        $excluido = $excluidos + 1;
+        $excluido = $excluidos ;
         $VoBo = $conteo - $excluido;
         $total = $conteo - $excluido;
 
