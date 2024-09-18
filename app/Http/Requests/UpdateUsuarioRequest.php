@@ -29,7 +29,7 @@ class UpdateUsuarioRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'apellidoP' => ['required', 'string', 'max:255'],
             'apellidoM' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'email' => ['nullable','string', 'lowercase', 'email', 'max:255'],
         ];
     }
 
@@ -50,7 +50,6 @@ class UpdateUsuarioRequest extends FormRequest
             'apellidoM.required' => 'El campo apellido materno es obligatorio.',
             'apellidoM.string' => 'El campo apellido materno debe ser una cadena de texto.',
             'apellidoM.max' => 'El campo apellido materno no debe exceder los 255 caracteres.',
-            'email.required' => 'El campo correo electrónico es obligatorio.',
             'email.string' => 'El campo correo electrónico debe ser una cadena de texto.',
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
             'email.max' => 'El campo correo electrónico no debe exceder los 255 caracteres.',
