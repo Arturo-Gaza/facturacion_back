@@ -25,11 +25,13 @@ class UpdateUsuarioRequest extends FormRequest
      */
     public function rules(): array
     {
+        $userId = $this->route('id');
         return [
             'name' => ['required', 'string', 'max:255'],
             'apellidoP' => ['required', 'string', 'max:255'],
             'apellidoM' => ['required', 'string', 'max:255'],
-            'email' => ['nullable','string', 'lowercase', 'email', 'max:255'],
+            'user' => ['required', 'string', 'min:6', 'max:10','unique:users,user,'.$userId],
+            'email' => ['nullable','string', 'lowercase', 'email', 'max:255','unique:users,email,'.$userId],
         ];
     }
 
@@ -54,6 +56,10 @@ class UpdateUsuarioRequest extends FormRequest
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
             'email.max' => 'El campo correo electrónico no debe exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado.',
+            'user.required' => 'El campo usuario es obligatorio.',
+            'user.string' => 'El campo usuario debe ser una cadena de texto.',
+            'user.min' => 'El campo usuario debe tener mínimo 6 caracteres.',
+            'user.max' => 'El campo usuario no debe exceder los 10 caracteres.',
         ];
     }
 

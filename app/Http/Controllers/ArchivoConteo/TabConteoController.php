@@ -183,7 +183,7 @@ class TabConteoController extends Controller
             $getConteos = $this->_TabConteo->reporteDiferencias($idCarga, $conteo);
             return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista');
         }
     }
 
