@@ -6,23 +6,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class InsertarFaltantesCatController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoCSV = 'archivoCargado.xlsx';
 
     public function procesoInsertar(Request $request)
     {
 
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -33,11 +31,8 @@ class InsertarFaltantesCatController extends Controller
             ], 422);
         }
 
-
-        $records = $csv->getRecords();
-
         $nombreColumna = 0;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar = [];
 
         foreach ($records as $record) {
@@ -61,7 +56,7 @@ class InsertarFaltantesCatController extends Controller
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna2 = 3;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar2 = [];
 
         foreach ($records as $record) {
@@ -86,7 +81,7 @@ class InsertarFaltantesCatController extends Controller
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna3 = 4;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -112,7 +107,7 @@ class InsertarFaltantesCatController extends Controller
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna4 = 2;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar4 = [];
 
         foreach ($records as $record) {
@@ -137,7 +132,7 @@ class InsertarFaltantesCatController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna5 = 1;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar5 = [];
 
         foreach ($records as $record) {
@@ -165,7 +160,7 @@ class InsertarFaltantesCatController extends Controller
         $this->insertTabUniMedidas($datoNoEncontrado2);
         $this->insetarTabGrupoFam($datoNoEncontrado3);
         //$this->insertTabProductos($datoNoEncontrado4, $datoNoEncontrado5);
-        
+
 
         return response()->json([
             'dtno_Almacenes' => $datoNoEncontrado, $datoNoEncontrado4,
@@ -258,17 +253,13 @@ class InsertarFaltantesCatController extends Controller
     public function cargarArchivoCompleto(Request $request)
     {
 
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-
-
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $records = array_slice($rows, 1);
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -281,7 +272,7 @@ class InsertarFaltantesCatController extends Controller
 
         $claveCarga = $this->obtenerNuevoId();
 
-        foreach ($csv->getRecords() as $record) {
+        foreach ($records as $record) {
 
             $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([

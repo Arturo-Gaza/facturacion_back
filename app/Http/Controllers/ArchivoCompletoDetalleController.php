@@ -7,31 +7,34 @@ use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 use App\Models\ArchivoCarga\tab_detalle_carga;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ArchivoCompletoDetalleController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoXLSX = 'archivoCargado.xlsx';
 
     public function detalleArchivo(Request $request, $idUser)
     {
         if ($request->hasFile('csv_file')) {
             $archivo = $request->file('csv_file');
             $nombreArchivo = $archivo->getClientOriginalName();
-            $path = $archivo->storeAs('csv', $nombreArchivo);
-            $file_csv = Storage::path($path);
-        } elseif (Storage::exists('csv/' . $this->nombreArchivoCSV)) {
-            $file_csv = Storage::path('csv/' . $this->nombreArchivoCSV);
-            $nombreArchivo = basename($file_csv);
+            $path = $archivo->storeAs('xlsx', $nombreArchivo);
+            $file_xlsx = Storage::path($path);
+        } elseif (Storage::exists('xlsx/' . $this->nombreArchivoXLSX)) {
+            $file_xlsx = Storage::path('xlsx/' . $this->nombreArchivoXLSX);
+            $nombreArchivo = basename($file_xlsx);
         } else {
             return response()->json(['error' => 'No se ha subido ningún archivo y no hay archivo almacenado.'], 400);
         }
 
-        $csv = Reader::createFromPath($file_csv, 'r');
-        $csv->setHeaderOffset(0);
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
+        // Extraer datos del archivo
         $conteoGeneral = 0;
 
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -42,29 +45,19 @@ class ArchivoCompletoDetalleController extends Controller
             ], 422);
         }
 
-        // Conteo de registros
+        // Conteo de registros (excluyendo el encabezado)
         $registrosColumna = 1;
-        $records = $csv->getRecords();
         $conteo = 0;
-
-        foreach ($records as $record) {
-            $record = array_values($record);
-            if (!empty($record[$registrosColumna])) {
+        for ($i = 1; $i < count($rows); $i++) {
+            if (!empty($rows[$i][$registrosColumna])) {
                 $conteo++;
             }
         }
 
-        // Comparación de la primera columna
+        // Comparar la primera columna
         $nombreColumna = 0;
-        $columnaComparar = [];
-        foreach ($records as $record) {
-            $record = array_values($record);
-            if (!empty($record[$nombreColumna])) {
-                $columnaComparar[] = $record[$nombreColumna];
-            }
-        }
+        $columnaComparar = array_unique(array_column($rows, $nombreColumna, 1));
 
-        $columnaComparar = array_unique($columnaComparar);
         $tableName = 'cat_almacenes';
         $columnCompara = 'clave_almacen';
 
@@ -80,15 +73,8 @@ class ArchivoCompletoDetalleController extends Controller
 
         // Comparación de la tercera columna
         $numColumna3 = 3;
-        $columnaComparar3 = [];
-        foreach ($records as $record) {
-            $record = array_values($record);
-            if (!empty($record[$numColumna3])) {
-                $columnaComparar3[] = $record[$numColumna3];
-            }
-        }
+        $columnaComparar3 = array_unique(array_column($rows, $numColumna3, 1));
 
-        $columnaComparar3 = array_unique($columnaComparar3);
         $tableCatUME = 'cat_unidad_medidas';
         $columnCompara3 = 'clave_unidad_medida';
 
@@ -101,18 +87,11 @@ class ArchivoCompletoDetalleController extends Controller
         }
 
         $numDatosNoEncontrados3 = count($datoNoEncontrado3);
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        // Comparación de la cuarta columna
         $numColumna4 = 4;
-        $columnaComparar4 = [];
-        foreach ($records as $record) {
-            $record = array_values($record);
-            if (!empty($record[$numColumna4])) {
-                $columnaComparar4[] = $record[$numColumna4];
-            }
-        }
+        $columnaComparar4 = array_unique(array_column($rows, $numColumna4, 1));
 
-        $columnaComparar4 = array_unique($columnaComparar4);
         $tableCatGpo = 'cat_gpo_familias';
         $columnCompara4 = 'clave_gpo_familia';
 
@@ -125,30 +104,20 @@ class ArchivoCompletoDetalleController extends Controller
         }
 
         $numDatosNoEncontrados4 = count($datoNoEncontrado4);
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        // Comparar la segunda columna (ISO-8859-1)
         $numColumna2 = 2;
-        $columnaComparar2 = [];
+        $columnaComparar2 = array_unique(array_map(function ($row) use ($numColumna2) {
+            return mb_convert_encoding($row[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
+        }, array_slice($rows, 1)));
 
-        // Itera sobre los registros y extrae el valor de la columna especificada.
-        foreach ($records as $record) {
-            $record = array_values($record);
-            if (!empty($record[$numColumna2])) {
-                $columnaComparar2[] = mb_convert_encoding($record[$numColumna2], 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
-            }
-        }
-
-        // Elimina duplicados en la columna a comparar.
-        $columnaComparar2 = array_unique($columnaComparar2);
         $tableCatProducto = 'cat_productos';
         $columnCompara2 = 'descripcion_producto_material';
 
         $conteoGeneral2 = 0;
         $conteoGeneral = 0;
-
         $datoNoEncontrado2 = [];
 
-        // Verifica si los valores de la columna existen en la tabla especificada.
         foreach ($columnaComparar2 as $value) {
             $existente = DB::table($tableCatProducto)->where($columnCompara2, $value)->exists();
             if (!$existente) {
@@ -158,7 +127,6 @@ class ArchivoCompletoDetalleController extends Controller
             $conteoGeneral++;
         }
 
-        // Cuenta cuántos datos no fueron encontrados en la tabla.
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +148,7 @@ class ArchivoCompletoDetalleController extends Controller
 
         if ($conteoGeneral2 <= $conteo2 && $conteoGeneral2 >= 1) {
             $conteoGeneral2++;
-            
+
             $VoBo = $conteo - $conteoGeneral2;
             $total = $VoBo + $conteoGeneral2;
 
@@ -224,7 +192,7 @@ class ArchivoCompletoDetalleController extends Controller
 
             $this->procesoInsertar($request, $detalleArchivo);
         }
-        
+
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos', $numDatosNoEncontrados2, $conteo, 'data' => $detalleArchivo]);
     }
 
@@ -232,30 +200,24 @@ class ArchivoCompletoDetalleController extends Controller
     public function procesoInsertar(Request $request, $detalleArchivo)
     {
 
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrio un error',
+                'message' => 'Ocurrió un error',
                 'errors' => $errors
             ], 422);
         }
 
-
-        $records = $csv->getRecords();
-
         $nombreColumna = 0;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar = [];
 
         foreach ($records as $record) {
@@ -279,7 +241,7 @@ class ArchivoCompletoDetalleController extends Controller
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna2 = 3;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar2 = [];
 
         foreach ($records as $record) {
@@ -304,7 +266,7 @@ class ArchivoCompletoDetalleController extends Controller
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna3 = 4;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar3 = [];
 
         foreach ($records as $record) {
@@ -330,7 +292,7 @@ class ArchivoCompletoDetalleController extends Controller
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         $nombreColumna4 = 2;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar4 = [];
 
         foreach ($records as $record) {
@@ -355,7 +317,7 @@ class ArchivoCompletoDetalleController extends Controller
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         $nombreColumna5 = 1;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $columnaComparar5 = [];
 
         foreach ($records as $record) {
@@ -387,7 +349,8 @@ class ArchivoCompletoDetalleController extends Controller
 
 
         return response()->json([
-            'dtno_Almacenes' => $datoNoEncontrado, $datoNoEncontrado4,
+            'dtno_Almacenes' => $datoNoEncontrado,
+            $datoNoEncontrado4,
             'success' => true,
             'message' => 'Los siguientes datos se insertaron en los catálogos correspondientes.',
         ]);
@@ -467,17 +430,12 @@ class ArchivoCompletoDetalleController extends Controller
     public function cargarArchivoCompleto(Request $request, $detalleArchivo)
     {
 
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-
-
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -487,9 +445,17 @@ class ArchivoCompletoDetalleController extends Controller
                 'errors' => $errors
             ], 422);
         }
+        // Filtrar solo las filas que tienen datos
+        $filasConDatos = array_filter($rows, function ($fila) {
+            // Filtra filas donde al menos una celda tenga valor no vacío
+            return array_filter($fila);
+        });
+
+        // Si también quieres excluir los encabezados (primer fila):
+        $filasConDatosSinEncabezado = array_slice($filasConDatos, 1);
 
 
-        foreach ($csv->getRecords() as $record) {
+        foreach ($filasConDatosSinEncabezado as $record) {
 
             $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([
@@ -497,17 +463,17 @@ class ArchivoCompletoDetalleController extends Controller
                 'almacen' => $record[0],
                 'material' => $record[1],
                 'texto_breve_material' => $record[2],
-                'ume' => $record[3],
-                'grupo_articulos' => $record[4],
-                'libre_utilizacion' => $record[5],
-                'en_control_calidad' =>  $record[6],
-                'bloqueado' =>  $record[7],
-                'valor_libre_util' => $record[8],
-                'valor_insp_cal' =>  $record[9],
-                'valor_stock_bloq' =>  $record[10],
-                'cantidad_total' =>  $record[11],
-                'importe_unitario' => $record[12],
-                'importe_total' =>  $record[13],
+                'ume' => str_replace(['$', ' '], '', $record[3]),
+                'grupo_articulos' => str_replace(['$', ' '], '', $record[4]),
+                'libre_utilizacion' => str_replace(['$', ' '], '', $record[5]),
+                'en_control_calidad' =>  str_replace(['$', ' '], '', $record[6]),
+                'bloqueado' =>  str_replace(['$', ' '], '', $record[7]),
+                'valor_libre_util' => str_replace(['$', ' '], '', $record[8]),
+                'valor_insp_cal' =>  str_replace(['$', ' '], '', $record[9]),
+                'valor_stock_bloq' =>  str_replace(['$', ' '], '', $record[10]),
+                'cantidad_total' =>  str_replace(['$', ' '], '', $record[11]),
+                'importe_unitario' => str_replace(['$', ' '], '', $record[12]),
+                'importe_total' =>  str_replace(['$', ' '], '', $record[13]),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -7,34 +7,38 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class InsertarArchivoController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoCSV = 'archivoCargado.xlsx';
 
     public function insertarArchivo(Request $request)
     {
-         if ($request->hasFile('csv_file')) {
-            
-            $path = $request->file('csv_file')->storeAs('csv', $this->nombreArchivoCSV);
-
-      
-            $file_csv = Storage::path($path);
-        } elseif (Storage::exists('csv/' . $this->nombreArchivoCSV)) {
-            
-            $file_csv = Storage::path('csv/' . $this->nombreArchivoCSV);
+        if ($request->hasFile('csv_file')) {
+            $archivo = $request->file('csv_file');
+            $nombreArchivo = $archivo->getClientOriginalName();
+            $path = $archivo->storeAs('xlsx', $nombreArchivo);
+            $file_xlsx = Storage::path($path);
+        } elseif (Storage::exists('xlsx/' . $this->nombreArchivoCSV)) {
+            $file_xlsx = Storage::path('xlsx/' . $this->nombreArchivoCSV);
+            $nombreArchivo = basename($file_xlsx);
         } else {
-            return response()->json(['error' => 'No hay archivo almacenado.'], 400);
+            return response()->json(['error' => 'No se ha subido ningún archivo y no hay archivo almacenado.'], 400);
         }
 
-        
-        $csv = Reader::createFromPath($file_csv, 'r');
-        $csv->setHeaderOffset(0);
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Extraer datos del archivo
+        $conteoGeneral = 0;
+
+        $rows = $sheet->toArray();
 
         $idCarga = '3';
 
-        
-        foreach ($csv->getRecords() as $record) {
+
+        foreach ($rows as $record) {
             DB::table('tab_archivo_completos')->insert([
                 'id_detalle_carga' => $idCarga,
                 'almacen' => trim($record['Almacen']),
@@ -55,6 +59,6 @@ class InsertarArchivoController extends Controller
         }
 
         return response()->json(['message' => 'Datos guardados exitosamente.'], 200);
-    
+
     }
 }

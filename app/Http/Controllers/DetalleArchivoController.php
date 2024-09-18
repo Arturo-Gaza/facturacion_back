@@ -7,29 +7,34 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class DetalleArchivoController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoCSV = 'archivoCargado.xlsx';
 
     public function detalleArchivo(Request $request, $idUser)
     {
         if ($request->hasFile('csv_file')) {
             $archivo = $request->file('csv_file');
             $nombreArchivo = $archivo->getClientOriginalName();
-            $path = $archivo->storeAs('csv', $nombreArchivo);
-            $file_csv = Storage::path($path);
-        } elseif (Storage::exists('csv/' . $this->nombreArchivoCSV)) {
-            $file_csv = Storage::path('csv/' . $this->nombreArchivoCSV);
-            $nombreArchivo = basename($file_csv);
+            $path = $archivo->storeAs('xlsx', $nombreArchivo);
+            $file_xlsx = Storage::path($path);
+        } elseif (Storage::exists('xlsx/' . $this->nombreArchivoCSV)) {
+            $file_xlsx = Storage::path('xlsx/' . $this->nombreArchivoCSV);
+            $nombreArchivo = basename($file_xlsx);
         } else {
             return response()->json(['error' => 'No se ha subido ningún archivo y no hay archivo almacenado.'], 400);
         }
 
-        $csv = Reader::createFromPath($file_csv, 'r');
-        $csv->setHeaderOffset(0);
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $encabezado = $csv->getHeader();
+        // Extraer datos del archivo
+        $conteoGeneral = 0;
+
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -42,7 +47,7 @@ class DetalleArchivoController extends Controller
 
         // Conteo de registros
         $registrosColumna = 1;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $conteo = 0;
 
         foreach ($records as $record) {

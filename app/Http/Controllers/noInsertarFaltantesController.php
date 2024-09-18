@@ -7,29 +7,34 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class noInsertarFaltantesController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoCSV = 'archivoCargado.xlsx';
 
     public function detalleArchivo(Request $request, $idUser)
     {
         if ($request->hasFile('csv_file')) {
             $archivo = $request->file('csv_file');
             $nombreArchivo = $archivo->getClientOriginalName();
-            $path = $archivo->storeAs('csv', $nombreArchivo);
-            $file_csv = Storage::path($path);
-        } elseif (Storage::exists('csv/' . $this->nombreArchivoCSV)) {
-            $file_csv = Storage::path('csv/' . $this->nombreArchivoCSV);
-            $nombreArchivo = basename($file_csv);
+            $path = $archivo->storeAs('xlsx', $nombreArchivo);
+            $file_xlsx = Storage::path($path);
+        } elseif (Storage::exists('xlsx/' . $this->nombreArchivoCSV)) {
+            $file_xlsx = Storage::path('xlsx/' . $this->nombreArchivoCSV);
+            $nombreArchivo = basename($file_xlsx);
         } else {
             return response()->json(['error' => 'No se ha subido ningún archivo y no hay archivo almacenado.'], 400);
         }
 
-        $csv = Reader::createFromPath($file_csv, 'r');
-        $csv->setHeaderOffset(0);
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $encabezado = $csv->getHeader();
+        // Extraer datos del archivo
+        $conteoGeneral = 0;
+
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -42,7 +47,7 @@ class noInsertarFaltantesController extends Controller
 
         // Conteo de registros
         $registrosColumna = 1;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
         $conteo = 0;
 
         foreach ($records as $record) {
@@ -148,7 +153,7 @@ class noInsertarFaltantesController extends Controller
                 $datoNoEncontrado2[] = $value;
                 $excluidos++;
             }
-            
+
         }
 
         $numDatosNoEncontrados2 = count($datoNoEncontrado2);
@@ -200,7 +205,7 @@ class noInsertarFaltantesController extends Controller
             ], 422);
         }
         $detalleArchivo->save();
-        
+
         $this->cargarArchivoCompleto($request, $detalleArchivo);
         $this->insertCatProductos();
         return response()->json(['success' => true, 'message' => 'Los datos no se insertaron en los catalogos',$numDatosNoEncontrados2,$conteo, 'data'=> $detalleArchivo]);
@@ -213,17 +218,13 @@ class noInsertarFaltantesController extends Controller
     public function cargarArchivoCompleto(Request $request, $detalleArchivo)
     {
 
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-
-
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $records = array_slice($rows,1);
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -234,8 +235,16 @@ class noInsertarFaltantesController extends Controller
             ], 422);
         }
 
+        // Filtrar solo las filas que tienen datos
+        $filasConDatos = array_filter($records, function ($fila) {
+            // Filtra filas donde al menos una celda tenga valor no vacío
+            return array_filter($fila);
+        });
 
-        foreach ($csv->getRecords() as $record) {
+        // Si también quieres excluir los encabezados (primer fila):
+        //$filasConDatosSinEncabezado = array_slice($filasConDatos, 1);
+
+        foreach ($filasConDatos as $record) {
 
             $record = array_values($record);
             DB::table('tab_archivo_completos')->insert([
@@ -243,17 +252,17 @@ class noInsertarFaltantesController extends Controller
                 'almacen' => $record[0],
                 'material' => $record[1],
                 'texto_breve_material' => $record[2],
-                'ume' => $record[3],
-                'grupo_articulos' => $record[4],
-                'libre_utilizacion' => $record[5],
-                'en_control_calidad' =>  $record[6],
-                'bloqueado' =>  $record[7],
-                'valor_libre_util' => $record[8],
-                'valor_insp_cal' =>  $record[9],
-                'valor_stock_bloq' =>  $record[10],
-                'cantidad_total' =>  $record[11],
-                'importe_unitario' => $record[12],
-                'importe_total' =>  $record[13],
+                'ume' => str_replace(['$', ' '], '', $record[3]),
+                'grupo_articulos' => str_replace(['$', ' '], '', $record[4]),
+                'libre_utilizacion' => str_replace(['$', ' '], '', $record[5]),
+                'en_control_calidad' =>  str_replace(['$', ' '], '', $record[6]),
+                'bloqueado' =>  str_replace(['$', ' '], '', $record[7]),
+                'valor_libre_util' => str_replace(['$', ' '], '', $record[8]),
+                'valor_insp_cal' =>  str_replace(['$', ' '], '', $record[9]),
+                'valor_stock_bloq' =>  str_replace(['$', ' '], '', $record[10]),
+                'cantidad_total' =>  str_replace(['$', ' '], '', $record[11]),
+                'importe_unitario' => str_replace(['$', ' '], '', $record[12]),
+                'importe_total' =>  str_replace(['$', ' '], '', $record[13]),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

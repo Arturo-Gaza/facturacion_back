@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use League\Csv\Reader;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class cargaArchivoController extends Controller
 {
-    protected $nombreArchivoCSV = 'archivoCargado.csv';
+    protected $nombreArchivoCSV = 'archivoCargado.xlsx';
 
     public function processCsv(Request $request)
     {
@@ -23,17 +24,12 @@ class cargaArchivoController extends Controller
         }
 
         // Ruta al archivo
-        $file_csv = $request->file('csv_file')->getRealPath();
+        $file_xlsx = $request->file('csv_file')->getRealPath();
+        $spreadsheet = IOFactory::load($file_xlsx);
+        $sheet = $spreadsheet->getActiveSheet();
 
-        $handle = fopen($file_csv, 'r');
-
-        stream_filter_append($handle, 'convert.iconv.ISO-8859-1/UTF-8');
-
-        $csv = Reader::createFromStream($handle);
-        $csv->setHeaderOffset(0);
-
-        // Verificar el número de columnas
-        $encabezado = $csv->getHeader();
+        $rows = $sheet->toArray();
+        $encabezado = $rows[0];
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -47,7 +43,7 @@ class cargaArchivoController extends Controller
         // Contar registros en una columna
 
         $registrosColumna = 0;
-        $records = $csv->getRecords();
+        $records = array_slice($rows, 1);
 
         $conteo = 0;
 
@@ -194,7 +190,7 @@ class cargaArchivoController extends Controller
             'message' => 'Los siguientes datos no se encuentran en los catálogos correspondientes.',
         ]);
     }
-   
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public function fileNameExist()
     {
