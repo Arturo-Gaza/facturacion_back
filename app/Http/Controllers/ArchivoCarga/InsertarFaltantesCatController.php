@@ -284,7 +284,7 @@ class InsertarFaltantesCatController extends Controller
                 'grupo_articulos' => str_replace(['$', ' '], '', $record[4]),
                 'libre_utilizacion' => str_replace(['$', ' ',','], '', $record[5]),
                 'en_control_calidad' =>  str_replace(['$', ' ',','], '', $record[6]),
-                'bloqueado' =>  str_replace(['$', ' '], '',',', $record[7]),
+                'bloqueado' =>  str_replace(['$', ' ',','], '', $record[7]),
                 'valor_libre_util' => str_replace(['$', ' ',','], '', $record[8]),
                 'valor_insp_cal' =>  str_replace(['$', ' ',','], '', $record[9]),
                 'valor_stock_bloq' =>  str_replace(['$', ' ',','], '', $record[10]),
