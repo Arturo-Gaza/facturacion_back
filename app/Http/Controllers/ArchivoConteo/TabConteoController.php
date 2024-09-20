@@ -69,23 +69,23 @@ class TabConteoController extends Controller
         //         ->orWhere('ubicacion', $cat->ubicacion)
         //         ->exists();
 
-        $exists = DB::table('tab_conteo')
-            ->where('id_carga', $cat->id_carga)
-            ->where('id_usuario', $cat->id_usuario)
-            ->where('conteo', $cat->conteo)
-            ->where('id_producto', $cat->id_producto)
-            ->where('ubicacion', $cat->ubicacion)
-            ->get();
+        //$exists = DB::table('tab_conteo')
+        //    ->where('id_carga', $cat->id_carga)
+        //    ->where('id_usuario', $cat->id_usuario)
+        //    ->where('conteo', $cat->conteo)
+        //    ->where('id_producto', $cat->id_producto)
+        //    ->where('ubicacion', $cat->ubicacion)
+        //    ->get();
 
-        if ($exists->count() != 0) {
-            $errors = ['Ya se cuenta con este registro.'];
-            return response()->json([
-                'success' => false,
-                'message' => 'Ocurrió un error',
-                'errors' => $errors,
-                'data' => $exists,
-            ], 422);
-        }
+        //if ($exists->count() != 0) {
+        //    $errors = ['Ya se cuenta con este registro.'];
+        //    return response()->json([
+        //        'success' => false,
+        //        'message' => 'Ocurrió un error',
+        //        'errors' => $errors,
+        //        'data' => $exists,
+        //    ], 422);
+        //}
 
         DB::beginTransaction();
         try {
