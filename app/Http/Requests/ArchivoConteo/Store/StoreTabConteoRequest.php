@@ -27,7 +27,7 @@ public function rules(): array
         'codigo' => 'required|string|max:10',
         'descripcion' => 'required|string|max:255',
         'ume' => 'required|string|max:10',
-        'cantidad' => 'required|integer',
+        'cantidad' => 'required',
         'ubicacion' => 'required|string|max:100',
         'observaciones' => 'nullable|string|max:500',
         'conteo'=> 'required|integer',
@@ -51,7 +51,6 @@ public function messages(): array
         'ume.max' => 'El campo UME no debe exceder los 10 caracteres.',
 
         'cantidad.required' => 'El campo Cantidad es obligatorio.',
-        'cantidad.integer' => 'El campo Cantidad debe ser un número entero.',
         'cantidad.min' => 'El campo Cantidad debe ser al menos 1.',
 
         'ubicacion.required' => 'El campo Ubicación es obligatorio.',

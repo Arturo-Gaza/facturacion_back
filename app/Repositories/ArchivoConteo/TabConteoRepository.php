@@ -121,7 +121,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
     public function reporteGeneral($idCarga, $conteo)
     {
         $products = DB::table('tab_conteo')
-            ->join('users', 'tab_conteo.id_usuario', '=', 'users.id')  // INNER JOIN con la tabla users
+            ->join('users', 'tab_conteo.id_usuario', '=', 'users.id')
             ->join('cat_productos', 'tab_conteo.id_producto', '=', 'cat_productos.id')
             ->select(
                 'tab_conteo.id_producto',
@@ -130,12 +130,12 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'tab_conteo.id_grupofamilia',
                 'tab_conteo.ubicacion',
                 'tab_conteo.id_usuario',
-                'users.name as usuario_nombre',  // Selecciona el nombre del usuario desde la tabla users
-                'tab_conteo.cantidad',
-                'tab_conteo.observaciones',
+                'users.name as usuario_nombre',
+                DB::raw('tab_conteo.cantidad::NUMERIC(10, 2) as cantidad'),
+                'tab_conteo.observaciones'
             )
             ->where('tab_conteo.id_carga', $idCarga)  // Condición WHERE
-            ->where('tab_conteo.conteo', $conteo)
+            ->where('tab_conteo.conteo', $conteo)     // Condición WHERE
             ->groupBy(
                 'tab_conteo.id_producto',
                 'tab_conteo.id_grupofamilia',
@@ -145,9 +145,13 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'cat_productos.clave_producto',
                 'cat_productos.descripcion_producto_material',
                 'tab_conteo.cantidad',
-                'tab_conteo.observaciones',
+                'tab_conteo.observaciones'
             )
             ->get();
+            $products->transform(function ($item) {
+                $item->cantidad = (float) $item->cantidad;  // Convertir a número
+                return $item;
+            });
 
         return response()->json($products);
     }
@@ -186,12 +190,12 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'a.descripcion',
                 'a.ume',
                 'b.clave_gpo_familia',
-                DB::raw('sap.total_sap AS "SAP"'),
-                DB::raw('fisico.total_fisico AS "Fisico"'),
-                DB::raw('(fisico.total_fisico - sap.total_sap) AS "DiferenciaCantidad"'),
-                DB::raw('sap.importe_unitario AS "importe_unitario"'),
-                DB::raw('(sap.importe_unitario * (fisico.total_fisico - sap.total_sap)) AS "DiferenciaMoneda"'),
-                DB::raw('sap.importe_total AS "ImporteTotal"')
+                DB::raw('CAST(sap.total_sap AS DECIMAL(12, 2)) AS "SAP"'),
+                DB::raw('CAST(fisico.total_fisico AS DECIMAL(10, 2)) AS "Fisico"'),
+                DB::raw('CAST((fisico.total_fisico - sap.total_sap) AS DECIMAL(12, 2)) AS "DiferenciaCantidad"'),
+                DB::raw('CAST(sap.importe_unitario AS DECIMAL(12, 2)) AS "importe_unitario"'),
+                DB::raw('CAST((sap.importe_unitario * (fisico.total_fisico - sap.total_sap)) AS DECIMAL(12, 2)) AS "DiferenciaMoneda"'),
+                DB::raw('CAST(sap.importe_total AS DECIMAL(10,2)) AS "ImporteTotal"')
             )
             ->where('a.id_carga', $idCarga)
             ->where('conteo', $conteo)
@@ -214,27 +218,31 @@ class TabConteoRepository implements TabConteoRepositoryInterface
     public function getConteoByIdCarga($idCarga)
     {
         $products = DB::table('tab_conteo')
-        ->select(
-            'tab_conteo.conteo',
-        )
-        ->where('tab_conteo.id_carga', $idCarga)
-        ->groupBy(
-            'tab_conteo.id_carga',
-            'tab_conteo.conteo'
-        )
-        ->get();
+            ->select(
+                'tab_conteo.conteo',
+            )
+            ->where('tab_conteo.id_carga', $idCarga)
+            ->groupBy(
+                'tab_conteo.id_carga',
+                'tab_conteo.conteo'
+            )
+            ->get();
 
-    return response()->json($products);
+        return response()->json($products);
     }
 
     public function reporteConcentrado($idCarga, $numconteo)
     {
         $conteo = TabConteo::select('id_producto', 'codigo', 'descripcion', DB::raw('SUM(cantidad) as Total'))
-        ->where('id_carga', $idCarga)
-        ->where('conteo', $numconteo)
-        ->groupBy('id_producto', 'codigo', 'descripcion')
-        ->get();
+            ->where('id_carga', $idCarga)
+            ->where('conteo', $numconteo)
+            ->groupBy('id_producto', 'codigo', 'descripcion')
+            ->get();
 
+            $conteo->transform(function ($item) {
+                $item->Total = (float) $item->Total;  // Convertir a número
+                return $item;
+            });
         return response()->json($conteo);
     }
 }
