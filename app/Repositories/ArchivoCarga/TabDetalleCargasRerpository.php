@@ -3,7 +3,12 @@
 namespace App\Repositories\ArchivoCarga;
 
 use App\Interfaces\ArchivoCarga\TabArchivoCargaRepositoryInterface;
+use App\Models\ArchivoCarga\Tab_archivo_completo;
+use App\Models\ArchivoCarga\tab_detalle_archivo;
 use App\Models\ArchivoCarga\tab_detalle_carga;
+use App\Models\ArchivoCarga\TabObservaciones;
+use App\Models\ArchivoConteo\TabConteo;
+use App\Models\AsignacionCarga\tab_asignacion;
 
 class TabDetalleCargasRerpository implements TabArchivoCargaRepositoryInterface
 {
@@ -50,5 +55,16 @@ class TabDetalleCargasRerpository implements TabArchivoCargaRepositoryInterface
     public function update(array $data, $id)
     {
         return tab_detalle_carga::where('id', $id)->update($data);
+    }
+
+    public function deleteCarga($idCarga)
+    {
+        tab_detalle_archivo::where('id_carga_cab', $idCarga)->delete();
+        TabConteo::where('id_carga',$idCarga)->delete();
+        Tab_archivo_completo::where('id_detalle_carga',$idCarga)->delete();
+        tab_asignacion::where('id_carga',$idCarga)->delete();
+        TabObservaciones::where('id_detalle_carga',$idCarga)->delete();
+        tab_detalle_carga::where('id',$idCarga)->delete();
+        return "Carga eliminada correctamente.";
     }
 }

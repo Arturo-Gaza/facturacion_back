@@ -96,6 +96,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
 
     //Ruta de catalogo ubicaciones
     Route::get('catUbicaciones/getAll', [CatUbicaionesController::class, 'getAll']);
+    Route::post('catUbicaciones/getAllPaginate', [CatUbicaionesController::class, 'getAllPaginate']);
     Route::get('catUbicaciones/getById/{id}', [CatUbicaionesController::class, 'getById']);
     Route::post('catUbicaciones/register', [CatUbicaionesController::class, 'store']);
     Route::put('catUbicaciones/update/{id}', [CatUbicaionesController::class, 'update']);
@@ -110,6 +111,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::put('tabCargaDetalle/updateConteo/{id}', [TabDetalleCargaController::class, 'updateConte']);
     Route::put('tabCargaDetalle/updateValidarCierre', [TabDetalleCargaController::class, 'ValidarCierre']);
     Route::get('tabCargaDetalle/ValidarCierreUsuarios/{idCarga}', [TabDetalleCargaController::class, 'ValidarCierreUsuarios']);
+    Route::delete('tabCargaDetalle/deleteCarga/{idCarga}', [TabDetalleCargaController::class, 'deleteCarga']);
 
     //Rutas detalle archivo
     Route::get('tabDetalleArchivo/getAll', [TabArchivoDetalleController::class, 'getAll']);

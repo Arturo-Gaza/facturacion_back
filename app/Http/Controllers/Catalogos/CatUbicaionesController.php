@@ -8,6 +8,7 @@ use App\Classes\ApiResponseHelper;
 use App\Http\Requests\Catalogos\Store\StoreCatUbicacionesRequest;
 use App\Http\Requests\Catalogos\Update\UpdateCatUbicacionesRequest;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class CatUbicaionesController extends Controller
@@ -23,6 +24,17 @@ class CatUbicaionesController extends Controller
     {
         try {
             $getAll = $this->_catUbicaciones->getAll();
+            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
+        }
+        catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+        }
+    }
+
+    public function getAllPaginate(Request $data)
+    {
+        try {
+            $getAll = $this->_catUbicaciones->getAllPaginate($data);
             return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
         }
         catch (Exception $ex) {

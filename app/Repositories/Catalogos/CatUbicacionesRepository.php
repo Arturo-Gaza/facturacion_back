@@ -12,6 +12,17 @@ class CatUbicacionesRepository implements CatUbicacionesRepositoryInterface
         return CatUbicaciones::all();
     }
 
+    public function getAllPaginate($data)
+    {
+        // Construir la consulta
+        $query = CatUbicaciones::query();
+        $query->whereRaw('LOWER(clave_ubicacion) LIKE ?', ['%' . strtolower($data->clave_ubicacion) . '%'])
+        ->orderBy('clave_ubicacion');
+
+        // Paginar los resultados
+        return $query->paginate($data->pageSize);
+    }
+
     public function getByID($id): ?CatUbicaciones
     {
         return CatUbicaciones::where('id', $id)->first();

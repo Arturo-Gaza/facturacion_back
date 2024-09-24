@@ -176,4 +176,17 @@ class TabDetalleCargaController extends Controller
 
         return  $results;
     }
+
+    public function deleteCarga($idCarga)
+    {
+        DB::beginTransaction();
+        try {
+            $deleteCarga = $this->_tabDetalleArchivo->deleteCarga($idCarga);
+            DB::commit();
+            return ApiResponseHelper::sendResponse(null, $deleteCarga, 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex,"Ocurrio un error al eliminar la carga.");
+        }
+    }
 }
