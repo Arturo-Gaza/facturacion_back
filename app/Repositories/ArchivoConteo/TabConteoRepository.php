@@ -165,7 +165,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 DB::raw('CAST(importe_unitario AS DECIMAL(10, 2)) AS importe_unitario'),
                 DB::raw('CAST(importe_total AS DECIMAL(10, 2)) AS importe_total')
             )
-            ->groupBy('id_cat_prod', 'importe_unitario', 'importe_total', 'cantidad_total');
+            ->groupBy('id_cat_prod','id_gpo_familia','id_unid_med', 'importe_unitario', 'importe_total', 'cantidad_total');
 
         $fisicoTotals = DB::table('tab_conteo')
             ->select(
@@ -174,7 +174,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
             )
             ->where('id_carga', $idCarga)
             ->where('conteo', $conteo)
-            ->groupBy('id_producto');
+            ->groupBy('id_producto','id_grupofamilia','id_unidadmedida');
 
         $query = DB::table('tab_conteo as a')
             ->join('cat_gpo_familias as b', 'a.id_grupofamilia', '=', 'b.id')
@@ -185,7 +185,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 $join->on('a.id_producto', '=', 'fisico.id_producto');
             })
             ->select(
-                'a.id_producto',
+                DB::raw('DISTINCT ON (a.id_producto) a.id_producto'),
                 'a.codigo',
                 'a.descripcion',
                 'a.ume',
@@ -209,10 +209,8 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'fisico.total_fisico',
                 'sap.importe_unitario',
                 'sap.importe_total'
-            )
-            ->get();
-
-        return response()->json($query);
+            )->get();
+            return response()->json($query);
     }
 
     public function getConteoByIdCarga($idCarga)
