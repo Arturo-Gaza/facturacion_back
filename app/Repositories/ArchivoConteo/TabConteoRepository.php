@@ -161,11 +161,11 @@ class TabConteoRepository implements TabConteoRepositoryInterface
         $sapTotals = DB::table('tab_detalle_archivos')
             ->select(
                 'id_cat_prod',
-                DB::raw('CAST(cantidad_total AS DECIMAL(10, 2)) AS total_sap'),
-                DB::raw('CAST(importe_unitario AS DECIMAL(10, 2)) AS importe_unitario'),
-                DB::raw('CAST(importe_total AS DECIMAL(10, 2)) AS importe_total')
-            )
-            ->groupBy('id_cat_prod','id_gpo_familia','id_unid_med', 'importe_unitario', 'importe_total', 'cantidad_total');
+                DB::raw('CAST(cantidad_total AS DECIMAL(12, 3)) AS total_sap'),
+                DB::raw('CAST(importe_unitario AS DECIMAL(12, 3)) AS importe_unitario'),
+                DB::raw('CAST(importe_total AS DECIMAL(12, 3)) AS importe_total')
+            )->where('id_carga_cab',$idCarga)
+            ->groupBy('id_cat_prod', 'importe_unitario', 'importe_total', 'cantidad_total');
 
         $fisicoTotals = DB::table('tab_conteo')
             ->select(
@@ -174,7 +174,7 @@ class TabConteoRepository implements TabConteoRepositoryInterface
             )
             ->where('id_carga', $idCarga)
             ->where('conteo', $conteo)
-            ->groupBy('id_producto','id_grupofamilia','id_unidadmedida');
+            ->groupBy('id_producto');
 
         $query = DB::table('tab_conteo as a')
             ->join('cat_gpo_familias as b', 'a.id_grupofamilia', '=', 'b.id')
@@ -190,12 +190,12 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'a.descripcion',
                 'a.ume',
                 'b.clave_gpo_familia',
-                DB::raw('CAST(sap.total_sap AS DECIMAL(12, 2)) AS "SAP"'),
-                DB::raw('CAST(fisico.total_fisico AS DECIMAL(10, 2)) AS "Fisico"'),
-                DB::raw('CAST((fisico.total_fisico - sap.total_sap) AS DECIMAL(12, 2)) AS "DiferenciaCantidad"'),
+                DB::raw('CAST(sap.total_sap AS DECIMAL(12, 3)) AS "SAP"'),
+                DB::raw('CAST(fisico.total_fisico AS DECIMAL(12, 3)) AS "Fisico"'),
+                DB::raw('CAST((fisico.total_fisico - sap.total_sap) AS DECIMAL(12, 3)) AS "DiferenciaCantidad"'),
                 DB::raw('CAST(sap.importe_unitario AS DECIMAL(12, 2)) AS "importe_unitario"'),
                 DB::raw('CAST((sap.importe_unitario * (fisico.total_fisico - sap.total_sap)) AS DECIMAL(12, 2)) AS "DiferenciaMoneda"'),
-                DB::raw('CAST(sap.importe_total AS DECIMAL(10,2)) AS "ImporteTotal"')
+                DB::raw('CAST(sap.importe_total AS DECIMAL(12,2)) AS "ImporteTotal"')
             )
             ->where('a.id_carga', $idCarga)
             ->where('conteo', $conteo)
