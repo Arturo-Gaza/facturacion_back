@@ -222,4 +222,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         User::where('id', $id)->update(array('login_activo' => false));
     }
+
+    public function deleteUser(array $data, $id)
+    {
+        return User::whereId($id)->update($data);
+    }
 }
