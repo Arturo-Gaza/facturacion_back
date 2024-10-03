@@ -189,4 +189,14 @@ class TabDetalleCargaController extends Controller
             return ApiResponseHelper::rollback($ex,"Ocurrio un error al eliminar la carga.");
         }
     }
+
+    public function validarEstatusCarga($idCarga,$conteo)
+    {
+        try {
+            $validar = $this->_tabDetalleArchivo->validarEstatusCarga($idCarga,$conteo);
+            return ApiResponseHelper::sendResponse(["numConteo"=> $validar], 'Núemro de conteos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
 }

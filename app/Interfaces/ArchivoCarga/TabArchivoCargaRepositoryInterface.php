@@ -9,4 +9,5 @@ interface TabArchivoCargaRepositoryInterface
     public function store(array $data);
     public function update(array $data, $id);
     public function deleteCarga($idCarga);
+    public function validarEstatusCarga($idCarga,$conteo);
 }

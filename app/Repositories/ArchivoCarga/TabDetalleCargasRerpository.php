@@ -67,4 +67,9 @@ class TabDetalleCargasRerpository implements TabArchivoCargaRepositoryInterface
         tab_detalle_carga::where('id',$idCarga)->delete();
         return "Carga eliminada correctamente.";
     }
+
+    public function validarEstatusCarga($idCarga,$conteo)
+    {
+        return tab_detalle_carga::where('id', $idCarga)->where('conteo',$conteo)->count();
+    }
 }
