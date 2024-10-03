@@ -114,6 +114,7 @@ class UsuarioController extends Controller
     {
         $data = [
             'habilitado' => $request->habilitado,
+            'user' => $request->user,
         ];
 
         DB::beginTransaction();

@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class StoreUsuarioRequest extends FormRequest
@@ -29,9 +30,12 @@ class StoreUsuarioRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'apellidoP' => ['required', 'string', 'max:255'],
             'apellidoM' => ['required', 'string', 'max:255'],
-            'email' => ['nullable','string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', Rules\Password::defaults()],
-            'user' => ['required', 'min:6', 'unique:' . User::class]
+            'user' => ['required', 'string', 'min:6', 'max:20', Rule::unique('users', 'user')
+                ->where(function ($query) {
+                    $query->where('habilitado', 1); // Condición adicional: solo usuarios con status 'active'
+                })],
         ];
     }
 
@@ -62,6 +66,7 @@ class StoreUsuarioRequest extends FormRequest
             'user.string' => 'El campo usuario debe ser una cadena de texto.',
             'user.min' => 'El campo usuario debe tener al menos 6 caracteres.',
             'user.unique' => 'El nombre de usuario ya está registrado.',
+            'user.max' => 'El campo usuario no debe de exceder los 20 caracteres.',
         ];
     }
 

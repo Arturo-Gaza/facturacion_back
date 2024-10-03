@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
 
 class UpdateUsuarioRequest extends FormRequest
@@ -30,8 +31,25 @@ class UpdateUsuarioRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'apellidoP' => ['required', 'string', 'max:255'],
             'apellidoM' => ['required', 'string', 'max:255'],
-            'user' => ['required', 'string', 'min:6', 'max:10','unique:users,user,'.$userId],
-            'email' => ['nullable','string', 'lowercase', 'email', 'max:255','unique:users,email,'.$userId],
+            'user' => ['required', 'string', 'min:6', 'max:20', Rule::unique('users', 'user')
+                ->ignore($userId) // Ignora el email del usuario actual en la validación de unicidad
+                ->where(function ($query) {
+                    $query->where('habilitado', 1); // Condición adicional: solo usuarios con status 'active'
+                })],
+            'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $userId],
+
+
+            // 'user' => [
+            //     'required',
+            //     'string',
+            //     'min:6',
+            //     'max:10',
+            //     'sometimes' => [
+            //         'unique:users,user,' . $userId,
+            //         'habilitado' => 'true',
+            //     ],
+            // ], ejemplo 2 de user
+
         ];
     }
 
@@ -59,7 +77,7 @@ class UpdateUsuarioRequest extends FormRequest
             'user.required' => 'El campo usuario es obligatorio.',
             'user.string' => 'El campo usuario debe ser una cadena de texto.',
             'user.min' => 'El campo usuario debe tener mínimo 6 caracteres.',
-            'user.max' => 'El campo usuario no debe exceder los 10 caracteres.',
+            'user.max' => 'El campo usuario no debe de exceder los 20 caracteres.',
         ];
     }
 
