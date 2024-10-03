@@ -72,7 +72,7 @@ class UsuarioController extends Controller
 
     public function update(UpdateUsuarioRequest $request, string $id)
     {
-       
+
         if ($request->password == null) {
             $data = [
                 'name' => $request->name,
@@ -104,6 +104,23 @@ class UsuarioController extends Controller
             }
             DB::commit();
             return ApiResponseHelper::sendResponse(null, 'Usuario actualizado correctamente', 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
+
+    public function deleteUser(Request $request, string $id)
+    {
+        $data = [
+            'habilitado' => $request->habilitado,
+        ];
+
+        DB::beginTransaction();
+        try {
+            $this->usuario->deleteUser($data, $id);
+            DB::commit();
+            return ApiResponseHelper::sendResponse(null, 'Usuario eliminado correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);

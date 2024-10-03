@@ -60,6 +60,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
+    Route::put('usuario/deleteUser/{id}', [UsuarioController::class, 'deleteUser']);
 
     //CATALOGOS
     //Rutas de catalogo Roles
