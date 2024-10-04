@@ -70,6 +70,7 @@ class TabDetalleCargasRerpository implements TabArchivoCargaRepositoryInterface
 
     public function validarEstatusCarga($idCarga,$conteo)
     {
-        return tab_detalle_carga::where('id', $idCarga)->where('conteo',$conteo)->count();
+        $estatus = [6,8,9];
+        return tab_detalle_carga::where('id', $idCarga)->where('conteo',$conteo)->whereIn('id_estatus',$estatus)->count();
     }
 }
