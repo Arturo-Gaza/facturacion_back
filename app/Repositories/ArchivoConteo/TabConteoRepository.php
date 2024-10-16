@@ -131,22 +131,11 @@ class TabConteoRepository implements TabConteoRepositoryInterface
                 'tab_conteo.ubicacion',
                 'tab_conteo.id_usuario',
                 'users.name as usuario_nombre',
-                DB::raw('tab_conteo.cantidad::NUMERIC(10, 2) as cantidad'),
+                DB::raw('tab_conteo.cantidad::NUMERIC(10, 3) as cantidad'),
                 'tab_conteo.observaciones'
             )
             ->where('tab_conteo.id_carga', $idCarga)  // Condición WHERE
             ->where('tab_conteo.conteo', $conteo)     // Condición WHERE
-            ->groupBy(
-                'tab_conteo.id_producto',
-                'tab_conteo.id_grupofamilia',
-                'tab_conteo.ubicacion',
-                'tab_conteo.id_usuario',
-                'users.name',
-                'cat_productos.clave_producto',
-                'cat_productos.descripcion_producto_material',
-                'tab_conteo.cantidad',
-                'tab_conteo.observaciones'
-            )
             ->get();
             $products->transform(function ($item) {
                 $item->cantidad = (float) $item->cantidad;  // Convertir a número
