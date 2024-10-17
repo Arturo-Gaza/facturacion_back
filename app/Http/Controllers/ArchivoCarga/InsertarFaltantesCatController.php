@@ -21,6 +21,11 @@ class InsertarFaltantesCatController extends Controller
 
         $rows = $sheet->toArray();
         $encabezado = $rows[0];
+        $encabezado = $rows[0];
+        if (count($encabezado) > 14) {
+            // Truncar el encabezado y cada fila a las primeras 14 columnas
+            $encabezado = array_slice($encabezado, 0, 14);
+        }
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
@@ -260,6 +265,11 @@ class InsertarFaltantesCatController extends Controller
         $rows = $sheet->toArray();
         $records = array_slice($rows, 1);
         $encabezado = $rows[0];
+        $encabezado = $rows[0];
+        if (count($encabezado) > 14) {
+            // Truncar el encabezado y cada fila a las primeras 14 columnas
+            $encabezado = array_slice($encabezado, 0, 14);
+        }
         $numColumnas = 14;
         if (count($encabezado) !== $numColumnas) {
             $errors = ['El archivo no tiene el número esperado de columnas.'];
