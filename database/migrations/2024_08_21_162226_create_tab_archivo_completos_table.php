@@ -12,22 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tab_archivo_completos', function (Blueprint $table) {
-            $table->id(); 
+            $table->id();
             $table->foreignId('id_detalle_carga')->constrained('tab_detalle_cargas');
             $table->string('almacen');
             $table->string('material');
             $table->string('texto_breve_material');
             $table->string('ume');
             $table->string('grupo_articulos');
-            $table->string('libre_utilizacion', 15);
-            $table->string('en_control_calidad', 15);
-            $table->string('bloqueado', 15);
-            $table->string('valor_libre_util', 15);
-            $table->string('valor_insp_cal', 15);
-            $table->string('valor_stock_bloq', 15);
-            $table->string('cantidad_total', 15);
-            $table->string('importe_unitario', 15);
-            $table->string('importe_total', 15);
+            $table->string('libre_utilizacion', 60);
+            $table->string('en_control_calidad', 60);
+            $table->string('bloqueado', 60);
+            $table->string('valor_libre_util', 60);
+            $table->string('valor_insp_cal', 60);
+            $table->string('valor_stock_bloq', 60);
+            $table->string('cantidad_total', 60);
+            $table->string('importe_unitario', 60);
+            $table->string('importe_total', 60);
             $table->timestamps();
         });
     }
