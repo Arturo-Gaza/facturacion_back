@@ -24,7 +24,7 @@ public function authorize(): bool
 public function rules(): array
 {
     return [
-        'codigo' => 'required|string|max:10',
+        'codigo' => 'required|string|max:20',
         'descripcion' => 'required|string|max:255',
         'ume' => 'required|string|max:10',
         'cantidad' => 'required',
