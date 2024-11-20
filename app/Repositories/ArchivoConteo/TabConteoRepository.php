@@ -232,4 +232,100 @@ class TabConteoRepository implements TabConteoRepositoryInterface
             });
         return response()->json($conteo);
     }
+
+    public function reporteDiferenciasComparativoAnual($idCarga, $conteo1,$conteo2,$conteo3)
+    {
+        $sapTotals = DB::table('tab_detalle_archivos')
+        ->select(
+            'id_cat_prod',
+            DB::raw('CAST(cantidad_total AS DECIMAL(12, 3)) AS total_sap'),
+            DB::raw('CAST(importe_unitario AS DECIMAL(12, 3)) AS importe_unitario'),
+            DB::raw('CAST(importe_total AS DECIMAL(12, 3)) AS importe_total')
+        )
+        ->where('id_carga_cab', $idCarga)
+        ->groupBy('id_cat_prod', 'importe_unitario', 'importe_total', 'cantidad_total');
+
+        // Subconsulta para conteo 1
+        $conteo1Totals = DB::table('tab_conteo')
+        ->select(
+            'id_producto',
+            DB::raw('SUM(cantidad) AS total_conteo1')
+        )
+        ->where('id_carga', $idCarga)
+        ->where('conteo', $conteo1)
+        ->groupBy('id_producto');
+
+        // Subconsulta para conteo 2
+        $conteo2Totals = DB::table('tab_conteo')
+        ->select(
+            'id_producto',
+            DB::raw('SUM(cantidad) AS total_conteo2')
+        )
+        ->where('id_carga', $idCarga)
+        ->where('conteo', $conteo2)
+        ->groupBy('id_producto');
+
+        // Subconsulta para conteo 3
+        $conteo3Totals = DB::table('tab_conteo')
+        ->select(
+            'id_producto',
+            DB::raw('SUM(cantidad) AS total_conteo3')
+        )
+        ->where('id_carga', $idCarga)
+        ->where('conteo', $conteo3)
+        ->groupBy('id_producto');
+
+        // Unimos todos los datos
+        $query = DB::table('tab_conteo as a')
+            ->join('cat_gpo_familias as b', 'a.id_grupofamilia', '=', 'b.id')
+            ->joinSub($sapTotals, 'sap', function ($join) {
+                $join->on('a.id_producto', '=', 'sap.id_cat_prod');
+            })
+            ->leftJoinSub($conteo1Totals, 'conteo1', function ($join) {
+                $join->on('a.id_producto', '=', 'conteo1.id_producto');
+            })
+            ->leftJoinSub($conteo2Totals, 'conteo2', function ($join) {
+                $join->on('a.id_producto', '=', 'conteo2.id_producto');
+            })
+            ->leftJoinSub($conteo3Totals, 'conteo3', function ($join) {
+                $join->on('a.id_producto', '=', 'conteo3.id_producto');
+            })
+            ->select(
+                'a.id_producto',
+                'a.codigo',
+                'a.descripcion',
+                'a.ume as unidad_medida',
+                'b.clave_gpo_familia as grupo_articulos',
+                DB::raw('CAST(sap.total_sap AS DECIMAL(12, 3)) AS SAP'),
+                DB::raw('COALESCE(conteo1.total_conteo1, 0) AS Fisico_Conteo_1'),
+                DB::raw('COALESCE(conteo2.total_conteo2, 0) AS Fisico_Conteo_2'),
+                DB::raw('COALESCE(conteo3.total_conteo3, 0) AS Fisico_Conteo_3'),
+                DB::raw('(COALESCE(conteo2.total_conteo2, 0) - COALESCE(conteo1.total_conteo1, 0)) AS Diferencia'),
+                DB::raw('(COALESCE(conteo3.total_conteo3, 0) - COALESCE(sap.total_sap, 0)) AS Diferencia_Fisica_C3'),
+                DB::raw('CAST(sap.importe_unitario AS DECIMAL(12, 2)) AS Importe_Unitario'),
+                //DB::raw('CAST(sap.importe_unitario * COALESCE(conteo1.total_conteo1, 0) AS DECIMAL(12, 2)) AS Diferencia_Pesos_Conteo_1'),
+                //DB::raw('CAST(sap.importe_unitario * COALESCE(conteo2.total_conteo2, 0) AS DECIMAL(12, 2)) AS Diferencia_Pesos_Conteo_2'),
+                //DB::raw('CAST(sap.importe_unitario * COALESCE(conteo3.total_conteo3, 0) AS DECIMAL(12, 2)) AS Diferencia_Pesos_Conteo_3'),
+                DB::raw('CAST((sap.importe_unitario * (COALESCE(conteo1.total_conteo1, 0) - COALESCE(sap.total_sap, 0))) AS DECIMAL(12, 2)) AS diferencia_moneda_c1'),
+                DB::raw('CAST((sap.importe_unitario * (COALESCE(conteo2.total_conteo2, 0) - COALESCE(sap.total_sap, 0))) AS DECIMAL(12, 2)) AS diferencia_moneda_c2'),
+                DB::raw('CAST((sap.importe_unitario * (COALESCE(conteo3.total_conteo3,0) - COALESCE(sap.total_sap,0))) AS DECIMAL(12, 2)) AS diferencia_moneda_c3'),
+                DB::raw('CAST(sap.importe_total AS DECIMAL(12, 2)) AS Importe_Total')
+            )
+            ->where('a.id_carga', $idCarga)
+            ->groupBy(
+                'a.id_producto',
+                'a.codigo',
+                'a.descripcion',
+                'a.ume',
+                'b.clave_gpo_familia',
+                'sap.total_sap',
+                'sap.importe_unitario',
+                'sap.importe_total',
+                'conteo1.total_conteo1',
+                'conteo2.total_conteo2',
+                'conteo3.total_conteo3'
+            )
+            ->get();
+        return response()->json($query);
+    }
 }

@@ -133,6 +133,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('TabConteo/getNumConteoByCarga/{idCarga}', [TabConteoController::class, 'getNoConteosByCarga']);
     Route::get('TabConteo/getConcentradoByCarga/{idCarga}/{conteo}', [TabConteoController::class, 'getConteoConcentrado']);
     Route::delete('TabConteo/deleteConteoAllByIDCargaIDUser/{idCarga}/{idUser}/{conteo}', [TabConteoController::class, 'DeleteAll']);
+    Route::post('TabConteo/getDiferenciasCA/{idCarga}', [TabConteoController::class, 'getDiferenciasComparativaAnual']);
 
 
 

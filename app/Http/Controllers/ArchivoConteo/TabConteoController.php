@@ -206,4 +206,14 @@ class TabConteoController extends Controller
             return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
         }
     }
+
+    public function getDiferenciasComparativaAnual($idCarga, Request $conteos)
+    {
+        try {
+            $getConteos = $this->_TabConteo->reporteDiferenciasComparativoAnual($idCarga, $conteos->conteo1,$conteos->conteo2,$conteos->conteo3);
+            return ApiResponseHelper::sendResponse($getConteos, 'Conteo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista');
+        }
+    }
 }
