@@ -44,12 +44,29 @@ class cargaArchivoController extends Controller
             ], 422);
         }
 
+        // Detectar celdas vacías
+        $records = array_slice($rows, 1); // Excluir encabezado
+        $celdasVacias = [];
+
+        foreach ($records as $filaIndex => $fila) {
+            foreach ($fila as $colIndex => $celda) {
+                // Consideramos celda vacía si es null o una cadena vacía
+                if ($celda === null || $celda === '') {
+                    $columnaNombre = $encabezado[$colIndex] ?? "Columna " . ($colIndex + 1);
+                    $celdasVacias[] = [
+                        'fila' => $filaIndex + 2,
+                        'columna' => $columnaNombre,
+                    ];
+                }
+            }
+        }
         // Contar registros en una columna
 
         $registrosColumna = 0;
         $records = array_slice($rows, 1);
 
         $conteo = 0;
+        
 
         foreach ($records as $record) {
             $record = array_values($record);
@@ -182,6 +199,15 @@ class cargaArchivoController extends Controller
         }
         //////////////////////////////////////////////////////////////////////////////////////////////////
         // Retorna resultados
+        if (count($celdasVacias) > 0) {
+            $errors = ['Hay celdas vacias', $celdasVacias];
+            return response()->json([
+                'success' => false,
+                'message' => 'El archivo contiene celdas vacías.',
+                'errors' => $errors,
+            ], 422);
+        }
+
         return response()->json([
             'num_registros' => $conteo,
             'dtno_Almacenes' => $datoNoEncontrado,
