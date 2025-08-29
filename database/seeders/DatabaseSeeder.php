@@ -29,6 +29,15 @@ class DatabaseSeeder extends Seeder
         $this->call(TabDepartamentosCategoriasSeeder::class);
 $this->call(UsuariosSoliSeeder::class);
 
+
+     $this->call([
+            CatRegimenesFiscalesSeeder::class,
+            CatEstatusesSatSeeder::class,
+            CatTiposDireccionSeeder::class,
+            CatTiposContactoSeeder::class,
+            // Agrega aquí otros seeders que crees en el futuro
+        ]);
+
         //Department::factory(6)->create();
         //Employee::factory(25)->create();
 
