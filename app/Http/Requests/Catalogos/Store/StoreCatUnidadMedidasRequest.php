@@ -24,7 +24,7 @@ class StoreCatUnidadMedidasRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_unidad_medida' => 'required|string|max:10',
+            'clave_unidad_medida' => 'required|string|max:10|unique:cat_unidad_medidas,clave_unidad_medida',
             'descripcion_unidad_medida' => 'required|string|max:200'
         ];
     }
@@ -35,6 +35,7 @@ class StoreCatUnidadMedidasRequest extends FormRequest
             'clave_unidad_medida.required' => 'El campo Clave unidad de medida es obligatorio.',
             'clave_unidad_medida.string' => 'El campo Clave unidad de medida debe ser una cadena de texto.',
             'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 10 caracteres.',
+            'clave_unidad_medida.unique' => 'Clave Unidad de Medida ya existente' ,
 
             'descripcion_unidad_medida.required' => 'El campo Descripcion unidad de medida es obligatorio.',
             'descripcion_unidad_medida.string' => 'El campo Descripcion unidad de medida debe ser una cadena de texto.',

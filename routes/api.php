@@ -1,66 +1,100 @@
 <?php
 
-use App\Http\Controllers\ActualizarEstatusAsignacionController;
-use App\Http\Controllers\ArchivoCarga\ActualizarStatusController;
-use App\Http\Controllers\ArchivoCarga\InsertarArchivoController;
-use App\Http\Controllers\ArchivoCarga\InsertarFaltantesCatController;
-use App\Http\Controllers\ArchivoCarga\ObtenerCargaIdController;
-use App\Http\Controllers\ArchivoCarga\TabArchivoDetalleController;
-use App\Http\Controllers\ArchivoCarga\TabDetalleCargaController;
+
 use App\Http\Controllers\ArchivoCarga\TabObservacionesController;
-use App\Http\Controllers\ArchivoCompletoController;
-use App\Http\Controllers\ArchivoCompletoDetalleController;
-use App\Http\Controllers\ArchivoConteo\TabConteoController;
-use App\Http\Controllers\AsignacionCarga\TabAsignacionController;
+
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\cargaArchivoController;
 use App\Http\Controllers\Catalogos\CatAlmacenesController;
 use App\Http\Controllers\Catalogos\CatGpoFamiliaController;
 use App\Http\Controllers\Catalogos\CatProductosController;
 use App\Http\Controllers\Catalogos\CatRolesController;
 use App\Http\Controllers\Catalogos\CatUbicaionesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
-use App\Http\Controllers\DetalleArchivoController;
-use App\Http\Controllers\noInsertarFaltantesController;
-use App\Http\Controllers\subirCatalogoUbicacionesController;
+use App\Http\Controllers\SistemaTickets\CatCategoriasController;
+use App\Http\Controllers\SistemaTickets\CatCentroController;
+use App\Http\Controllers\SistemaTickets\CatDepartamentosController;
+use App\Http\Controllers\SistemaTickets\CatMonedaController;
+use App\Http\Controllers\SistemaTickets\CatTiposController;
+use App\Http\Controllers\SistemaTickets\TabArchivosObservacionesDetalleController;
+use App\Http\Controllers\SistemaTickets\TabArchivosObservacionesSolicitudReqInfoController;
+use App\Http\Controllers\SistemaTickets\TabcotizacionesDetalleController;
+use App\Http\Controllers\SistemaTickets\TabCotizacionesSolicitudesController;
+use App\Http\Controllers\SistemaTickets\TabObesrvacionesDetalleController;
+use App\Http\Controllers\SistemaTickets\TabObservacionesSolicitudController;
+use App\Http\Controllers\SistemaTickets\TabObservacionesSolicitudReqInfoController;
+use App\Http\Controllers\TabArchivoSolicitudesDetalleController;
+use App\Http\Controllers\TabDepartamentosCategoriasController;
+use App\Http\Controllers\TabSolicitudesController;
+use App\Http\Controllers\TabSolicitudesDetalleController;
 use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\UsuarioDetalleCargaController;
+
 use App\Http\Middleware\AcceptJsonMiddleware;
-use App\Models\ArchivoCarga\tab_detalle_carga;
-use App\Models\ArchivoConteo\TabConteo;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 //     return $request->user();
 // });
-//ruta para insertar ubicacion
-route::get('importUbicaciones', [subirCatalogoUbicacionesController::class, 'importUbicaciones']);
 
-Route::get('cargaArchivo/{id}', [ObtenerCargaIdController::class, 'getByDetalleCargaId']);
-Route::put('ActualizarStatus/{id}', [ActualizarStatusController::class, 'actualizarEstatus']);
+Route::post('usuario/enviarCorreoRec', [UsuarioController::class, 'enviarCorreoRec']);
+Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorreoRec']);
+Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
+
+Route::get('/test', function () {
+    return 'ok';
+});
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
-Route::get('cargas-usuario/{id_usuario}', [ArchivoCompletoController::class, 'getCargasByUsuario']);
+//Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
-Route::post('/insertarArchivo', [InsertarArchivoController::class, 'insertarArchivo']);
-
-//Ruta para insertar datos faltantes
-Route::get('/obtenerID', [cargaArchivoController::class, 'obtenerNuevoId']);
-Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
-
-
-
-
-Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function () {
+Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
 
     //Cierre de sesión
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
 
     Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
+    Route::get('usuario/getCompras', [UsuarioController::class, 'getCompras']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
     Route::put('usuario/deleteUser/{id}', [UsuarioController::class, 'deleteUser']);
+
+
+    //Ruta para tabla Solicitudes
+    Route::get('tabSolicitudes/getAll', [TabSolicitudesController::class, 'getAll']);
+    Route::get('tabSolicitudes/getById/{id}', [TabSolicitudesController::class, 'getByID']);
+    Route::get('tabSolicitudes/getByIdSolicitud/{id}', [TabSolicitudesController::class, 'getByIDSolicitud']);
+    Route::post('tabSolicitudes/register', [TabSolicitudesController::class, 'store']);
+    Route::put('tabSolicitudes/update/{id}', [TabSolicitudesController::class, 'update']);
+    Route::post('tabSolicitudes/asignar', [TabSolicitudesController::class, 'asignar']);
+     Route::post('tabSolicitudes/reasignar', [TabSolicitudesController::class, 'reasignar']);
+    Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
+    Route::post('tabSolicitudes/reporte', [TabSolicitudesController::class, 'reporte']);
+    Route::post('tabSolicitudes/formatearSolicitud/{id}', [TabSolicitudesController::class, 'formatearSolicitud']);
+  Route::get('tabSolicitudes/getCotizaciones/{id}', [TabSolicitudesController::class, 'getCotizaciones']);
+
+    //Ruta para tabla SolicitudesDetalle
+    Route::get('tabSolicitudesDetalle/getAll', [TabSolicitudesDetalleController::class, 'getAll']);
+    Route::get('tabSolicitudesDetalle/getById/{id}', [TabSolicitudesDetalleController::class, 'getById']);
+    Route::get('tabSolicitudesDetalle/getByIDSolicitud/{id}', [TabSolicitudesDetalleController::class, 'getByIDSolicitud']);
+    Route::post('tabSolicitudesDetalle/register', [TabSolicitudesDetalleController::class, 'store']);
+    Route::put('tabSolicitudesDetalle/update/{id}', [TabSolicitudesDetalleController::class, 'update']);
+    Route::put('tabSolicitudesDetalle/deleteByDetalle/{id}', [TabSolicitudesDetalleController::class, 'deleteByDetalle']);
+    Route::put('tabSolicitudesDetalle/deleteBySolicitud/{id}', [TabSolicitudesDetalleController::class, 'deleteBySolicitud']);
+    //Ruta para tabla ArchivoSolicitudesDetalle
+    Route::get('tabArchivoSolicitudesDetalle/getAll', [TabArchivoSolicitudesDetalleController::class, 'getAll']);
+    Route::get('tabArchivoSolicitudesDetalle/getById/{id}', [TabArchivoSolicitudesDetalleController::class, 'getById']);
+    Route::get('tabArchivoSolicitudesDetalle/getByIDSolicitudDeta/{id}', [TabArchivoSolicitudesDetalleController::class, 'getByIDSolicitudDeta']);
+    Route::post('tabArchivoSolicitudesDetalle/register', [TabArchivoSolicitudesDetalleController::class, 'store']);
+    Route::put('tabArchivoSolicitudesDetalle/update/{id}', [TabArchivoSolicitudesDetalleController::class, 'update']);
+    Route::post('tabArchivoSolicitudesDetalle/delete', [TabArchivoSolicitudesDetalleController::class, 'delete']);
+    //Ruta para tabla DepartamentosCategorias
+    Route::get('tabDepartamentosCategorias/getAll', [TabDepartamentosCategoriasController::class, 'getAll']);
+
+
+    Route::get('tabDepartamentosCategorias/getByDep/{id}', [TabDepartamentosCategoriasController::class, 'getByDep']);
+    Route::post('tabDepartamentosCategorias/register', [TabDepartamentosCategoriasController::class, 'store']);
+    Route::post('tabDepartamentosCategorias/addDelete', [TabDepartamentosCategoriasController::class, 'AddDelete']);
+    Route::delete('tabDepartamentosCategorias/delete', [TabDepartamentosCategoriasController::class, 'delete']);
 
     //CATALOGOS
     //Rutas de catalogo Roles
@@ -68,6 +102,7 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('catRoles/getById/{id}', [CatRolesController::class, 'getById']);
     Route::post('catRoles/register', [CatRolesController::class, 'store']);
     Route::put('catRoles/update/{id}', [CatRolesController::class, 'update']);
+    Route::post('catRoles/exportar', [CatRolesController::class, 'exportar']);
 
     //Rutas de catalogo Almacenes
     Route::get('catAlmacenes/getAll', [CatAlmacenesController::class, 'getAll']);
@@ -80,20 +115,28 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::get('catUnidadMedidas/getById/{id}', [CatUnidadMedidasController::class, 'getById']);
     Route::post('catUnidadMedidas/register', [CatUnidadMedidasController::class, 'store']);
     Route::put('catUnidadMedidas/update/{id}', [CatUnidadMedidasController::class, 'update']);
+    Route::post('catUnidadMedidas/exportar', [CatUnidadMedidasController::class, 'exportar']);
 
     //Rutas Catalogo Grupo familia
+
     Route::get('catGpoFamilia/getAll', [CatGpoFamiliaController::class, 'getAll']);
     Route::get('catGpoFamilia/getById/{id}', [CatGpoFamiliaController::class, 'getById']);
     Route::post('catGpoFamilia/register', [CatGpoFamiliaController::class, 'store']);
     Route::put('catGpoFamilia/update/{id}', [CatGpoFamiliaController::class, 'update']);
     Route::get('catGpoFamilia/getAllPersonalizado/{idCarga}', [CatGpoFamiliaController::class, 'getAllPersonalizado']);
+    Route::post('catGpoFamilia/search', [CatGpoFamiliaController::class, 'search']);
+    Route::post('catGpoFamilia/exportar', [CatGpoFamiliaController::class, 'exportar']);
 
     //Rutas Catalogo Productos
     Route::get('catProductos/getAll', [CatProductosController::class, 'getAll']);
     Route::get('catProductos/getById/{id}', [CatProductosController::class, 'getById']);
+    Route::post('catProductos/search', [CatProductosController::class, 'search']);
+    Route::get('catProductos/getBygetByCategoria/{id}', [CatProductosController::class, 'getByCategoria']);
     Route::post('catProductos/register', [CatProductosController::class, 'store']);
+    Route::post('catProductos/registerSinClave', [CatProductosController::class, 'storeSinClave']);
     Route::put('catProductos/update/{id}', [CatProductosController::class, 'update']);
     Route::get('catProductos/getAllPersonalizado/{idCarga}', [CatProductosController::class, 'getAllPersonalizado']);
+    Route::post('catProductos/exportar', [CatProductosController::class, 'exportar']);
 
     //Ruta de catalogo ubicaciones
     Route::get('catUbicaciones/getAll', [CatUbicaionesController::class, 'getAll']);
@@ -102,68 +145,10 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('catUbicaciones/register', [CatUbicaionesController::class, 'store']);
     Route::put('catUbicaciones/update/{id}', [CatUbicaionesController::class, 'update']);
 
-    //Ruta api archivo csv
-
-    //Rutas Carga detalle
-    Route::get('tabCargaDetalle/getAll', [TabDetalleCargaController::class, 'getAll']);
-    Route::get('tabCargaDetalle/getById/{id}', [TabDetalleCargaController::class, 'getById']);
-    Route::get('tabCargaDetalle/validarEstatusCarga/{idCarga}/{conteo}', [TabDetalleCargaController::class, 'validarEstatusCarga']);
-    Route::post('tabCargaDetalle/register', [TabDetalleCargaController::class, 'store']);
-    Route::put('tabCargaDetalle/update/{id}', [TabDetalleCargaController::class, 'update']);
-    Route::put('tabCargaDetalle/updateConteo/{id}', [TabDetalleCargaController::class, 'updateConte']);
-    Route::put('tabCargaDetalle/updateValidarCierre', [TabDetalleCargaController::class, 'ValidarCierre']);
-    Route::get('tabCargaDetalle/ValidarCierreUsuarios/{idCarga}', [TabDetalleCargaController::class, 'ValidarCierreUsuarios']);
-    Route::delete('tabCargaDetalle/deleteCarga/{idCarga}', [TabDetalleCargaController::class, 'deleteCarga']);
-
-    //Rutas detalle archivo
-    Route::get('tabDetalleArchivo/getAll', [TabArchivoDetalleController::class, 'getAll']);
-    Route::get('tabDetalleArchivo/getById/{id}', [TabArchivoDetalleController::class, 'getById']);
-    Route::post('tabDetalleArchivo/register', [TabArchivoDetalleController::class, 'store']);
-    Route::put('tabDetalleArchivo/update/{id}', [TabArchivoDetalleController::class, 'update']);
-
-    //Rutas Tabla Conteo
-    Route::get('TabConteo/getById/{id}', [TabConteoController::class, 'getById']);
-    Route::post('TabConteo/register', [TabConteoController::class, 'store']);
-    Route::get('TabConteo/getAll', [TabConteoController::class, 'getAll']);
-    Route::put('TabConteo/update/{id}', [TabConteoController::class, 'update']);
-    Route::get('TabConteo/getByIDCargaIDUser/{idCarga}/{idUser}', [TabConteoController::class, 'getByIDCargaIDUser']);
-    Route::get('TabConteo/getByIDCarga/{idCarga}', [TabConteoController::class, 'getByIDCarga']);
-    Route::get('TabConteo/getConteosGeneral/{idCarga}/{conteo}', [TabConteoController::class, 'getConteosGeneral']);
-    Route::get('TabConteo/getDiferenciasConteo/{idCarga}/{conteo}', [TabConteoController::class, 'getDiferenciasConteo']);
-    Route::get('TabConteo/getNumConteoByCarga/{idCarga}', [TabConteoController::class, 'getNoConteosByCarga']);
-    Route::get('TabConteo/getConcentradoByCarga/{idCarga}/{conteo}', [TabConteoController::class, 'getConteoConcentrado']);
-    Route::delete('TabConteo/deleteConteoAllByIDCargaIDUser/{idCarga}/{idUser}/{conteo}', [TabConteoController::class, 'DeleteAll']);
-    Route::post('TabConteo/getDiferenciasCA/{idCarga}', [TabConteoController::class, 'getDiferenciasComparativaAnual']);
-
-
-
-    //Rutas Tabla Asignacion
-    Route::get('TabAsignacion/getById/{id}', [TabAsignacionController::class, 'getById']);
-    Route::post('TabAsignacion/Asignacion', [TabAsignacionController::class, 'Asignacion']);
-    Route::post('TabAsignacion/Designacion/{idUserDesig}', [TabAsignacionController::class, 'Designacion']);
-    Route::post('TabAsignacion/register', [TabAsignacionController::class, 'store']);
-    Route::get('TabAsignacion/getAll', [TabAsignacionController::class, 'getAll']);
-    Route::put('TabAsignacion/update/{id}', [TabAsignacionController::class, 'update']);
-    Route::put('TabAsignacion/CerrarAll/{idCarga}', [TabAsignacionController::class, 'CerrarAll']);
-    Route::put('TabAsignacion/NuevoConteoAsignacion/{idCarga}', [TabAsignacionController::class, 'NuevoConteoAsignacion']);
-    Route::get('TabAsignacion/getAllPersonalizado/{idCarga}/{idUsuario}', [TabAsignacionController::class, 'getByIdCargaIdUserPer']);
-    Route::put('actualizarEstatus/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatus']);
-    Route::put('actualizarEstatusFechaInicio/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaInicio']);
-    Route::put('actualizarEstatusFechaFin/{idUser}/{idCarga}', [ActualizarEstatusAsignacionController::class, 'actualizarEstatusFechaFin']);
-
-    Route::post('detalleArchivo/{idUser}', [DetalleArchivoController::class, 'detalleArchivo']);  //CARGAR CABECERA DETALLE_1
-    Route::post('cargarArchivoCompleto/{idCargar}', [cargaArchivoController::class, 'cargarArchivoCompleto']); //CARGAR ARCHIVOS FALTANTES_3
-    Route::post('InsertarDatos', [InsertarFaltantesCatController::class, 'procesoInsertar']); //INSERTAR PRODUCTOS_2
-    Route::post('noInsertarFaltantes/{idUser}', [noInsertarFaltantesController::class, 'detalleArchivo']);
-
-    Route::post('/process-csv', [cargaArchivoController::class, 'processCsv']);
-    Route::post('nombreArchivoExi', [cargaArchivoController::class, 'archivoRepetido']);
 
     Route::get('usuario/getAllUserAlmacen/{idCarga}', [UsuarioController::class, 'getAllUserAlmacen']);
     Route::get('usuario/getAllUser', [UsuarioController::class, 'getAllUser']);
     Route::get('usuario/getAllUserAsignado/{idCarga}', [UsuarioController::class, 'getAllUserAsignado']);
-
-    Route::get('detalleUsuarioAsignacion/{idUser}', [UsuarioDetalleCargaController::class, 'UsuarioDetalleCarga']);
 
     //Ruta para tabla Observaciones
     Route::get('tabObsercaiones/getAll', [TabObservacionesController::class, 'getAll']);
@@ -173,6 +158,96 @@ Route::middleware(['auth:sanctum', AcceptJsonMiddleware::class])->group(function
     Route::post('tabObsercaiones/register', [TabObservacionesController::class, 'store']);
     Route::put('tabObsercaiones/update/{id}', [TabObservacionesController::class, 'update']);
 
-    //Ruta para insertar catalogos y cargar completas
-    Route::post('detalleUsuarioAsignacionCompleto/{idUser}', [ArchivoCompletoDetalleController::class, 'detalleArchivo']);
+
+    //Ruta para cat moneda
+    Route::get('catMoneda/getAll', [CatMonedaController::class, 'getAll']);
+    Route::get('catMoneda/getById/{id}', [CatMonedaController::class, 'getById']);
+    Route::post('catMoneda/register', [CatMonedaController::class, 'store']);
+    Route::put('catMoneda/update/{id}', [CatMonedaController::class, 'update']);
+    Route::post('catMoneda/exportar', [CatMonedaController::class, 'exportar']);
+
+    //Ruta para cat centro
+    Route::get('catCentro/getAll', [CatCentroController::class, 'getAll']);
+    Route::get('catCentro/getById/{id}', [CatCentroController::class, 'getById']);
+    Route::post('catCentro/register', [CatCentroController::class, 'store']);
+    Route::put('catCentro/update/{id}', [CatCentroController::class, 'update']);
+
+    //Ruta para cat departamentos
+    Route::get('catDepartamentos/getAll', [CatDepartamentosController::class, 'getAll']);
+    Route::get('catDepartamentos/getById/{id}', [CatDepartamentosController::class, 'getById']);
+    Route::post('catDepartamentos/register', [CatDepartamentosController::class, 'store']);
+    Route::put('catDepartamentos/update/{id}', [CatDepartamentosController::class, 'update']);
+    Route::post('catDepartamentos/exportar', [CatDepartamentosController::class, 'exportar']);
+
+    //Ruta para cat tipos
+    Route::get('catTipos/getAll', [CatTiposController::class, 'getAll']);
+    Route::get('catTipos/getById/{id}', [CatTiposController::class, 'getById']);
+    Route::get('catTipos/getByDpto/{id}', [CatTiposController::class, 'getByDpto']);
+    Route::post('catTipos/register', [CatTiposController::class, 'store']);
+    Route::put('catTipos/update/{id}', [CatTiposController::class, 'update']);
+    Route::post('catTipos/exportar', [CatTiposController::class, 'exportar']);
+    //Ruta para cat categorias
+    Route::get('catCategorias/getAll', [CatCategoriasController::class, 'getAll']);
+    Route::get('catCategorias/getById/{id}', [CatCategoriasController::class, 'getById']);
+    Route::get('catCategorias/getByDpto/{id}', [CatCategoriasController::class, 'getByDpto']);
+    Route::post('catCategorias/register', [CatCategoriasController::class, 'store']);
+    Route::put('catCategorias/update/{id}', [CatCategoriasController::class, 'update']);
+    Route::get('catCategorias/getByIdCat/{id}', [CatCategoriasController::class, 'getByIdCat']);
+    Route::post('catCategorias/exportar', [CatCategoriasController::class, 'exportar']);
+    Route::post('tabDepartamento/cateDepartamento', [TabDepartamentosCategoriasController::class, 'AddDelete']);
+
+    //Ruta para tab observaciones solicitud
+    Route::get('tabObservacionSolicitud/getAll', [TabObservacionesSolicitudController::class, 'getAll']);
+    Route::get('tabObservacionSolicitud/getById/{id}', [TabObservacionesSolicitudController::class, 'getById']);
+    Route::get('tabObservacionSolicitud/solicitud/{id}', [TabObservacionesSolicitudController::class, 'getBySolicitud']);
+    Route::post('tabObservacionSolicitud/register', [TabObservacionesSolicitudController::class, 'store']);
+    Route::put('tabObservacionSolicitud/update/{id}', [TabObservacionesSolicitudController::class, 'update']);
+
+    Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
+
+    //Ruta para tab observaciones solicitud detalle
+    Route::get('tabobservacionesSolicitudDetalle/getAll', [TabObesrvacionesDetalleController::class, 'getAll']);
+    Route::get('tabobservacionesSolicitudDetalle/getById/{id}', [TabObesrvacionesDetalleController::class, 'getById']);
+    Route::get('tabobservacionesSolicitudDetalle/getByIdDetalle/{id}', [TabObesrvacionesDetalleController::class, 'getByIdDetalle']);
+    Route::post('tabobservacionesSolicitudDetalle/register', [TabObesrvacionesDetalleController::class, 'store']);
+    Route::put('tabobservacionesSolicitudDetalle/update/{id}', [TabObesrvacionesDetalleController::class, 'update']);
+
+    //Ruta para tab cotizaciones  solicitud detalle
+    Route::get('tabCotizacionesSolicitudDetalle/getAll', [TabcotizacionesDetalleController::class, 'getAll']);
+    Route::get('tabCotizacionesSolicitudDetalle/getById/{id}', [TabcotizacionesDetalleController::class, 'getById']);
+    Route::get('tabCotizacionesSolicitudDetalle/getByIdDetalle/{id}', [TabcotizacionesDetalleController::class, 'getByIdDetalle']);
+    Route::post('tabCotizacionesSolicitudDetalle/register', [TabcotizacionesDetalleController::class, 'store']);
+    Route::put('tabCotizacionesSolicitudDetalle/update', [TabcotizacionesDetalleController::class, 'update']);
+    Route::post('tabCotizacionesSolicitudDetalle/delete', [TabcotizacionesDetalleController::class, 'delete']);
+
+        //Ruta para tab cotizaciones  solicitud
+    Route::get('tabCotizacionesSolicitudes/getAll', [TabCotizacionesSolicitudesController::class, 'getAll']);
+    Route::get('tabCotizacionesSolicitudes/getById/{id}', [TabCotizacionesSolicitudesController::class, 'getById']);
+    Route::get('tabCotizacionesSolicitudes/getByIdDetalle/{id}', [TabCotizacionesSolicitudesController::class, 'getByIdDetalle']);
+    Route::post('tabCotizacionesSolicitudes/register', [TabCotizacionesSolicitudesController::class, 'store']);
+    Route::put('tabCotizacionesSolicitudes/update', [TabCotizacionesSolicitudesController::class, 'update']);
+    Route::post('tabCotizacionesSolicitudes/delete', [TabCotizacionesSolicitudesController::class, 'delete']);
+
+    Route::get('TabArchivosObservacionesDetalle/getAll', [TabArchivosObservacionesDetalleController::class, 'getAll']);
+    Route::get('TabArchivosObservacionesDetalle/getById/{id}', [TabArchivosObservacionesDetalleController::class, 'getById']);
+    Route::get('TabArchivosObservacionesDetalle/getByIDSolicitudDeta/{id}', [TabArchivosObservacionesDetalleController::class, 'getByIDSolicitudDeta']);
+    Route::post('TabArchivosObservacionesDetalle/register', [TabArchivosObservacionesDetalleController::class, 'store']);
+    Route::put('TabArchivosObservacionesDetalle/update/{id}', [TabArchivosObservacionesDetalleController::class, 'update']);
+    Route::post('TabArchivosObservacionesDetalle/delete', [TabArchivosObservacionesDetalleController::class, 'delete']);
+
+   //Ruta para tab observaciones solicitud detalle
+    Route::get('TabObservacionesSolicitudReqInfo/getAll', [TabObservacionesSolicitudReqInfoController::class, 'getAll']);
+    Route::get('TabObservacionesSolicitudReqInfo/getById/{id}', [TabObservacionesSolicitudReqInfoController::class, 'getById']);
+    Route::get('TabObservacionesSolicitudReqInfo/getByIdSolicitud/{id}', [TabObservacionesSolicitudReqInfoController::class, 'getByIdSolicitud']);
+    Route::post('TabObservacionesSolicitudReqInfo/register', [TabObservacionesSolicitudReqInfoController::class, 'store']);
+    Route::put('TabObservacionesSolicitudReqInfo/update/{id}', [TabObservacionesSolicitudReqInfoController::class, 'update']);
+
+    Route::get('TabArchivosObservacionesSolicitudReqInfo/getAll', [TabArchivosObservacionesSolicitudReqInfoController::class, 'getAll']);
+    Route::get('TabArchivosObservacionesSolicitudReqInfo/getById/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'getById']);
+    Route::get('TabArchivosObservacionesSolicitudReqInfo/getByIDSolicitudDeta/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'getByIDSolicitudDeta']);
+    Route::post('TabArchivosObservacionesSolicitudReqInfo/register', [TabArchivosObservacionesSolicitudReqInfoController::class, 'store']);
+    Route::put('TabArchivosObservacionesSolicitudReqInfo/update/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'update']);
+    Route::post('TabArchivosObservacionesSolicitudReqInfo/delete', [TabArchivosObservacionesSolicitudReqInfoController::class, 'delete']);
+
+
 });

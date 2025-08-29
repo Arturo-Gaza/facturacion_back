@@ -4,20 +4,36 @@ namespace App\Repositories\Usuario;
 
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
+use App\Models\PasswordReset;
 use App\Models\User;
 use App\Models\UserSistema;
 use App\Models\UsuarioRol;
+use App\Services\EmailService;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UsuarioRepository implements UsuarioRepositoryInterface
 {
+    protected $emailService;
+
+    public function __construct(EmailService $emailService)
+    {
+        $this->emailService = $emailService;
+    }
+
+
     public function getAll()
     {
-        $usuario = User::select('users.id', 'users.user', 'users.name', 'users.apellidoP', 'users.apellidoM', 'users.email', 'users.idRol', 'users.habilitado', 'cat_roles.nombre')
-            ->join('cat_roles', 'cat_roles.id', '=', 'users.idRol')->get();
+        $usuario = User::all();
+
         return $usuario;
+    }
+
+    public function getCompras()
+    {
+        return User::where('idRol', 3)->get();
     }
 
     public function getAllUserAlmacen($idCarga)
@@ -172,6 +188,75 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         return User::where('habilitado', 1)->get();
     }
+    public function enviarCorreoRec($data)
+    {
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $usr = $this->emailService->enviarCorreoRec($email);
+        return $usr;
+    }
+
+    public function recPass($data)
+    {
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+        $nuevaPass = Hash::make($data['nuevaPass']);
+
+        $passwordReset = PasswordReset::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+
+
+                // Si quieres marcarlo como usado aquí
+                $reset->used = true;
+                $reset->used_at = now();
+                $reset->save();
+
+                $usr = User::where('email', $email)->first();
+                $usr->password = $nuevaPass;
+                $usr->save();
+                return "Contraseña cambiada con exito";
+            }
+        }
+
+
+        return "Error inesperado";
+    }
+    public function validarCorreoRec($data)
+    {
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+        $expiraEnMinutos = 10;
+        $passwordReset = PasswordReset::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    return null;
+                }
+
+
+                return "Código válido";
+            }
+        }
+        // Continuar con el flujo para permitir cambiar contraseña
+    }
 
     public function findByEmailOrUser(string $email): ?User
     {
@@ -180,8 +265,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function responseUser(string $email)
     {
-        $usuario = User::select('users.id', 'users.user', 'users.name', 'users.idRol', 'users.email', 'users.apellidoP', 'users.apellidoM', 'cat_roles.nombre')
-            ->join('cat_roles', 'cat_roles.id', '=', 'users.idRol')->where('users.email', $email)->orWhere('users.user', $email)->first();
+        $usuario = User::where('users.email', $email)->orWhere('users.user', $email)->first();
         return $usuario;
     }
 
@@ -210,7 +294,8 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function generateToken(User $user): string
     {
-        return $user->createToken('API Token')->plainTextToken;
+        $token = $user->createToken('API Token');
+        return $token->plainTextToken;
     }
 
     public function loginActive(int $id)
@@ -226,5 +311,16 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function deleteUser(array $data, $id)
     {
         return User::whereId($id)->update($data);
+    }
+
+    public function desencriptarAES($textoEncriptado)
+    {
+        $clave = "mi_clave_super_secreta_123";
+        $cifra = "AES-256-CBC";
+        $key = hash('sha256', $clave, true); // misma clave que en JS
+        $iv = substr($key, 0, 16); // IV derivado de la clave (debe coincidir con JS si no usas uno dinámico)
+
+        $textoEncriptado = base64_decode($textoEncriptado);
+        return openssl_decrypt($textoEncriptado, $cifra, $key, OPENSSL_RAW_DATA, $iv);
     }
 }

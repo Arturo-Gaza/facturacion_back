@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('cat_gpo_familias', function (Blueprint $table) {
             $table->id();
-            $table->string('clave_gpo_familia');
-            $table->string('descripcion_gpo_familia');
+            $table->text('clave_gpo_familia');
+            $table->text('descripcion_gpo_familia');
+            $table->text('descripcion_gpo_familia_2');
             $table->timestamps();
-            $table->boolean('habilitado');
+            $table->boolean('habilitado')->default(1);
         });
     }
 

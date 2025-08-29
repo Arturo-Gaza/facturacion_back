@@ -36,6 +36,7 @@ class UpdateCatUnidadMedidaRequest extends FormRequest
             'clave_unidad_medida.string' => 'El campo Clave unidad de medida debe ser una cadena de texto.',
             'clave_unidad_medida.max' => 'El campo Clave unidad de medida no debe exceder los 10 caracteres.',
 
+
             'descripcion_unidad_medida.required' => 'El campo Descripcion unidad de medida es obligatorio.',
             'descripcion_unidad_medida.string' => 'El campo Descripcion unidad de medida debe ser una cadena de texto.',
             'descripcion_unidad_medida.max' => 'El campo Descripcion unidad de medida no debe exceder los 200 caracteres.',

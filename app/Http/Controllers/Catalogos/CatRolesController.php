@@ -27,7 +27,7 @@ class CatRolesController extends Controller
             return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
         }
         catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista',500);
         }
     }
 
@@ -37,7 +37,7 @@ class CatRolesController extends Controller
             $getById = $this->_catRoles->getByID($id);
             return ApiResponseHelper::sendResponse($getById, 'Catálogo obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
 
@@ -50,7 +50,7 @@ class CatRolesController extends Controller
             ];
             $student = $this->_catRoles->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente',201);
+            return ApiResponseHelper::sendResponse(null, 'Rol creado correctamente',201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
@@ -66,7 +66,20 @@ class CatRolesController extends Controller
             ];
             $this->_catRoles->update($data,$id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Rol actualizado correctamente',200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
+        public function exportar(Request $data)
+    {
+        DB::beginTransaction();
+        try {
+            $filtro = trim($data->getContent(), '"');
+            $archivo = $this->_catRoles->exportar($filtro);
+            DB::commit();
+            return ApiResponseHelper::sendResponse($archivo, 'Roles exportados correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);

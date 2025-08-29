@@ -22,7 +22,8 @@ class UpdateGpoFamiliaRequest extends FormRequest
     {
         return [
             'clave_gpo_familia' => 'required|string|max:10',
-            'descripcion_gpo_familia' => 'required|string|max:200'
+            'descripcion_gpo_familia' => 'required|string|max:200',
+            'descripcion_gpo_familia_2' => 'required|string|max:200'
         ];
     }
 
@@ -32,6 +33,7 @@ class UpdateGpoFamiliaRequest extends FormRequest
             'clave_gpo_familia.required' => 'El campo clave grupo familia es obligatorio.',
             'clave_gpo_familia.string' => 'El campo clave grupo familia debe ser una cadena de texto.',
             'clave_gpo_familia.max' => 'El campo clave grupo familia no debe exceder los 10 caracteres.',
+
 
             'descripcion_gpo_familia.required' => 'El campo descripcion grupo familia es obligatorio.',
             'descripcion_gpo_familia.string' => 'El campo descripcion grupo familia debe ser una cadena de texto.',

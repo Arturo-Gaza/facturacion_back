@@ -21,8 +21,9 @@ class StoreCatGpoFamiliaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_gpo_familia' => 'required|string|max:10',
-            'descripcion_gpo_familia' => 'required|string|max:200'
+            'clave_gpo_familia' => 'required|string|max:10|unique:cat_gpo_familias',
+            'descripcion_gpo_familia' => 'required|string|max:200',
+            'descripcion_gpo_familia_2' => 'required|string|max:200'
         ];
     }
 
@@ -30,6 +31,7 @@ class StoreCatGpoFamiliaRequest extends FormRequest
     {
         return [
             'clave_gpo_familia.required' => 'El campo clave grupo familia es obligatorio.',
+            'clave_gpo_familia.unique' => 'Clave Grupo familia ya existe',
             'clave_gpo_familia.string' => 'El campo clave grupo familia debe ser una cadena de texto.',
             'clave_gpo_familia.max' => 'El campo clave grupo familia no debe exceder los 10 caracteres.',
 

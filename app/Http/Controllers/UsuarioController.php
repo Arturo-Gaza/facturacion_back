@@ -23,13 +23,19 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
 
+    public function getCompras()
+    {
+        $usuario = $this->usuario->getCompras();
+        return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
+    }
+
     public function getAllUser()
     {
         try {
             $getAllUser = $this->usuario->getAllUser();
             return ApiResponseHelper::sendResponse($getAllUser, 'Usuarios obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -40,7 +46,7 @@ class UsuarioController extends Controller
             $getAllUserAlmacen = $this->usuario->getAllUserAlmacen($idCarga);
             return ApiResponseHelper::sendResponse($getAllUserAlmacen, 'Usuarios obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -50,7 +56,7 @@ class UsuarioController extends Controller
             $getAllUserAsignado = $this->usuario->getAllUserAsignado($idCarga);
             return ApiResponseHelper::sendResponse($getAllUserAsignado, 'Usuarios obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -60,15 +66,55 @@ class UsuarioController extends Controller
             $getById = $this->usuario->getByID($id);
             return ApiResponseHelper::sendResponse($getById, 'Usuario obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
+
+
 
     public function getAllHabilitados()
     {
         $usuario = $this->usuario->getAllHabilitados();
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
+
+    public function enviarCorreoRec(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->enviarCorreoRec($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
+    }
+    public function validarCorreoRec(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->validarCorreoRec($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
+    }
+    public function recPass(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+            'nuevaPass' => $request->nuevaPass,
+        ];
+
+        try {
+            $getById = $this->usuario->recPass($data);
+            return ApiResponseHelper::sendResponse($getById, 'Contraseña cambiada con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+        }
+    }
+
 
     public function update(UpdateUsuarioRequest $request, string $id)
     {
@@ -82,6 +128,7 @@ class UsuarioController extends Controller
                 'user' => $request->user,
                 'habilitado' => $request->habilitado,
                 'idRol' => $request->idRol,
+                'id_departamento'=> $request->id_departamento
             ];
         } else {
             $data = [
@@ -93,6 +140,7 @@ class UsuarioController extends Controller
                 'user' => $request->user,
                 'habilitado' => $request->habilitado,
                 'idRol' => $request->idRol,
+                'id_departamento'=> $request->id_departamento
             ];
         }
         DB::beginTransaction();

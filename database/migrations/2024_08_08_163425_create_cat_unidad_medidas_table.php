@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('cat_unidad_medidas', function (Blueprint $table) {
             $table->id();
-            $table->string('clave_unidad_medida');
-            $table->string('descripcion_unidad_medida');
+            $table->text('clave_unidad_medida');
+            $table->text('descripcion_unidad_medida');
             $table->timestamps();
-            $table->boolean('habilitado');
+            $table->boolean('habilitado')->default(1);
         });
     }
 

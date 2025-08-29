@@ -27,10 +27,10 @@ class StoreUsuarioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'apellidoP' => ['required', 'string', 'max:255'],
-            'apellidoM' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'name' => ['required', 'string' ],
+            'apellidoP' => ['required', 'string' ],
+            'apellidoM' => ['required', 'string' ],
+            'email' => ['nullable', 'string', 'lowercase', 'email' , 'unique:' . User::class],
             'password' => ['required', Rules\Password::defaults()],
             'user' => ['required', 'string', 'min:6', 'max:20', Rule::unique('users', 'user')
                 ->where(function ($query) {
@@ -49,16 +49,13 @@ class StoreUsuarioRequest extends FormRequest
         return [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.string' => 'El campo nombre debe ser una cadena de texto.',
-            'name.max' => 'El campo nombre no debe exceder los 255 caracteres.',
             'apellidoP.required' => 'El campo apellido paterno es obligatorio.',
             'apellidoP.string' => 'El campo apellido paterno debe ser una cadena de texto.',
-            'apellidoP.max' => 'El campo apellido paterno no debe exceder los 255 caracteres.',
+
             'apellidoM.required' => 'El campo apellido materno es obligatorio.',
             'apellidoM.string' => 'El campo apellido materno debe ser una cadena de texto.',
-            'apellidoM.max' => 'El campo apellido materno no debe exceder los 255 caracteres.',
             'email.string' => 'El campo correo electrónico debe ser una cadena de texto.',
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
-            'email.max' => 'El campo correo electrónico no debe exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado.',
             'password.required' => 'El campo contraseña es obligatorio.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',

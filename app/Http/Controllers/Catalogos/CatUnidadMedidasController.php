@@ -29,7 +29,7 @@ class CatUnidadMedidasController extends Controller
             return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
         }
         catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener la lista',500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista',500);
         }
     }
 
@@ -39,7 +39,7 @@ class CatUnidadMedidasController extends Controller
             $getById = $this->_catUnidadMedidas->getByID($id);
             return ApiResponseHelper::sendResponse($getById, 'Catálogo obtenido', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::sendResponse($ex, 'No se pudo obtener el registro', 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
 
@@ -53,7 +53,7 @@ class CatUnidadMedidasController extends Controller
             ];
             $almacen = $this->_catUnidadMedidas->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente',201);
+            return ApiResponseHelper::sendResponse(null, 'Unidad de Medida creada correctamente',201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
@@ -70,7 +70,20 @@ class CatUnidadMedidasController extends Controller
             ];
             $this->_catUnidadMedidas->update($data,$id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Unidad de Medida actualizada correctamente',200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
+    public function exportar(Request $data)
+    {
+        DB::beginTransaction();
+        try {
+            $filtro = trim($data->getContent(), '"');
+            $archivo = $this->_catUnidadMedidas->exportar($filtro);
+            DB::commit();
+            return ApiResponseHelper::sendResponse($archivo, 'Unidades de medida exportadas correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);

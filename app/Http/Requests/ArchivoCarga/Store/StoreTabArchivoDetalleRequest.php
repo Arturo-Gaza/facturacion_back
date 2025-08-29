@@ -29,7 +29,6 @@ class StoreTabArchivoDetalleRequest extends FormRequest
             // 'id_cat_prod' => 'nullable|date',
             // 'id_unid_med' => 'nullable|date',
             // 'id_gpo_familia' => 'nullable|integer',
-            // 'Libre_utilizacion' => 'required|string|max:255',
             // 'En_control_calidad' => 'required|exists:users,id',
             // 'Bloqueado' => 'nullable|integer',
             // 'Valor_en_insp_cal' => 'nullable|integer',

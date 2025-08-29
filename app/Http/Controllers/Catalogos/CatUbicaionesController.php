@@ -62,7 +62,7 @@ class CatUbicaionesController extends Controller
             ];
             $ubicacion = $this->_catUbicaciones->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo creado correctamente',201);
+            return ApiResponseHelper::sendResponse(null, 'Ubicación creada correctamente',201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
@@ -79,7 +79,7 @@ class CatUbicaionesController extends Controller
             ];
             $this->_catUbicaciones->update($data,$id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Catálogo actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Ubicación actualizada correctamente',200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);

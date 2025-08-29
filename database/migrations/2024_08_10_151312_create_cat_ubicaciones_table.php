@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('cat_ubicaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('clave_ubicacion');
-            $table->string('descripcion_ubicacion');
+            $table->text('clave_ubicacion');
+            $table->text('descripcion_ubicacion');
             $table->timestamps();
             $table->boolean('habilitado');
         });

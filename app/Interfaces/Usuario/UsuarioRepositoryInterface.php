@@ -7,11 +7,15 @@ use App\Models\User;
 interface UsuarioRepositoryInterface
 {
     public function getAll();
+    public function getCompras();
     public function getAllUser();
     public function getAllUserAlmacen($idCarga);
     public function getAllUserAsignado($idCarga);
     public function getByID($id);
     public function getAllHabilitados();
+    public function enviarCorreoRec($data);
+     public function validarCorreoRec($data);
+     public function recPass($data);
     public function findByEmailOrUser(string $email): ?User;
     public function responseUser(string $email);
     public function aumentarIntento(int $intentos, $id);

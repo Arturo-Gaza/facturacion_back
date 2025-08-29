@@ -24,7 +24,7 @@ class UpdateCatUbicacionesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'clave_ubicacion' => 'required|string|max:10|unique:cat_ubicaciones,clave_ubicacion',
+            'clave_ubicacion' => 'required|string|max:10',
             'descripcion_ubicacion' => 'required|string|max:200'
         ];
     }

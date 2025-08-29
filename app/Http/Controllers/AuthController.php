@@ -86,16 +86,17 @@ class AuthController extends Controller
         $user = $this->userRepo->findByEmailOrUser($request->email);
         $userresponse = $this->userRepo->responseUser($request->email);
         if ($user == null) {
-            return response()->json(['message' => 'Credenciales no válidas '], 400);
+            return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 400);
+
         }
 
         if ($user->intentos >= 3) {
-            return response()->json(['message' => 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador '], 400);
+            return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 400);
         } else {
 
             if (!$user->habilitado == 1) {
 
-                return response()->json(['message' => 'Usuario inhabilitado'], 400);
+                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 400);
             } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
                     // $user->intentos=$user->intentos+1;
@@ -112,7 +113,7 @@ class AuthController extends Controller
                     //     return ApiResponseHelper::rollback($ex);
                     // }
 
-                    return response()->json(['message' => 'Credenciales no válidas '], 400);
+                     return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 400);
                 }
             }
         }

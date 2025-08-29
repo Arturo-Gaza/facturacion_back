@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('apellidoP');
-            $table->string('apellidoM');
-            $table->string('email')->unique()->nullable();
+            $table->text('name');
+            $table->text('apellidoP');
+            $table->text('apellidoM');
+            $table->text('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->text('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->string('user');
+            $table->text('user');
             $table->boolean('habilitado');
             $table->integer('intentos')->default('0');
             $table->boolean('login_activo')->default(false);
@@ -29,8 +29,11 @@ return new class extends Migration
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
+           $table->id();
+            $table->string('email')->index();
+            $table->string('codigo');
+            $table->boolean('used')->default(false);
+            $table->timestamp('used_at')->nullable();
             $table->timestamp('created_at')->nullable();
         });
 

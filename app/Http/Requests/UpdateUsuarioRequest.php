@@ -28,15 +28,15 @@ class UpdateUsuarioRequest extends FormRequest
     {
         $userId = $this->route('id');
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'apellidoP' => ['required', 'string', 'max:255'],
-            'apellidoM' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string' ],
+            'apellidoP' => ['required', 'string'  ],
+            'apellidoM' => ['required', 'string' ],
             'user' => ['required', 'string', 'min:6', 'max:20', Rule::unique('users', 'user')
                 ->ignore($userId) // Ignora el email del usuario actual en la validación de unicidad
                 ->where(function ($query) {
                     $query->where('habilitado', 1); // Condición adicional: solo usuarios con status 'active'
                 })],
-            'email' => ['nullable', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $userId],
+            'email' => ['nullable', 'string', 'lowercase', 'email' , 'unique:users,email,' . $userId],
 
 
             // 'user' => [
@@ -63,16 +63,12 @@ class UpdateUsuarioRequest extends FormRequest
         return [
             'name.required' => 'El campo nombre es obligatorio.',
             'name.string' => 'El campo nombre debe ser una cadena de texto.',
-            'name.max' => 'El campo nombre no debe exceder los 255 caracteres.',
             'apellidoP.required' => 'El campo apellido paterno es obligatorio.',
             'apellidoP.string' => 'El campo apellido paterno debe ser una cadena de texto.',
-            'apellidoP.max' => 'El campo apellido paterno no debe exceder los 255 caracteres.',
             'apellidoM.required' => 'El campo apellido materno es obligatorio.',
             'apellidoM.string' => 'El campo apellido materno debe ser una cadena de texto.',
-            'apellidoM.max' => 'El campo apellido materno no debe exceder los 255 caracteres.',
             'email.string' => 'El campo correo electrónico debe ser una cadena de texto.',
             'email.email' => 'El campo correo electrónico debe ser una dirección válida.',
-            'email.max' => 'El campo correo electrónico no debe exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya está registrado.',
             'user.required' => 'El campo usuario es obligatorio.',
             'user.string' => 'El campo usuario debe ser una cadena de texto.',

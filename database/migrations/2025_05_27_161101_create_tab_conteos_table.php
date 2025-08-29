@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('tab_conteo', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_carga')->constrained('tab_detalle_cargas');
+            $table->foreignId('id_usuario')->nullable()->constrained('users');
+            $table->foreignId('id_almacen')->nullable()->constrained('cat_almacenes');
+            $table->foreignId('id_unidadmedida')->nullable()->constrained('cat_unidad_medidas');
+            $table->foreignId('id_grupofamilia')->nullable()->constrained('cat_gpo_familias');
+            $table->foreignId('id_producto')->nullable()->constrained('cat_productos');
+            $table->foreignId('id_ubicacion')->nullable()->constrained('cat_ubicaciones');
+            $table->string('codigo');
+            $table->string('descripcion');
+            $table->string('ume');
+            $table->integer('cantidad');
+            $table->string('ubicacion');
+            $table->text('observaciones')->nullable();
+            $table->boolean('habilitado');
+            $table->integer('conteo')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('tab_conteo');
+    }
+};

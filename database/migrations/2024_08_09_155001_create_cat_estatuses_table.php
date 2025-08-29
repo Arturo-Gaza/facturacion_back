@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cat_estatuses', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
+            $table->text('nombre');
             $table->timestamps();
             $table->boolean('habilitado');
         });
