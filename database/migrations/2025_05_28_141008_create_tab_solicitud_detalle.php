@@ -13,16 +13,10 @@ return new class extends Migration
     {
         Schema::create('tab_solicitud_detalle', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_producto')->nullable()->constrained('cat_productos');
-
+  
             $table->foreignId('id_solicitud')->nullable()->constrained('tab_solicitudes');
             $table->text('descripcion');
-            $table->text('marca')->nullable();
-            $table->text('modelo')->nullable();
-           // $table->string('nombre_cotizacion')->nullable();
-            //$table->text('archivo_cotizacion')->nullable();
-            $table->integer('cantidad');
-            $table->boolean('cotizado')->nullable();
+ 
              $table->boolean('habilitado')->default(1);
             $table->text('observacion')->nullable();
             $table->timestamps();

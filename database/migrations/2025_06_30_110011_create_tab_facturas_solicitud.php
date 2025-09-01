@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tab_observaciones', function (Blueprint $table) {
+        Schema::create('tab_facturas_solicitudes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_detalle_carga')->constrained('tab_detalle_cargas');
+            $table->foreignId('id_solicitud')->constrained('tab_solicitudes');
             $table->foreignId('id_usuario')->constrained('users');
-            $table->text('observacion')->nullable();
-            $table->boolean('habilitado');
+            $table->string('nombre_facturas');
+            $table->text('archivo_facturas');
+            $table->boolean('recomendada')->nullable();
+            $table->text('justificacion_general')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tab_observaciones');
+        Schema::dropIfExists('tab_facturas_solicitudes');
     }
 };
