@@ -17,6 +17,7 @@ class CatCategoriasRepository implements CatCategoriasRepositoryInterface
     public function getByID($id): ?CatCategorias
     {
         return CatCategorias::where('id', $id)->first();
+        
     }
 
     public function getByIdCat($id)
