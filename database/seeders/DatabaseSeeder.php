@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
         $this->call(UserSeeder::class);
         # $this->call(UbicacionSeeder::class);
         $this->call(EstatusSolicitudSeeder::class);
-        $this->call(MonedaSeeder::class);
-        $this->call(UnidadMedidaSeeder::class);
-        $this->call(GpoFamiliaSeeder::class);
+        #$this->call(MonedaSeeder::class);
+        #$this->call(UnidadMedidaSeeder::class);
+        #$this->call(GpoFamiliaSeeder::class);
         #$this->call(ProductosSeeder::class);
         $this->call(TabDepartamentosCategoriasSeeder::class);
-$this->call(UsuariosSoliSeeder::class);
+#$this->call(UsuariosSoliSeeder::class);
 
 
      $this->call([
