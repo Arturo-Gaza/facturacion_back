@@ -34,7 +34,7 @@ class CatRegimenesFiscalesSeeder extends Seeder
 
         foreach ($regimenes as $regimen) {
             DB::table('cat_regimenes_fiscales')->insert(array_merge($regimen, [
-                'vigente' => true,
+                'habilitado' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]));

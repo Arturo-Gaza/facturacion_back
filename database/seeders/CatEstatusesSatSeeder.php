@@ -20,7 +20,7 @@ class CatEstatusesSatSeeder extends Seeder
 
         foreach ($estatuses as $estatus) {
             DB::table('cat_estatuses_sat')->insert(array_merge($estatus, [
-                'vigente' => true,
+                'habilitado' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]));

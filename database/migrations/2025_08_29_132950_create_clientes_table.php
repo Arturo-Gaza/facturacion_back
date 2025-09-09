@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('usuario', 150)->unique();
             $table->string('password');
             $table->string('email', 250)->unique();
-            $table->boolean('activo')->default(true);
+            $table->boolean('habilitado')->default(true);
             $table->timestamps();
             $table->softDeletes(); // Para eliminación lógica
         });

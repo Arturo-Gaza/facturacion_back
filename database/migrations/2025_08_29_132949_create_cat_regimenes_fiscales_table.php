@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('descripcion', 250);
             $table->boolean('aplica_pf')->default(false);
             $table->boolean('aplica_pm')->default(false);
-            $table->boolean('vigente')->default(true);
+            $table->boolean('habilitado')->default(true);
             $table->timestamps();
         });
     }

@@ -13,7 +13,7 @@ return new class extends Migration
             $table->id('id_tipo_contacto');
             $table->string('clave', 50);
             $table->string('descripcion', 250);
-            $table->boolean('vigente')->default(true);
+            $table->boolean('habilitado')->default(true);
             $table->timestamps();
         });
     }

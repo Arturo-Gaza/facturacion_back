@@ -19,7 +19,7 @@ class CatTiposDireccionSeeder extends Seeder
 
         foreach ($tipos as $tipo) {
             DB::table('cat_tipos_direccion')->insert(array_merge($tipo, [
-                'vigente' => true,
+                'habilitado' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]));

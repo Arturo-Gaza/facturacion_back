@@ -15,9 +15,17 @@ use Illuminate\Support\ServiceProvider;
 use App\Interfaces\Catalogos\CatUnidadMedidasRepositoryInterface;
 use App\Repositories\Catalogos\CatUnidadMedidasRepository;
 use App\Interfaces\Catalogos\CatAlmacenesRepositoryInterface;
+use App\Interfaces\Catalogos\CatEstatusSatRepositoryInterface;
 use App\Interfaces\Catalogos\CatGpoFamiliaRepositoryInterface;
 use App\Interfaces\Catalogos\CatProductosRepositoryInterface;
+use App\Interfaces\Catalogos\CatRegimenesFiscaslesRepositoryInterface;
+use App\Interfaces\Catalogos\CatTipoDireccionRepositoryInterface;
+use App\Interfaces\Catalogos\CatTiposContactosRepositoryInterface;
 use App\Interfaces\Catalogos\CatUbicacionesRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\TabClientesFiscalesRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\TabClientesRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\TabContactosRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\TabDireccionesRepositoryInterface;
 use App\Interfaces\SistemaTickets\CatCategoriasRepositoryInterface;
 use App\Interfaces\SistemaTickets\CatCentroRepositoryInterface;
 use App\Interfaces\SistemaTickets\CatDepartamentosRepositoryInterface;
@@ -41,9 +49,17 @@ use App\Repositories\ArchivoConteo\TabConteoRepository;
 use App\Repositories\SistemaTickets\TabArchivosObservacionesDetalleRepository;
 use App\Repositories\AsignacionCarga\TabAsigancionRepository;
 use App\Repositories\Catalogos\CatAlmacenesRepository;
+use App\Repositories\Catalogos\CatEstatusSatRepository;
 use App\Repositories\Catalogos\CatGpoFamiliaRepository;
 use App\Repositories\Catalogos\CatProductosRepository;
+use App\Repositories\Catalogos\CatRegimensFiscalesRepository;
+use App\Repositories\Catalogos\CatTipoDireccionRepository;
+use App\Repositories\Catalogos\CatTiposContactosRepository;
 use App\Repositories\Catalogos\CatUbicacionesRepository;
+use App\Repositories\SistemaFacturacion\TabClientesFiscalesRepository;
+use App\Repositories\SistemaFacturacion\TabClientesRepository;
+use App\Repositories\SistemaFacturacion\TabContactoRepository;
+use App\Repositories\SistemaFacturacion\TabDireccionesRepository;
 use App\Repositories\SistemaTickets\CatCategoriasRepository;
 use App\Repositories\SistemaTickets\CatCentroRepository;
 use App\Repositories\SistemaTickets\CatDepartamentosRepository;
@@ -70,11 +86,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(UsuarioRepositoryInterface::class, UsuarioRepository::class);
         $this->app->bind(CatRolesRepositoryInterface::class, CatRolesRepository::class);
         $this->app->bind(CatUnidadMedidasRepositoryInterface::class, CatUnidadMedidasRepository::class);
-        $this->app->bind(CatGpoFamiliaRepositoryInterface::class, CatGpoFamiliaRepository::class);
-        $this->app->bind(CatProductosRepositoryInterface::class, CatProductosRepository::class);
 
         $this->app->bind(TabObservacionesRepositoryInterface::class, TabObservacionesRepository::class);
-        $this->app->bind(CatUbicacionesRepositoryInterface::class, CatUbicacionesRepository::class);
         $this->app->bind(CatMonedaRepositoryInterface::class, CatMonedaRepository::class);
         $this->app->bind(CatCentroRepositoryInterface::class, CatCentroRepository::class);
         $this->app->bind(TabSolicitudesRepositoryInterface::class, TabSolicitudesRepository::class);
@@ -96,7 +109,16 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TabObservacionesSolicitudReqInfoRepositoryInterface::class, TabObservacionesSolicitudReqInfoRepository::class);
 
         $this->app->bind(TabArchivosObservacionesSolicitudReqInfoRepositoryInterface::class, TabArchivosObservacionesSolicitudReqInfoRepository::class);
+        //Facturacion
 
+        $this->app->bind(CatEstatusSatRepositoryInterface::class, CatEstatusSatRepository::class);
+        $this->app->bind(CatRegimenesFiscaslesRepositoryInterface::class, CatRegimensFiscalesRepository::class);
+        $this->app->bind(CatTiposContactosRepositoryInterface::class, CatTiposContactosRepository::class);
+        $this->app->bind(CatTipoDireccionRepositoryInterface::class, CatTipoDireccionRepository::class);
+        $this->app->bind(TabClientesRepositoryInterface::class, TabClientesRepository::class);
+        $this->app->bind(TabClientesFiscalesRepositoryInterface::class, TabClientesFiscalesRepository::class);
+        $this->app->bind(TabContactosRepositoryInterface::class, TabContactoRepository::class);
+        $this->app->bind(TabDireccionesRepositoryInterface::class, TabDireccionesRepository::class);
     }
 
     /**

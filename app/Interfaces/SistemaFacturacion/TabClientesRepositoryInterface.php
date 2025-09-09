@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Interfaces\Catalogos;
+namespace App\Interfaces\SistemaFacturacion;
 
-interface CatUbicacionesRepositoryInterface
+interface TabClientesRepositoryInterface
 {
     public function getAll();
-    public function getAllPaginate($data);
     public function getByID($id);
     public function store(array $data);
     public function update(array $data, $id);

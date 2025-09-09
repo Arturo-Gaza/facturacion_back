@@ -26,7 +26,7 @@ class CatRolesRepository implements CatRolesRepositoryInterface
 
     public function update(array $data, $id)
     {
-        return CatRoles::where('id',$id)->update($data);
+        return CatRoles::where('id', $id)->update($data);
     }
 
     public function exportar($filtro)
@@ -38,7 +38,7 @@ class CatRolesRepository implements CatRolesRepositoryInterface
                 $q->where('nombre', 'ilike', "%$filtro%");
             });
         }
- $catRol = $query->get();
+        $catRol = $query->get();
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -70,5 +70,4 @@ class CatRolesRepository implements CatRolesRepositoryInterface
         ];
         return  $data;
     }
-
 }

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id('id_contacto');
             $table->foreignId('id_cliente')->constrained('clientes', 'id_cliente');
             $table->foreignId('id_tipo_contacto')->constrained('cat_tipos_contacto', 'id_tipo_contacto');
+            $table->string('lada',5);
             $table->string('valor', 250);
             $table->boolean('principal')->default(false);
             $table->timestamps();

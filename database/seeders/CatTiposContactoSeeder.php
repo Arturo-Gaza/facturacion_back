@@ -20,7 +20,7 @@ class CatTiposContactoSeeder extends Seeder
 
         foreach ($tipos as $tipo) {
             DB::table('cat_tipos_contacto')->insert(array_merge($tipo, [
-                'vigente' => true,
+                'habilitado' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ]));
