@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 use Exception;
 
 
@@ -28,7 +30,69 @@ class AuthController extends Controller
     {
         $this->userRepo = $userRepo;
     }
+public function redirectToGoogle()
+{
+    return Socialite::driver('google')->redirect();
+}
 
+
+public function handleGoogleCallback()
+{
+    try {
+        session()->forget('google_token');
+$googleUser = Socialite::driver('google')->user();
+
+// Extraer nombre y apellidos del nombre completo
+$name = $googleUser->getName();
+$nameParts = explode(' ', $name);
+
+$user = User::updateOrCreate(
+    ['email' => $googleUser->getEmail()],
+    [
+        'name' => $nameParts[0] ?? '', // Primer nombre
+        'apellidoP' => $nameParts[1] ?? null, // Primer apellido (nullable)
+        'apellidoM' => $nameParts[2] ?? null, // Segundo apellido (nullable)
+        'google_id' => $googleUser->getId(),
+        'avatar' => $googleUser->getAvatar(),
+        'password' => null, // Contraseña nullable
+        'user' => strtolower(str_replace(' ', '', $googleUser->getName())), // Generar nombre de usuario
+        'habilitado' => true,
+        'intentos' => 0,
+        'login_activo' => true,
+        'idRol' => 2, // Asigna el ID de rol apropiado para usuarios normales
+        'email_verified_at' => now(), // Marcar email como verificado
+    ]
+);
+     if (!$user->habilitado == 1) {
+
+                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 400);
+    }
+     $userresponse = $this->userRepo->responseUser($user->email);
+    // Generar token de acceso (si es una API)
+    $tokenGoogle = $user->createToken('google-token')->plainTextToken;
+    $token = $this->userRepo->generateToken($user);
+           try {
+            $this->userRepo->loginActive($user->id);
+
+            DB::commit();
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+        return view('google-callback', [
+            'user' => $userresponse,
+            'token' => $token,
+            'tokenGoogle' => $tokenGoogle,
+        ]);
+    
+} catch (\Exception $e) {
+    \Log::error('Error Google Auth: ' . $e->getMessage());
+    return response()->json([
+        'error' => 'Error en autenticación',
+        'message' => $e->getMessage() // Solo en desarrollo
+    ], 500);
+}
+}
     /**
      * @OA\Post(
      *     path="/api/auth/register",
