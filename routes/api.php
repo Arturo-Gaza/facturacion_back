@@ -270,6 +270,7 @@ Route::get('TabContacto/getAll', [TabContactoController::class, 'getAll']);
 Route::get('TabContacto/getById/{id}',[TabContactoController::class, 'getById']);
 Route::post('TabContacto/register', [TabContactoController::class, 'store']);
 Route::put('TabContacto/update/{id}', [TabContactoController::class, 'update']);
+Route::post('TabContacto/mandarSMS', [TabContactoController::class, 'mandarSMS']);
 
 //Tab Direcciones
 Route::get('TabDirecciones/getAll', [TabDireccionesController::class, 'getAll']);

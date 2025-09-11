@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-                    $table->string('google_id')->nullable()->unique();
-        $table->string('avatar')->nullable();
-        });
+Schema::create('user_emails', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->string('email')->unique();
+    $table->boolean('verificado')->default(false);
+    $table->timestamps();
+});
     }
 
     /**
@@ -23,9 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-             $table->dropColumn(['google_id', 'avatar']);
-        });
+        Schema::dropIfExists('user_emails');
     }
 };

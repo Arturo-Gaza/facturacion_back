@@ -3,7 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-
+use App\Models\UserEmail;
 use App\Models\Catalogos\CatRoles;
 use App\Models\SistemaTickets\CatDepartamentos;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,40 +15,22 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'idRol',
-        'name',
-        'apellidoP',
-        'apellidoM',
-        'email',
+        'id_mail_principal', // Cambiado de 'email' a 'id_mail_principal'
         'id_departamento',
         'password',
-        'user',
+        'usuario', // Cambiado de 'user' a 'usuario para coincidir con migración
         'habilitado',
         'intentos',
         'login_activo',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -56,17 +38,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    protected $appends = ['descripcion_rol','descripcio_depatamento'];
+    
+    protected $appends = ['descripcion_rol','descripcio_depatamento', 'email'];
+    
+    // Nueva relación con el correo principal
+    public function mailPrincipal()
+    {
+        return $this->belongsTo(UserEmail::class, 'id_mail_principal');
+    }
+    
     public function rol()
     {
         return $this->belongsTo(CatRoles::class, 'idRol');
     }
+    
     public function departamento()
     {
         return $this->belongsTo(CatDepartamentos::class, 'id_departamento');
     }
-
-
 
     public function getDescripcionRolAttribute()
     {
@@ -76,5 +65,11 @@ class User extends Authenticatable
     public function getDescripcioDepatamentoAttribute()
     {
         return optional($this->departamento)->descripcion;
+    }
+    
+    // Accessor para mantener compatibilidad con email
+    public function getEmailAttribute()
+    {
+        return optional($this->mailPrincipal)->email;
     }
 }

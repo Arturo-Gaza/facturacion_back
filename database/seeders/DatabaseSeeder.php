@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             CatRegimenesFiscalesSeeder::class,
             CatEstatusesSatSeeder::class,
             CatTiposDireccionSeeder::class,
-            CatTiposContactoSeeder::class,
+            //CatTiposContactoSeeder::class,
             // Agrega aquí otros seeders que crees en el futuro
         ]);
 

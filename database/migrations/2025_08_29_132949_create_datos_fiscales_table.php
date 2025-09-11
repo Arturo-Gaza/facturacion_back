@@ -9,9 +9,9 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('clientes_fiscales', function (Blueprint $table) {
-            $table->id('id_fiscal');
-            $table->foreignId('id_cliente')->constrained('clientes', 'id_cliente');
+        Schema::create('datos_fiscales', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_usuario')->constrained('users');
             $table->string('nombre_razon', 250);
             $table->string('nombre_comercial', 250)->nullable();
             $table->boolean('es_persona_moral')->default(false);
@@ -21,9 +21,9 @@ return new class extends Migration
             $table->date('fecha_inicio_op');
             $table->foreignId('id_estatus_sat')->constrained('cat_estatuses_sat', 'id_estatus_sat');
             $table->json('datos_extra')->nullable();
+                // Relación al correo específico para facturación
+    $table->foreignId('email_facturacion_id')->nullable();
             $table->timestamps();
-            
-            $table->unique('id_cliente'); // Relación 1 a 1
         });
     }
 

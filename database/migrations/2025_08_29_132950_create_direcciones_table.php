@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('direcciones', function (Blueprint $table) {
             $table->id('id_direccion');
-            $table->foreignId('id_cliente')->constrained('clientes', 'id_cliente');
+            $table->foreignId('id_fiscal')->constrained('datos_fiscales')->onDelete('cascade');
             $table->foreignId('id_tipo_direccion')->constrained('cat_tipos_direccion', 'id_tipo_direccion');
             $table->string('calle', 250);
             $table->string('num_exterior', 50);

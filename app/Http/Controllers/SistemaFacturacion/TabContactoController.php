@@ -43,6 +43,19 @@ class TabContactoController extends Controller
         }
     }
 
+    public function mandarSMS(Request $request)
+    {
+        try {
+            $data = $request->only([
+                'numero',
+                'codigo'
+            ]);
+            return ApiResponseHelper::sendResponse($data , 'SMS enviado', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(StoreTabContactoRequest $request)
     {
         DB::beginTransaction();

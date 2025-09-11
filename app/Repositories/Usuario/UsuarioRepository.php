@@ -258,16 +258,23 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         // Continuar con el flujo para permitir cambiar contraseña
     }
 
-    public function findByEmailOrUser(string $email): ?User
-    {
-        return User::where('email', $email)->orWhere('user', $email)->first();
-    }
+public function findByEmailOrUser(string $email): ?User
+{
+    return User::whereHas('mailPrincipal', function ($query) use ($email) {
+            $query->where('email', $email);
+        })
+        ->orWhere('usuario', $email) // Cambiado de 'user' a 'usuario'
+        ->first();
+}
 
-    public function responseUser(string $email)
-    {
-        $usuario = User::where('users.email', $email)->orWhere('users.user', $email)->first();
-        return $usuario;
-    }
+public function responseUser(string $email)
+{
+    return User::whereHas('mailPrincipal', function ($query) use ($email) {
+            $query->where('email', $email);
+        })
+        ->orWhere('usuario', $email)
+        ->first();
+}
 
     public function store(array $data)
     {
