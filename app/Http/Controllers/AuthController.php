@@ -150,34 +150,34 @@ $user = User::updateOrCreate(
         $user = $this->userRepo->findByEmailOrUser($request->email);
         $userresponse = $this->userRepo->responseUser($request->email);
         if ($user == null) {
-            return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 400);
+            return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
 
         }
 
         if ($user->intentos >= 3) {
-            return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 400);
+            return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 401);
         } else {
 
             if (!$user->habilitado == 1) {
 
-                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 400);
+                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 401);
             } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
-                    // $user->intentos=$user->intentos+1;
-                    // $user->update($user->toArray(),$user->id);
+                   // $user->intentos=$user->intentos+1;
+                   // $user->update($user->toArray(),$user->id);
 
                     //ESTE ME PERMITE EN AUMENTA EL NUMERO DE INTENTOS INTENTOS**
-                    // DB::beginTransaction();
-                    // try {
-                    //     $this->userRepo->aumentarIntento($user->intentos, $user->id);
+                     DB::beginTransaction();
+                     try {
+                         $this->userRepo->aumentarIntento($user->intentos, $user->id);
 
-                    //     DB::commit();
-                    // } catch (Exception $ex) {
-                    //     DB::rollBack();
-                    //     return ApiResponseHelper::rollback($ex);
-                    // }
+                         DB::commit();
+                     } catch (Exception $ex) {
+                         DB::rollBack();
+                         return ApiResponseHelper::rollback($ex);
+                     }
 
-                     return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 400);
+                     return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
                 }
             }
         }

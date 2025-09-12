@@ -9,14 +9,14 @@ use Carbon\Carbon;
 
 class ApiResponseHelper
 {
-    public static function rollback($e, $message = 'Ocurrio un error durante el proceso')
+    public static function rollback($e, $message = 'Ocurrio un error durante el proceso',$status=500)
     {
         DB::rollBack();
-        self::throw($e, $message);
+        self::throw($e, $message,$status);
     }
     //hola
 
-    public static function throw($e, $message = 'Ocurrio un error durante el proceso')
+    public static function throw($e, $message = 'Ocurrio un error durante el proceso',$status=500)
     {
         Log::info($e);
         throw new HttpResponseException(response()->json([
@@ -24,7 +24,7 @@ class ApiResponseHelper
             'errors' => [$message],
             'data' => $e,
             'success' => false,
-        ], 500));
+        ], $status));
     }
 
     public static function sendResponse($result, $message = '', $code = 200, $data2 = null)
