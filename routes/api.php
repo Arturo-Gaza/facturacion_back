@@ -35,7 +35,13 @@ use App\Http\Controllers\TabDepartamentosCategoriasController;
 use App\Http\Controllers\TabSolicitudesController;
 use App\Http\Controllers\TabSolicitudesDetalleController;
 use App\Http\Controllers\UsuarioController;
-
+use App\Http\Controllers\EstatusMovimientoController;
+use App\Http\Controllers\EstadoSolicitudController;
+use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\MovimientoSaldoController;
+use App\Http\Controllers\PrecioController;
+use App\Http\Controllers\ServicioController;
+use App\Http\Controllers\SolicitudController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -277,3 +283,45 @@ Route::get('TabDirecciones/getAll', [TabDireccionesController::class, 'getAll'])
 Route::get('TabDirecciones/getById/{id}',[TabDireccionesController::class, 'getById']);
 Route::post('TabDirecciones/register', [TabDireccionesController::class, 'store']);
 Route::put('TabDirecciones/update/{id}', [TabDireccionesController::class, 'update']);
+
+// EstatusMovimiento
+Route::get('EstatusMovimiento/getAll', [EstatusMovimientoController::class, 'getAll']);
+Route::get('EstatusMovimiento/getById/{id}', [EstatusMovimientoController::class, 'getById']);
+Route::post('EstatusMovimiento/register', [EstatusMovimientoController::class, 'store']);
+Route::put('EstatusMovimiento/update/{id}', [EstatusMovimientoController::class, 'update']);
+
+// EstadoSolicitud
+Route::get('EstadoSolicitud/getAll', [EstadoSolicitudController::class, 'getAll']);
+Route::get('EstadoSolicitud/getById/{id}', [EstadoSolicitudController::class, 'getById']);
+Route::post('EstadoSolicitud/register', [EstadoSolicitudController::class, 'store']);
+Route::put('EstadoSolicitud/update/{id}', [EstadoSolicitudController::class, 'update']);
+
+// Factura
+Route::get('Factura/getAll', [FacturaController::class, 'getAll']);
+Route::get('Factura/getById/{id}', [FacturaController::class, 'getById']);
+Route::post('Factura/register', [FacturaController::class, 'store']);
+Route::put('Factura/update/{id}', [FacturaController::class, 'update']);
+
+// MovimientoSaldo
+Route::get('MovimientoSaldo/getAll', [MovimientoSaldoController::class, 'getAll']);
+Route::get('MovimientoSaldo/getById/{id}', [MovimientoSaldoController::class, 'getById']);
+Route::post('MovimientoSaldo/register', [MovimientoSaldoController::class, 'store']);
+Route::put('MovimientoSaldo/update/{id}', [MovimientoSaldoController::class, 'update']);
+
+// Precio
+Route::get('Precio/getAll', [PrecioController::class, 'getAll']);
+Route::get('Precio/getById/{id}', [PrecioController::class, 'getById']);
+Route::post('Precio/register', [PrecioController::class, 'store']);
+Route::put('Precio/update/{id}', [PrecioController::class, 'update']);
+
+// Servicio
+Route::get('Servicio/getAll', [ServicioController::class, 'getAll']);
+Route::get('Servicio/getById/{id}', [ServicioController::class, 'getById']);
+Route::post('Servicio/register', [ServicioController::class, 'store']);
+Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
+
+// Solicitud
+Route::get('Solicitud/getAll', [SolicitudController::class, 'getAll']);
+Route::get('Solicitud/getById/{id}', [SolicitudController::class, 'getById']);
+Route::post('Solicitud/register', [SolicitudController::class, 'store']);
+Route::put('Solicitud/update/{id}', [SolicitudController::class, 'update']);

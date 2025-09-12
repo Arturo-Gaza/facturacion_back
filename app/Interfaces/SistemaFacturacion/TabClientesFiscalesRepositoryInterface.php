@@ -2,7 +2,7 @@
 
 namespace App\Interfaces\SistemaFacturacion;
 
-use App\Models\sistemaFacturacion\TabClientesFiscales;
+use App\Models\TabClientesFiscales;
 
 interface TabClientesFiscalesRepositoryInterface
 {

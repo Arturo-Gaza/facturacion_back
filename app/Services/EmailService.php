@@ -62,7 +62,9 @@ class EmailService
 
     public function enviarCorreoRec($email)
     {
-        $usr = User::where('email',$email)->first();
+        $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
+    $query->where('email', $email);
+})->first();
         if ($usr) {
             $codigo= str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $datosMail = [

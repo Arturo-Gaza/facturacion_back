@@ -24,6 +24,7 @@ class User extends Authenticatable
         'habilitado',
         'intentos',
         'login_activo',
+        'saldo',
     ];
 
     protected $hidden = [

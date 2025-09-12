@@ -75,6 +75,20 @@ use App\Repositories\TabArchivoSolicitudesDetalleRepository;
 use App\Repositories\TabDepartamentosCategoriasRepository;
 use App\Repositories\TabSolicitudesDetalleRepository;
 use App\Repositories\TabSolicitudesRepository;
+use App\Interfaces\SistemaFacturacion\EstatusMovimientoRepositoryInterface;
+use App\Repositories\SistemaFacturacion\EstatusMovimientoRepository;
+use App\Interfaces\SistemaFacturacion\EstadoSolicitudRepositoryInterface;
+use App\Repositories\SistemaFacturacion\EstadoSolicitudRepository;
+use App\Interfaces\SistemaFacturacion\FacturaRepositoryInterface;
+use App\Repositories\SistemaFacturacion\FacturaRepository;
+use App\Interfaces\SistemaFacturacion\MovimientoSaldoRepositoryInterface;
+use App\Repositories\SistemaFacturacion\MovimientoSaldoRepository;
+use App\Interfaces\SistemaFacturacion\PrecioRepositoryInterface;
+use App\Repositories\SistemaFacturacion\PrecioRepository;
+use App\Interfaces\SistemaFacturacion\ServicioRepositoryInterface;
+use App\Repositories\SistemaFacturacion\ServicioRepository;
+use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
+use App\Repositories\SistemaFacturacion\SolicitudRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -119,6 +133,14 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(TabClientesFiscalesRepositoryInterface::class, TabClientesFiscalesRepository::class);
         $this->app->bind(TabContactosRepositoryInterface::class, TabContactoRepository::class);
         $this->app->bind(TabDireccionesRepositoryInterface::class, TabDireccionesRepository::class);
+   
+        $this->app->bind(EstatusMovimientoRepositoryInterface::class, EstatusMovimientoRepository::class);
+        $this->app->bind(EstadoSolicitudRepositoryInterface::class, EstadoSolicitudRepository::class);
+        $this->app->bind(FacturaRepositoryInterface::class, FacturaRepository::class);
+        $this->app->bind(MovimientoSaldoRepositoryInterface::class, MovimientoSaldoRepository::class);
+        $this->app->bind(PrecioRepositoryInterface::class, PrecioRepository::class);
+        $this->app->bind(ServicioRepositoryInterface::class, ServicioRepository::class);
+        $this->app->bind(SolicitudRepositoryInterface::class, SolicitudRepository::class);
     }
 
     /**

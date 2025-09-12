@@ -25,7 +25,7 @@ Schema::create('users', function (Blueprint $table) {
     $table->unsignedBigInteger('id_telefono_principal')->nullable();
     $table->unsignedBigInteger('usuario_padre')->nullable();
     $table->unsignedBigInteger('datos_fiscales_principal')->nullable();
-    
+      $table->decimal('saldo', 10, 2)->default(0.00);
     $table->rememberToken();
     $table->timestamps();
     
