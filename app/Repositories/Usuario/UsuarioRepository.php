@@ -260,10 +260,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
 public function findByEmailOrUser(string $email): ?User
 {
-    return User::whereHas('mailPrincipal', function ($query) use ($email) {
-            $query->where('email', $email);
+    return User::where('habilitado', true)
+        ->where(function ($query) use ($email) {
+            $query->whereHas('mailPrincipal', function ($q) use ($email) {
+                $q->where('email', $email);
+            })
+            ->orWhere('usuario', $email);
         })
-        ->orWhere('usuario', $email) // Cambiado de 'user' a 'usuario'
         ->first();
 }
 

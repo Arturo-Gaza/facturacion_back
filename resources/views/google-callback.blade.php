@@ -12,9 +12,10 @@
         token: "{{ $token }}",
         tokenGoogle: "{{ $tokenGoogle }}"
     };
+    const targetOrigin = {!! json_encode(request()->query('origin', '*')) !!};
 
     // Enviamos los datos a la ventana que abrió el popup
-window.opener.postMessage(data, "http://127.0.0.1:5173");
+window.opener.postMessage(data, targetOrigin);
 window.close();
 </script>
 </body>

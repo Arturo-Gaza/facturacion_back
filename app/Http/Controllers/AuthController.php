@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use App\Models\UserEmail;
 use Exception;
 
 
@@ -45,28 +46,52 @@ $googleUser = Socialite::driver('google')->user();
 // Extraer nombre y apellidos del nombre completo
 $name = $googleUser->getName();
 $nameParts = explode(' ', $name);
-
-$user = User::updateOrCreate(
-    ['email' => $googleUser->getEmail()],
-    [
-        'name' => $nameParts[0] ?? '', // Primer nombre
-        'apellidoP' => $nameParts[1] ?? null, // Primer apellido (nullable)
-        'apellidoM' => $nameParts[2] ?? null, // Segundo apellido (nullable)
+$user=$this->userRepo->findByEmailOrUser($googleUser->email);
+if ($user) {
+    $user->update([
+        'name' => $nameParts[0] ?? '',
+        'apellidoP' => $nameParts[1] ?? null,
+        'apellidoM' => $nameParts[2] ?? null,
         'google_id' => $googleUser->getId(),
         'avatar' => $googleUser->getAvatar(),
-        'password' => null, // Contraseña nullable
-        'user' => strtolower(str_replace(' ', '', $googleUser->getName())), // Generar nombre de usuario
         'habilitado' => true,
         'intentos' => 0,
         'login_activo' => true,
-        'idRol' => 2, // Asigna el ID de rol apropiado para usuarios normales
-        'email_verified_at' => now(), // Marcar email como verificado
-    ]
-);
-     if (!$user->habilitado == 1) {
+        'idRol' => 2,
+        'email_verified_at' => now(),
+    ]);
 
-                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 400);
-    }
+}else{
+    // Crear el usuario primero
+    $user = User::create([
+        'name' => $nameParts[0] ?? '',
+        'apellidoP' => $nameParts[1] ?? null,
+        'apellidoM' => $nameParts[2] ?? null,
+        'google_id' => $googleUser->getId(),
+        'avatar' => $googleUser->getAvatar(),
+        'password' => null,
+        'user' => strtolower(str_replace(' ', '', $googleUser->getName())),
+        'habilitado' => true,
+        'intentos' => 0,
+        'login_activo' => true,
+        'idRol' => 2,
+        'email_verified_at' => now(),
+        // id_mail_principal se establecerá después de crear el email
+    ]);
+    
+    // Crear el registro en user_emails
+    $userEmail = UserEmail::create([
+        'user_id' => $user->id,
+        'email' => $googleUser->email,
+        'verificado' => true,
+    ]);
+    
+    // Actualizar el usuario con el id_mail_principal
+    $user->update(['id_mail_principal' => $userEmail->id]);
+
+}
+
+
      $userresponse = $this->userRepo->responseUser($user->email);
     // Generar token de acceso (si es una API)
     $tokenGoogle = $user->createToken('google-token')->plainTextToken;
@@ -181,6 +206,22 @@ $user = User::updateOrCreate(
                 }
             }
         }
+
+ if ($user->two_factor_enabled) {
+        // Generar código de verificación
+        $user->generateTwoFactorCode();
+        
+        // Enviar código por email (puedes adaptar para SMS u otros métodos)
+       // $user->notify(new TwoFactorCodeNotification());
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Se requiere verificación de dos factores',
+            'two_factor_required' => true,
+            'user_id' => $user->id,
+        ], 200);
+    }
+
 
         $token = $this->userRepo->generateToken($user);
 
