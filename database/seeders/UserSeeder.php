@@ -19,7 +19,6 @@ class UserSeeder extends Seeder
         // Primero crear el usuario
         $user = User::create([
     'idRol' => 1,
-    'usuario' => 'Administrador',
     'password' => '$2y$12$bHqfPcMYy3GLmbxM5iF54eOTGofmXHHyzuSYgP4MCS1EWUF2wNQX6',
     'habilitado' => true,
     'intentos' => 0,

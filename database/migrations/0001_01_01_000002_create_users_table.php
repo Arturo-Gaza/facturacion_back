@@ -13,7 +13,6 @@ return new class extends Migration
     {
 Schema::create('users', function (Blueprint $table) {
     $table->id();
-    $table->string('usuario', 100)->unique()->nullable();
     $table->string('password')->nullable();
     $table->foreignId('idRol')->constrained('cat_roles');
     $table->boolean('login_activo')->default(false);
@@ -26,13 +25,12 @@ Schema::create('users', function (Blueprint $table) {
     $table->unsignedBigInteger('usuario_padre')->nullable();
     $table->unsignedBigInteger('datos_fiscales_principal')->nullable();
       $table->decimal('saldo', 10, 2)->default(0.00);
-    $table->rememberToken();
+    $table->rememberToken()->nullable();;
     $table->timestamps();
     
     $table->string('google_id')->nullable()->unique();
     $table->string('avatar')->nullable();
     // Índices
-    $table->index('usuario');
     $table->index('habilitado');
     $table->index('login_activo');
 });

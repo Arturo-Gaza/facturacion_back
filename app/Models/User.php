@@ -17,7 +17,8 @@ class User extends Authenticatable
     use TwoFactorAuthenticatable;
     protected $fillable = [
         'idRol',
-        'id_mail_principal', // Cambiado de 'email' a 'id_mail_principal'
+        'id_mail_principal',
+        'id_telefono_principal', // Cambiado de 'email' a 'id_mail_principal'
         'id_departamento',
         'password',
         'usuario', // Cambiado de 'user' a 'usuario para coincidir con migración
@@ -73,4 +74,14 @@ class User extends Authenticatable
     {
         return optional($this->mailPrincipal)->email;
     }
+
+    public function emails()
+{
+    return $this->hasMany(UserEmail::class);
+}
+
+public function phones()
+{
+    return $this->hasMany(UserPhone::class);
+}
 }

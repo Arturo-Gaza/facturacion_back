@@ -144,6 +144,11 @@ if ($user) {
         $user = $this->userRepo->store($request->all());
         return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
     }
+        public function registerCliente(Request $request)
+    {
+        $user = $this->userRepo->storeCliente($request->all());
+        return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+    }
 
     /**
      * @OA\Post(

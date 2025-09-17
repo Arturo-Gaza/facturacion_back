@@ -59,6 +59,7 @@ Route::get('/test', function () {
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
+Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {

@@ -7,6 +7,9 @@ use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\PasswordReset;
 use App\Models\User;
 use App\Models\UserSistema;
+use App\Models\UserEmail;
+
+use App\Models\UserPhone;
 use App\Models\UsuarioRol;
 use App\Services\EmailService;
 use Carbon\Carbon;
@@ -284,6 +287,57 @@ public function responseUser(string $email)
         $data['password'] = Hash::make($data['password']);
         return User::create($data);
     }
+
+  public function storeCliente(array $data)
+{
+    $email = $data['email'];
+    $tel   = $data['tel'];
+
+    // 1. Buscar email existente
+    $existingEmail = UserEmail::where('email', $email)->first();
+    if ($existingEmail) {
+        if ($existingEmail->verificado) {
+            return response()->json(['message' => 'usuario existente (correo)'], 409);
+        } else {
+            // Eliminar email no verificado
+            $existingEmail->delete();
+        }
+    }
+
+    // 2. Buscar teléfono existente
+    $existingPhone = UserPhone::where('telefono', $tel)->first();
+    if ($existingPhone) {
+        if ($existingPhone->verificado) {
+            return response()->json(['message' => 'usuario existente (teléfono)'], 409);
+        } else {
+            // Eliminar teléfono no verificado
+            $existingPhone->delete();
+        }
+    }
+
+    // 3. Crear usuario
+    $data['password'] = Hash::make($data['password']);
+    $user = User::create([
+        'password'  => $data['password'],
+        'idRol'     => $data['idRol'] ?? 2, // ejemplo: rol por defecto cliente
+    ]);
+
+    // 4. Guardar correo y teléfono
+    $correo=$user->emails()->create([
+        'email' => $email,
+    ]);
+
+    $telefono=$user->phones()->create([
+        'telefono' => $tel,
+    ]);
+    $user->update([
+    'id_mail_principal' => $correo->id,
+    'id_telefono_principal' => $telefono->id
+]);
+
+    return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
+}
+
 
     public function update(array $data, $id)
     {
