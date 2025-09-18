@@ -15,17 +15,17 @@ class EstatusSolicitudSeeder extends Seeder
     {
 
         $estatus1 = new CatEstatusSolicitud();
-        $estatus1->descripcion_estatus_solicitud = 'Capturada';
+        $estatus1->descripcion_estatus_solicitud = 'En Proceso';
         $estatus1->mandarCorreo= false;
         $estatus1->save();
 
         $estatus2 = new CatEstatusSolicitud();
-        $estatus2->descripcion_estatus_solicitud = 'Concluida';
+        $estatus2->descripcion_estatus_solicitud = 'Recuperada';
         $estatus1->mandarCorreo= true;
         $estatus2->save();
 
         $estatus3 = new CatEstatusSolicitud();
-        $estatus3->descripcion_estatus_solicitud = 'Cancelada';
+        $estatus3->descripcion_estatus_solicitud = 'Rechazado';
         $estatus1->mandarCorreo= false;
         $estatus3->save();
 
