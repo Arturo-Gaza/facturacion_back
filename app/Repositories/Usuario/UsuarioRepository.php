@@ -267,8 +267,7 @@ public function findByEmailOrUser(string $email): ?User
         ->where(function ($query) use ($email) {
             $query->whereHas('mailPrincipal', function ($q) use ($email) {
                 $q->where('email', $email);
-            })
-            ->orWhere('usuario', $email);
+            });
         })
         ->first();
 }
@@ -278,7 +277,6 @@ public function responseUser(string $email)
     return User::whereHas('mailPrincipal', function ($query) use ($email) {
             $query->where('email', $email);
         })
-        ->orWhere('usuario', $email)
         ->first();
 }
 
