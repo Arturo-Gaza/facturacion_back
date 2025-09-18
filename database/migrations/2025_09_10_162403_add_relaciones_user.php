@@ -10,8 +10,8 @@ public function up()
 {
     Schema::table('users', function (Blueprint $table) {
         // Agregar restricciones foráneas después de crear todas las tablas
-        $table->foreign('id_mail_principal')->references('id')->on('user_emails');
-        $table->foreign('id_telefono_principal')->references('id')->on('user_phones');
+        $table->foreign('id_mail_principal')->references('id')->on('user_emails')->onDelete('cascade');;
+        $table->foreign('id_telefono_principal')->references('id')->on('user_phones')->onDelete('cascade');;
         $table->foreign('usuario_padre')->references('id')->on('users');
         $table->foreign('datos_fiscales_principal')->references('id')->on('datos_fiscales');
     });

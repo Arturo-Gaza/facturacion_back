@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\UserPhone;
 use App\Models\UserEmail;
 use App\Models\Catalogos\CatRoles;
 use App\Models\SistemaTickets\CatDepartamentos;
@@ -41,12 +42,17 @@ class User extends Authenticatable
         ];
     }
     
-    protected $appends = ['descripcion_rol','descripcio_depatamento', 'email'];
+    protected $appends = ['descripcion_rol','descripcio_depatamento', 'email','phone'];
     
     // Nueva relación con el correo principal
     public function mailPrincipal()
     {
         return $this->belongsTo(UserEmail::class, 'id_mail_principal');
+    }
+
+        public function telefonoPrincipal()
+    {
+        return $this->belongsTo(UserPhone::class, 'id_telefono_principal');
     }
     
     public function rol()
@@ -73,6 +79,10 @@ class User extends Authenticatable
     public function getEmailAttribute()
     {
         return optional($this->mailPrincipal)->email;
+    }
+        public function getPhoneAttribute()
+    {
+        return optional($this->telefonoPrincipal)->telefono;
     }
 
     public function emails()

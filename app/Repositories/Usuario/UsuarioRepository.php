@@ -288,7 +288,7 @@ public function responseUser(string $email)
         return User::create($data);
     }
 
-  public function storeCliente(array $data)
+public function storeCliente(array $data)
 {
     $email = $data['email'];
     $tel   = $data['tel'];
@@ -299,8 +299,18 @@ public function responseUser(string $email)
         if ($existingEmail->verificado) {
             return response()->json(['message' => 'usuario existente (correo)'], 409);
         } else {
-            // Eliminar email no verificado
-            $existingEmail->delete();
+            // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
+            $userToDelete = User::where('id_mail_principal', $existingEmail->id)
+                                ->orWhereHas('emails', function($query) use ($email) {
+                                    $query->where('email', $email);
+                                })
+                                ->first();
+            
+            if ($userToDelete) {
+                $userToDelete->delete(); // Esto eliminará todo en cascada
+            } else {
+                $existingEmail->delete();
+            }
         }
     }
 
@@ -310,30 +320,41 @@ public function responseUser(string $email)
         if ($existingPhone->verificado) {
             return response()->json(['message' => 'usuario existente (teléfono)'], 409);
         } else {
-            // Eliminar teléfono no verificado
-            $existingPhone->delete();
+            // Eliminar usuario completo
+            $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
+                                ->orWhereHas('phones', function($query) use ($tel) {
+                                    $query->where('telefono', $tel);
+                                })
+                                ->first();
+            
+            if ($userToDelete) {
+                $userToDelete->delete(); // Esto eliminará todo en cascada
+            } else {
+                $existingPhone->delete();
+            }
         }
     }
 
-    // 3. Crear usuario
+    // 3. Crear nuevo usuario
     $data['password'] = Hash::make($data['password']);
     $user = User::create([
         'password'  => $data['password'],
-        'idRol'     => $data['idRol'] ?? 2, // ejemplo: rol por defecto cliente
+        'idRol'     => $data['idRol'] ?? 2,
     ]);
 
     // 4. Guardar correo y teléfono
-    $correo=$user->emails()->create([
+    $correo = $user->emails()->create([
         'email' => $email,
     ]);
 
-    $telefono=$user->phones()->create([
+    $telefono = $user->phones()->create([
         'telefono' => $tel,
     ]);
+
     $user->update([
-    'id_mail_principal' => $correo->id,
-    'id_telefono_principal' => $telefono->id
-]);
+        'id_mail_principal' => $correo->id,
+        'id_telefono_principal' => $telefono->id
+    ]);
 
     return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
 }
