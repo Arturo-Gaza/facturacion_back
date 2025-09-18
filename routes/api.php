@@ -52,6 +52,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('usuario/enviarCorreoRec', [UsuarioController::class, 'enviarCorreoRec']);
 Route::post('usuario/enviarCorreoConf', [UsuarioController::class, 'enviarCorreoConf']);
 Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorreoRec']);
+
+Route::post('usuario/validarCorreoConf', [UsuarioController::class, 'validarCorreoConf']);
 Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
 
 Route::get('/test', function () {
@@ -76,17 +78,17 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
 
     //Ruta para tabla Solicitudes
-    Route::get('tabSolicitudes/getAll', [TabSolicitudesController::class, 'getAll']);
-    Route::get('tabSolicitudes/getById/{id}', [TabSolicitudesController::class, 'getByID']);
-    Route::get('tabSolicitudes/getByIdSolicitud/{id}', [TabSolicitudesController::class, 'getByIDSolicitud']);
-    Route::post('tabSolicitudes/register', [TabSolicitudesController::class, 'store']);
-    Route::put('tabSolicitudes/update/{id}', [TabSolicitudesController::class, 'update']);
-    Route::post('tabSolicitudes/asignar', [TabSolicitudesController::class, 'asignar']);
-    Route::post('tabSolicitudes/reasignar', [TabSolicitudesController::class, 'reasignar']);
-    Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
-    Route::post('tabSolicitudes/reporte', [TabSolicitudesController::class, 'reporte']);
-    Route::post('tabSolicitudes/formatearSolicitud/{id}', [TabSolicitudesController::class, 'formatearSolicitud']);
-    Route::get('tabSolicitudes/getCotizaciones/{id}', [TabSolicitudesController::class, 'getCotizaciones']);
+    //Route::get('tabSolicitudes/getAll', [TabSolicitudesController::class, 'getAll']);
+    //RRoute::get('tabSolicitudes/getById/{id}', [TabSolicitudesController::class, 'getByID']);
+   //Route::get('tabSolicitudes/getByIdSolicitud/{id}', [TabSolicitudesController::class, 'getByIDSolicitud']);
+    //Route::post('tabSolicitudes/register', [TabSolicitudesController::class, 'store']);
+     //Route::put('tabSolicitudes/update/{id}', [TabSolicitudesController::class, 'update']);
+     //Route::post('tabSolicitudes/asignar', [TabSolicitudesController::class, 'asignar']);
+    // Route::post('tabSolicitudes/reasignar', [TabSolicitudesController::class, 'reasignar']);
+     //Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
+     //Route::post('tabSolicitudes/reporte', [TabSolicitudesController::class, 'reporte']);
+     //Route::post('tabSolicitudes/formatearSolicitud/{id}', [TabSolicitudesController::class, 'formatearSolicitud']);
+     //Route::get('tabSolicitudes/getCotizaciones/{id}', [TabSolicitudesController::class, 'getCotizaciones']);
 
     //Ruta para tabla SolicitudesDetalle
     Route::get('tabSolicitudesDetalle/getAll', [TabSolicitudesDetalleController::class, 'getAll']);
@@ -323,7 +325,7 @@ Route::post('Servicio/register', [ServicioController::class, 'store']);
 Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
 
 // Solicitud
-Route::get('Solicitud/getAll', [SolicitudController::class, 'getAll']);
-Route::get('Solicitud/getById/{id}', [SolicitudController::class, 'getById']);
-Route::post('Solicitud/register', [SolicitudController::class, 'store']);
-Route::put('Solicitud/update/{id}', [SolicitudController::class, 'update']);
+Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
+Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
+Route::post('solicitud/register', [SolicitudController::class, 'store']);
+Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);

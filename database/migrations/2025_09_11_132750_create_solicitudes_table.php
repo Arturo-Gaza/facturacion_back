@@ -16,9 +16,8 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->string('imagen_url', 255);
             $table->text('texto_ocr')->nullable()->comment('Texto extraído por OCR');
-            $table->enum('estado', ['pendiente', 'procesando', 'facturado', 'rechazado'])->default('pendiente');
             $table->foreignId('empleado_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->foreignId('estado_id')->constrained('estados_solicitud')->default(1);
+            $table->foreignId('estado_id')->constrained('cat_estatus_solicitud')->default(1);
 
             $table->timestamps();
         });

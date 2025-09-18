@@ -220,7 +220,7 @@ if ($user) {
        // $user->notify(new TwoFactorCodeNotification());
         
         return response()->json([
-            'status' => true,
+            'success' => true,
             'message' => 'Se requiere verificación de dos factores',
             'two_factor_required' => true,
             'user_id' => $user->id,
@@ -241,13 +241,13 @@ if ($user) {
         }
 
         return response()->json([
-            'status' => true,
+            'success' => true,
             'message' => 'Usuario logueado correctamente',
             'data' => $userresponse,
             'token' => $token,
 
         ], 200);
-        return ApiResponseHelper::sendResponse($userresponse, 'Record insert succesfull', 201);
+        return ApiResponseHelper::sendResponse($userresponse, 'Usuario logueado correctamente', 201,$token);
     }
 
     /**

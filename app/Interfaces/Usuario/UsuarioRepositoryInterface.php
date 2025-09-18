@@ -16,6 +16,7 @@ interface UsuarioRepositoryInterface
     public function enviarCorreoRec($data);
        public function enviarCorreoConf($data);
      public function validarCorreoRec($data);
+     public function validarCorreoConf($data);
      public function recPass($data);
     public function findByEmailOrUser(string $email): ?User;
     public function responseUser(string $email);

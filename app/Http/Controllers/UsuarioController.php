@@ -108,6 +108,18 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
+        public function validarCorreoConf(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->validarCorreoConf($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
+    }
     public function recPass(Request $request)
     {
         $data = [

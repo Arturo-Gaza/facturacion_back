@@ -20,7 +20,7 @@ class EstatusSolicitudSeeder extends Seeder
         $estatus1->save();
 
         $estatus2 = new CatEstatusSolicitud();
-        $estatus2->descripcion_estatus_solicitud = 'Enviada';
+        $estatus2->descripcion_estatus_solicitud = 'Concluida';
         $estatus1->mandarCorreo= true;
         $estatus2->save();
 
@@ -29,39 +29,5 @@ class EstatusSolicitudSeeder extends Seeder
         $estatus1->mandarCorreo= false;
         $estatus3->save();
 
-        $estatus4 = new CatEstatusSolicitud();
-        $estatus4->descripcion_estatus_solicitud = 'Concluida';
-        $estatus1->mandarCorreo= true;
-        $estatus4->save();
-
-        $estatus5 = new CatEstatusSolicitud();
-        $estatus5->descripcion_estatus_solicitud = 'Requiere información';
-        $estatus1->mandarCorreo= true;
-        $estatus5->save();
-
-        $estatus5 = new CatEstatusSolicitud();
-        $estatus5->descripcion_estatus_solicitud = 'Respuesta al requerimiento';
-        $estatus1->mandarCorreo= false;
-        $estatus5->save();
-
-        $estatus6 = new CatEstatusSolicitud();
-        $estatus6->descripcion_estatus_solicitud = 'Vizualizada';
-        $estatus1->mandarCorreo= false;
-        $estatus6->save();
-
-        $estatus6 = new CatEstatusSolicitud();
-        $estatus6->descripcion_estatus_solicitud = 'Cotizando';
-        $estatus1->mandarCorreo= false;
-        $estatus6->save();
-
-        $estatus6 = new CatEstatusSolicitud();
-        $estatus6->descripcion_estatus_solicitud = 'Cotizada';
-        $estatus1->mandarCorreo= false;
-        $estatus6->save();
-
-        $estatus6 = new CatEstatusSolicitud();
-        $estatus6->descripcion_estatus_solicitud = 'Recibida';
-        $estatus1->mandarCorreo= false;
-        $estatus6->save();
     }
 }

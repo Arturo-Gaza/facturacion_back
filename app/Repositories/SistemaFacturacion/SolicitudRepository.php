@@ -4,7 +4,7 @@ namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Models\Solicitud;
-
+use Illuminate\Http\Request;
 class SolicitudRepository implements SolicitudRepositoryInterface
 {
     public function getAll()
@@ -17,9 +17,21 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->find($id);
     }
 
-    public function store(array $data): Solicitud
+    public function store(Request $request): Solicitud
     {
-        return Solicitud::create($data);
+        $solicitud = new Solicitud();
+        $solicitud->usuario_id = $request->usuario_id;
+        $solicitud->estado_id = 1; // Estado por defecto
+
+        // Guardar imagen
+        if ($request->hasFile('imagen')) {
+            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'));
+            $solicitud->imagen_url = $rutaImagen;
+        }
+
+        $solicitud->save();
+        
+        return $solicitud;
     }
 
     public function update(array $data, $id): ?Solicitud

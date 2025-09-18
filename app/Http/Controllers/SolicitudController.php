@@ -41,15 +41,8 @@ class SolicitudController extends Controller
     {
         DB::beginTransaction();
         try {
-            $data = $request->only([
-                'usuario_id',
-                'imagen_url',
-                'texto_ocr',
-                'estado',
-                'empleado_id',
-                'estado_id'
-            ]);
-            $solicitud = $this->solicitudRepository->store($data);
+
+            $solicitud = $this->solicitudRepository->store($request);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);

@@ -5,6 +5,7 @@ namespace App\Repositories\Usuario;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\PasswordReset;
+use App\Models\PasswordConf;
 use App\Models\User;
 use App\Models\UserSistema;
 use App\Models\UserEmail;
@@ -255,6 +256,32 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $email = $usr->email;
         $expiraEnMinutos = 10;
         $passwordReset = PasswordReset::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    return null;
+                }
+
+
+                return "Código válido";
+            }
+        }
+        // Continuar con el flujo para permitir cambiar contraseña
+    }
+
+        public function validarCorreoConf($data)
+    {
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+        $expiraEnMinutos = 10;
+        $passwordReset = PasswordConf::where('email', $email)
             ->where('used', false)
             ->get();
 
