@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\UploadedFile; 
+use App\Models\SistemaTickets\CatEstatusSolicitud;
 
 use Illuminate\Support\Facades\Storage;
 
@@ -40,7 +41,7 @@ class Solicitud extends Model
 
     public function estadoSolicitud(): BelongsTo
     {
-        return $this->belongsTo(EstadoSolicitud::class, 'estado_id');
+        return $this->belongsTo(CatEstatusSolicitud::class, 'estado_id');
     }
 
     public function facturas(): HasMany

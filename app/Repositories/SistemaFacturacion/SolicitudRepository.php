@@ -42,4 +42,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         return $solicitud;
     }
+
+        public function getByUsuario(int $usuario_id)
+    {
+           return Solicitud::where('usuario_id', $usuario_id)
+                    ->with(['usuario', 'empleado', 'estadoSolicitud'])
+                    ->get();
+    }
+
 }
