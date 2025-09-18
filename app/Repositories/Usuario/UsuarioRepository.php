@@ -275,10 +275,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         public function validarCorreoConf($data)
     {
+         DB::beginTransaction();
         $codigo = $data['codigo'];
         $usr = $this->findByEmailOrUser($data['email']);
-        if (!$usr)
+        if (!$usr) {
+            DB::rollBack();
             return null;
+        }
         $email = $usr->email;
         $expiraEnMinutos = 10;
         $passwordReset = PasswordConf::where('email', $email)
@@ -289,14 +292,28 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             if (Hash::check($codigo, $reset->codigo)) {
                 // Verificar si el código ha expirado
                 if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    DB::rollBack();
                     return null;
                 }
+                // Actualizar el registro en password_confirm_mail_tokens
+                $reset->update([
+                    'used' => true,
+                    'used_at' => now()
+                ]);
 
+                // Actualizar el correo como verificado en user_emails
+                UserEmail::where('email', $email)
+                    ->update([
+                        'verificado' => true
+                    ]);
+
+                DB::commit();
 
                 return "Código válido";
             }
         }
-        // Continuar con el flujo para permitir cambiar contraseña
+         DB::rollBack();
+        return null;
     }
 
 public function findByEmailOrUser(string $email): ?User
