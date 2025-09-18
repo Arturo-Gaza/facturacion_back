@@ -87,6 +87,15 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
     }
+        public function enviarCorreoConf(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->enviarCorreoConf($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
+    }
     public function validarCorreoRec(Request $request)
     {
         $data = [

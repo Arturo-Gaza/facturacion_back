@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recuperación de Contraseña</title>
+    <title>Confirmación de Email</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
     <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
@@ -13,32 +13,36 @@
             <div style="display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
                 <div style="width: 40px; height: 40px; background-color: rgba(255,255,255,0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" fill="white"/>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white"/>
                     </svg>
                 </div>
                 <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">Recupera Gastos</h1>
             </div>
-            <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 16px;">Recuperación de contraseña</p>
+            <p style="color: rgba(255,255,255,0.8); margin: 0; font-size: 16px;">Confirma tu correo electrónico</p>
         </div>
 
         <!-- Content -->
         <div style="padding: 40px 30px;">
             <h2 style="color: #1f2937; margin: 0 0 8px 0; font-size: 24px; font-weight: 600;">
-                Saludos {{ $datosMail['nombre'] }}
+                ¡Bienvenido/a {{ $datosMail['nombre'] }}!
             </h2>
             
             <p style="color: #6b7280; margin: 0 0 24px 0; font-size: 16px;">
-                Restablece tu acceso a la cuenta
+                Ingresa tus credenciales para acceder
+            </p>
+
+            <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
+                Gracias por registrarte en Recupera Gastos. Para completar tu registro y activar tu cuenta, necesitamos verificar tu dirección de correo electrónico.
             </p>
 
             <p style="color: #374151; font-size: 16px; line-height: 1.6; margin: 0 0 32px 0;">
-                Has solicitado recuperar tu contraseña. Usa el siguiente código para continuar:
+                Usa el siguiente código de verificación para confirmar tu email:
             </p>
 
             <!-- Verification Code Box -->
             <div style="background-color: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 32px; text-align: center; margin: 32px 0;">
                 <p style="color: #6b7280; margin: 0 0 8px 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">
-                    Código de Recuperación
+                    Código de Verificación
                 </p>
                 <div style="background-color: #1e3a8a; border-radius: 8px; padding: 20px; margin: 16px 0;">
                     <h1 style="color: #ffffff; margin: 0; font-size: 36px; font-weight: 700; letter-spacing: 4px; font-family: 'Courier New', monospace;">
@@ -50,24 +54,19 @@
                 </p>
             </div>
 
-            <!-- Security Notice -->
-            <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 32px 0; border-radius: 0 8px 8px 0;">
-                <h3 style="color: #92400e; margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">🔒 Importante:</h3>
-                <p style="color: #92400e; font-size: 14px; margin: 0; line-height: 1.6;">
-                    Si no solicitaste este cambio, puedes ignorar este correo de forma segura. Tu cuenta permanecerá protegida.
-                </p>
-            </div>
-
             <!-- Instructions -->
             <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 32px 0; border-radius: 0 8px 8px 0;">
-                <h3 style="color: #1e40af; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">📋 Cómo restablecer tu contraseña:</h3>
+                <h3 style="color: #1e40af; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">📋 Cómo verificar tu cuenta:</h3>
                 <ol style="color: #1e40af; font-size: 14px; margin: 0; padding-left: 16px; line-height: 1.6;">
-                    <li style="margin-bottom: 4px;">Regresa a la página de recuperación</li>
+                    <li style="margin-bottom: 4px;">Regresa a la página de verificación</li>
                     <li style="margin-bottom: 4px;">Ingresa el código mostrado arriba</li>
-                    <li style="margin-bottom: 4px;">Crea una nueva contraseña segura</li>
-                    <li>¡Listo! Ya podrás acceder nuevamente</li>
+                    <li>¡Listo! Ya podrás gestionar y recuperar tus gastos</li>
                 </ol>
             </div>
+
+            <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 32px 0 0 0;">
+                Si no creaste una cuenta en Recupera Gastos, puedes ignorar este correo de forma segura.
+            </p>
         </div>
 
         <!-- Footer -->
@@ -77,7 +76,7 @@
             </p>
             <p style="color: #6b7280; margin: 0 0 20px 0; font-size: 14px;">
                 Saludos,<br>
-                <strong>El equipo de soporte</strong>
+                <strong>El equipo de Recupera Gastos</strong>
             </p>
             
             <div style="margin: 24px 0;">
@@ -85,13 +84,14 @@
                 <span style="color: #d1d5db;">|</span>
                 <a href="#" style="display: inline-block; margin: 0 12px; color: #1e3a8a; text-decoration: none; font-size: 14px;">Contacto</a>
                 <span style="color: #d1d5db;">|</span>
-                <a href="#" style="display: inline-block; margin: 0 12px; color: #1e3a8a; text-decoration: none; font-size: 14px;">Seguridad</a>
+                <a href="#" style="display: inline-block; margin: 0 12px; color: #1e3a8a; text-decoration: none; font-size: 14px;">Términos</a>
             </div>
             
             <hr style="border: none; height: 1px; background-color: #e5e7eb; margin: 24px 0;">
             
             <p style="font-size: 12px; color: #9ca3af; margin: 0; line-height: 1.5;">
-                Este mensaje fue generado automáticamente. No respondas a este correo.<br>
+                Este correo de verificación fue enviado para confirmar tu registro.<br>
+                Por favor, no respondas a este correo electrónico.<br>
                 <br>
                 <span style="color: #d1d5db;">© 2024 Recupera Gastos. Todos los derechos reservados.</span>
             </p>

@@ -18,6 +18,16 @@ Schema::create('user_phones', function (Blueprint $table) {
     $table->boolean('verificado')->default(false);
     $table->timestamps();
 });
+        Schema::create('password_confirm_phone_tokens', function (Blueprint $table) {
+           $table->id();
+            $table->string('phone')->index();
+            $table->string('codigo');
+            $table->boolean('used')->default(false);
+            $table->timestamp('used_at')->nullable();
+            $table->timestamp('created_at')->nullable();
+        });
+
+
     }
 
     /**
@@ -26,5 +36,6 @@ Schema::create('user_phones', function (Blueprint $table) {
     public function down(): void
     {
         Schema::dropIfExists('user_phone');
+        Schema::dropIfExists('password_confirm_phone_tokens');
     }
 };

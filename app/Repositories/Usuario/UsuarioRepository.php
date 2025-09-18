@@ -202,6 +202,17 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $usr;
     }
 
+        public function enviarCorreoConf($data)
+    {
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $usr = $this->emailService->enviarCorreoConf($email);
+        return $usr;
+    }
+
     public function recPass($data)
     {
         $codigo = $data['codigo'];

@@ -50,6 +50,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('usuario/enviarCorreoRec', [UsuarioController::class, 'enviarCorreoRec']);
+Route::post('usuario/enviarCorreoConf', [UsuarioController::class, 'enviarCorreoConf']);
 Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorreoRec']);
 Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
 
