@@ -326,6 +326,7 @@ Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
 
 // Solicitud
 Route::get('solicitud/getByUsuario/{usuario_id}', [SolicitudController::class, 'getByUsuario']);
+Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::class, 'getGeneralByUsuario']);
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);

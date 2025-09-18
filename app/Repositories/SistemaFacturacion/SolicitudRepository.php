@@ -50,4 +50,31 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     ->get();
     }
 
+     public function getGeneralByUsuario(int $usuario_id)
+    {
+    // Obtener conteos con los nombres de estado desde el catálogo
+$conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
+    ->where('solicitudes.created_at', '>=', now()->subDays(30))
+    ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
+    ->selectRaw('cat_estatus_solicitud.descripcion_estatus_solicitud as estado, COUNT(*) as count')
+    ->groupBy('cat_estatus_solicitud.descripcion_estatus_solicitud')
+    ->pluck('count', 'estado');
+
+    $total = $conteos->sum();
+
+    $porcentaje = [];
+    $absoluto = [];
+
+    foreach ($conteos as $estado => $count) {
+        $absoluto[$estado] = $count;
+        $porcentaje[$estado] = $total > 0 ? round(($count / $total) * 100, 2) : 0;
+    }
+
+    return [
+        'total' => $total,
+        'porcentaje' => $porcentaje,
+        'absoluto' => $absoluto
+    ];
+    }
+
 }
