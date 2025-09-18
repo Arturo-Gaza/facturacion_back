@@ -13,6 +13,7 @@ use App\Models\UserEmail;
 use App\Models\UserPhone;
 use App\Models\UsuarioRol;
 use App\Services\EmailService;
+use App\Services\TwilioService;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -21,10 +22,12 @@ use Illuminate\Support\Facades\Hash;
 class UsuarioRepository implements UsuarioRepositoryInterface
 {
     protected $emailService;
+     protected $twilioService;
 
-    public function __construct(EmailService $emailService)
+    public function __construct(EmailService $emailService,TwilioService $twilioService)
     {
         $this->emailService = $emailService;
+         $this->twilioService = $twilioService;
     }
 
 
@@ -211,6 +214,17 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $email = $usr->email;
 
         $usr = $this->emailService->enviarCorreoConf($email);
+        return $usr;
+    }
+
+     public function enviarSMSConf($data)
+    {
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $usr = $this->twilioService->sendSMS($email);
         return $usr;
     }
 

@@ -94,8 +94,18 @@ class UsuarioController extends Controller
         ];
         $usuario = $this->usuario->enviarCorreoConf($data);
 
-        return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
+        public function enviarSMSConf(Request $request)
+    {
+        $data = [
+            'phone' => $request->phone,
+        ];
+        $usuario = $this->usuario->enviarSMSConf($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
+    }
+
     public function validarCorreoRec(Request $request)
     {
         $data = [
@@ -118,7 +128,7 @@ class UsuarioController extends Controller
         if (!$usuario) {
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
         }
-        return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
     public function recPass(Request $request)
     {

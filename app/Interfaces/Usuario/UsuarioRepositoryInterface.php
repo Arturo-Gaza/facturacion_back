@@ -15,6 +15,7 @@ interface UsuarioRepositoryInterface
     public function getAllHabilitados();
     public function enviarCorreoRec($data);
        public function enviarCorreoConf($data);
+       public function enviarSMSConf($data);
      public function validarCorreoRec($data);
      public function validarCorreoConf($data);
      public function recPass($data);
