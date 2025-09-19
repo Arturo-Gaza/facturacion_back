@@ -219,12 +219,12 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
      public function enviarSMSConf($data)
     {
-        $usr = $this->findByEmailOrUser($data['email']);
+        $usr = $this->findByEmailOrUser($data['phone']);
         if (!$usr)
             return null;
-        $email = $usr->email;
+        $phone = $usr->phone;
 
-        $usr = $this->twilioService->sendSMS($email);
+        $usr = $this->twilioService->sendSMSConf($phone);
         return $usr;
     }
 
@@ -333,12 +333,14 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 public function findByEmailOrUser(string $email): ?User
 {
     return User::where('habilitado', true)
-        ->where(function ($query) use ($email) {
-            $query->whereHas('mailPrincipal', function ($q) use ($email) {
-                $q->where('email', $email);
-            });
-        })
-        ->first();
+    ->where(function ($query) use ($email) {
+        $query->whereHas('mailPrincipal', function ($q) use ($email) {
+            $q->where('email', $email);
+        })->orWhereHas('telefonoPrincipal', function ($q) use ($email) {
+            $q->where('telefono', $email);
+        });
+    })
+    ->first();
 }
 
 public function responseUser(string $email)

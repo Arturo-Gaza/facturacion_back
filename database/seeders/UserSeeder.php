@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
         // Luego crear el email con el user_id correcto
         $emailAdmin = UserEmail::create([
             'user_id' => $user->id,
-            'email' => 'admin@alltub.com.mx',
+            'email' => 'admin@hopewellsystem.com',
             'verificado' => true,
         ]);
 

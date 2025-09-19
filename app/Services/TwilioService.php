@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use Twilio\Rest\Client;
+use App\Models\PasswordConfPhone;
+use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class TwilioService
 {
@@ -18,9 +21,18 @@ class TwilioService
         $this->from = env('TWILIO_PHONE_NUMBER');
     }
 
-    public function sendSMS($to, $message)
+    public function sendSMSConf($to)
     {
         try {
+            $codigo= str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $message="El codigo de verificación es ".$codigo;
+
+            PasswordConfPhone::create([
+                'phone' => $to,
+                'codigo' =>  Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+
             $response = $this->client->messages->create(
                 $to, // Número destino
                 [
