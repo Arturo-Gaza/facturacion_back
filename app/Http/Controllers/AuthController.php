@@ -185,12 +185,12 @@ if ($user) {
         }
 
   // Validar si el correo está verificado
-    if ($user->mailPrincipal && !$user->mailPrincipal->email_verified_at) {
+    if ($user->mailPrincipal && $user->mailPrincipal->true) {
         return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
     }
 
     // Validar si el teléfono está verificado
-    if ($user->telefonoPrincipal && !$user->telefonoPrincipal->telefono_verified_at) {
+    if ($user->telefonoPrincipal && $user->telefonoPrincipal->true) {
         return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
     }
 
