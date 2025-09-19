@@ -184,6 +184,16 @@ if ($user) {
 
         }
 
+  // Validar si el correo está verificado
+    if ($user->mailPrincipal && !$user->mailPrincipal->email_verified_at) {
+        return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
+    }
+
+    // Validar si el teléfono está verificado
+    if ($user->telefonoPrincipal && !$user->telefonoPrincipal->telefono_verified_at) {
+        return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
+    }
+
         if ($user->intentos >= 3) {
             return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 401);
         } else {
@@ -212,6 +222,8 @@ if ($user) {
             }
         }
 
+
+        
  if ($user->two_factor_enabled) {
         // Generar código de verificación
         $user->generateTwoFactorCode();
