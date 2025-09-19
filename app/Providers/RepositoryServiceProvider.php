@@ -89,7 +89,8 @@ use App\Interfaces\SistemaFacturacion\ServicioRepositoryInterface;
 use App\Repositories\SistemaFacturacion\ServicioRepository;
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Repositories\SistemaFacturacion\SolicitudRepository;
-
+use App\Interfaces\DatosFiscalesRepositoryInterface;
+use App\Repositories\DatosFiscalesRepository;
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
@@ -140,6 +141,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(MovimientoSaldoRepositoryInterface::class, MovimientoSaldoRepository::class);
         $this->app->bind(PrecioRepositoryInterface::class, PrecioRepository::class);
         $this->app->bind(ServicioRepositoryInterface::class, ServicioRepository::class);
+
+        $this->app->bind(DatosFiscalesRepositoryInterface::class, DatosFiscalesRepository::class);
         $this->app->bind(SolicitudRepositoryInterface::class, SolicitudRepository::class);
     }
 

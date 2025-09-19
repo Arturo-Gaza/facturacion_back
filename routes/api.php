@@ -42,6 +42,7 @@ use App\Http\Controllers\MovimientoSaldoController;
 use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\DatosFiscalesController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -332,3 +333,9 @@ Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);
 Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);
+
+Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
+Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getById']);
+Route::post('datosFiscales/register', [DatosFiscalesController::class, 'store']);
+Route::post('datosFiscales/registerConDomicilio', [DatosFiscalesController::class, 'storeConDomicilio']);
+Route::put('datosFiscales/update/{id}', [DatosFiscalesController::class, 'update']);
