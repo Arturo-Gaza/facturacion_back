@@ -12,6 +12,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\TwoFactorAuthenticatable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
@@ -41,25 +43,25 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    
-    protected $appends = ['descripcion_rol','descripcio_depatamento', 'email','phone'];
-    
+
+    protected $appends = ['descripcion_rol', 'descripcio_depatamento', 'email', 'phone'];
+
     // Nueva relación con el correo principal
     public function mailPrincipal()
     {
         return $this->belongsTo(UserEmail::class, 'id_mail_principal');
     }
 
-        public function telefonoPrincipal()
+    public function telefonoPrincipal()
     {
         return $this->belongsTo(UserPhone::class, 'id_telefono_principal');
     }
-    
+
     public function rol()
     {
         return $this->belongsTo(CatRoles::class, 'idRol');
     }
-    
+
     public function departamento()
     {
         return $this->belongsTo(CatDepartamentos::class, 'id_departamento');
@@ -74,24 +76,48 @@ class User extends Authenticatable
     {
         return optional($this->departamento)->descripcion;
     }
-    
+
     // Accessor para mantener compatibilidad con email
     public function getEmailAttribute()
     {
         return optional($this->mailPrincipal)->email;
     }
-        public function getPhoneAttribute()
+    public function getPhoneAttribute()
     {
         return optional($this->telefonoPrincipal)->telefono;
     }
 
     public function emails()
-{
-    return $this->hasMany(UserEmail::class);
-}
+    {
+        return $this->hasMany(UserEmail::class);
+    }
 
-public function phones()
-{
-    return $this->hasMany(UserPhone::class);
-}
+    public function phones()
+    {
+        return $this->hasMany(UserPhone::class);
+    }
+
+    /**
+     * Obtener los regímenes fiscales del usuario.
+     */
+    public function regimenesFiscales(): HasMany
+    {
+        return $this->hasMany(UsuarioRegimenFiscal::class, 'id_usuario');
+    }
+
+    /**
+     * Obtener el régimen fiscal predeterminado del usuario.
+     */
+    public function regimenFiscalPredeterminado()
+    {
+        return $this->regimenesFiscales()->predeterminado()->first();
+    }
+
+    /**
+     * Obtener los datos fiscales del usuario.
+     */
+    public function datosFiscales()
+    {
+        return $this->hasOne(DatosFiscal::class, 'id_usuario');
+    }
 }

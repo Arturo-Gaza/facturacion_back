@@ -82,15 +82,14 @@ class DatosFiscalesController extends Controller
                 'es_persona_moral',
                 'rfc',
                 'curp',
-                'id_regimen',
                 'fecha_inicio_op',
                 'id_estatus_sat',
                 'datos_extra',
                 'email_facturacion_id'
             ]);
             $direccionData = $request->input('direccion');
-
-            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData);
+            $regimenes=$request->input('regimenes');;
+            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData,  $regimenes );
 
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);

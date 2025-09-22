@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DatosFiscal extends Model
@@ -40,8 +41,37 @@ class DatosFiscal extends Model
     /**
      * Relación con las direcciones
      */
+ public function regimenPredeterminado(): BelongsTo
+    {
+        return $this->belongsTo(UsuarioRegimenFiscal::class, 'id_regimen_predeterminado');
+    }
+
+    /**
+     * Obtener todos los regímenes fiscales del usuario.
+     */
+    public function regimenesFiscales(): HasMany
+    {
+        return $this->hasMany(UsuarioRegimenFiscal::class, 'id_usuario', 'id_usuario');
+    }
+
+    /**
+     * Obtener el régimen fiscal predeterminado (método de conveniencia).
+     */
+    public function getRegimenPredeterminadoAttribute()
+    {
+        return $this->regimenPredeterminado->regimen ?? null;
+    }
+
+    /**
+     * Obtener todos los regímenes (método de conveniencia).
+     */
+    public function getTodosRegimenesAttribute()
+    {
+        return $this->regimenesFiscales()->with('regimen')->get();
+    }
     public function direcciones(): HasMany
     {
         return $this->hasMany(Direccion::class, 'id_fiscal');
     }
+
 }
