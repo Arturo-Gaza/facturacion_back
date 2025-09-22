@@ -19,10 +19,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         return DatosFiscal::with('direcciones')->find($id);
     }
 
-    public function storeConDomicilio(array $data, array $direccion, array $regimenes = [] )
+    public function storeConDomicilio(array $data, array $direccion )
     {
         $datosFiscales = DatosFiscal::create($data);
-        $this->guardarRegimenesFiscales($datosFiscales->id_usuario, $regimenes, $datosFiscales);
 
 
         if ($direccion && $datosFiscales) {

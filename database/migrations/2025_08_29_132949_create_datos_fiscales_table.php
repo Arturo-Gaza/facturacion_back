@@ -17,10 +17,11 @@ return new class extends Migration
             $table->boolean('es_persona_moral')->default(false);
             $table->string('rfc', 13);
             $table->string('curp', 18)->nullable();
-            $table->foreignId('id_regimen')->constrained('cat_regimenes_fiscales', 'id_regimen');
-            $table->date('fecha_inicio_op');
-            $table->foreignId('id_estatus_sat')->constrained('cat_estatuses_sat', 'id_estatus_sat');
-            $table->json('datos_extra')->nullable();
+            $table->foreignId('id_regimen')->constrained('cat_regimenes_fiscales', 'id_regimen')->nullable();
+            $table->date('fecha_inicio_op')->nullable();
+$table->foreignId('id_estatus_sat')
+      ->nullable()
+      ->constrained('cat_estatuses_sat', 'id_estatus_sat');            $table->json('datos_extra')->nullable();
                 // Relación al correo específico para facturación
     $table->foreignId('email_facturacion_id')->nullable();
             $table->timestamps();

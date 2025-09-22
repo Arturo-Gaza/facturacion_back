@@ -88,8 +88,7 @@ class DatosFiscalesController extends Controller
                 'email_facturacion_id'
             ]);
             $direccionData = $request->input('direccion');
-            $regimenes=$request->input('regimenes');;
-            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData,  $regimenes );
+            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData );
 
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
