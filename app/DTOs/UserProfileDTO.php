@@ -23,12 +23,12 @@ class UserProfileDTO
     {
         // Obtener datos fiscales principales
 
- $tieneDatosFiscalesPrincipal = $user->datosFiscalesPrincipal !== null;
+        $tieneDatosFiscalesPrincipal = $user->datosFiscalesPrincipal !== null;
         return new self(
             id: $user->id,
-            nombre: $user->datosFiscalesPrincipal->nombre_razon,
-            primer_apellido: $user->datosFiscalesPrincipal->primer_apellido,
-            segundo_apellido: $user->datosFiscalesPrincipal->segundo_apellido,
+            nombre: $user->datosFiscalesPrincipal?->nombre_razon, // Nullsafe operator
+            primer_apellido: $user->datosFiscalesPrincipal?->primer_apellido,
+            segundo_apellido: $user->datosFiscalesPrincipal?->segundo_apellido,
             email: $user->email,
             rol: $user->descripcion_rol,
             id_rol: $user->idRol,
@@ -36,7 +36,7 @@ class UserProfileDTO
             id_departamento: $user->id_departamento,
             departamento: $user->descripcio_depatamento,
             saldo: (float) $user->saldo,
-            datosCompletos:$tieneDatosFiscalesPrincipal
+            datosCompletos: $tieneDatosFiscalesPrincipal
 
         );
     }
@@ -55,7 +55,7 @@ class UserProfileDTO
             'id_departamento' => $this->id_departamento,
             'departamento' => $this->departamento,
             'saldo' => $this->saldo,
-            'datosCompletos'=>$this->datosCompletos
+            'datosCompletos' => $this->datosCompletos
         ];
     }
 }
