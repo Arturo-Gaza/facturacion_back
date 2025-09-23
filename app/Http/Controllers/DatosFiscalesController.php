@@ -98,6 +98,33 @@ class DatosFiscalesController extends Controller
         }
     }
 
+        public function storeCompleto(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->only([
+                'id_usuario',
+                'nombre_razon',
+                'primer_apellido',
+                'segundo_apellido',
+                'nombre_comercial',
+                'es_persona_moral',
+                'rfc',
+                'curp',
+                'id_estatus_sat'
+            ]);
+            $direccionData = $request->input('direccion');
+             $regimenesData = $request->input('regimenes');
+            $datosFiscales = $this->datosFiscalesRepository->storeCompleto($data,$direccionData,$regimenesData );
+
+            DB::commit();
+            return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
+
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
