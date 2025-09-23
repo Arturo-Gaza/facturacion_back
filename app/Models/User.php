@@ -7,6 +7,7 @@ use App\Models\UserPhone;
 use App\Models\UserEmail;
 use App\Models\Catalogos\CatRoles;
 use App\Models\SistemaTickets\CatDepartamentos;
+use App\Models\DatosFiscal; // Agrega esta importación
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,17 +19,19 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
     use TwoFactorAuthenticatable;
+    
     protected $fillable = [
         'idRol',
         'id_mail_principal',
-        'id_telefono_principal', // Cambiado de 'email' a 'id_mail_principal'
+        'id_telefono_principal',
         'id_departamento',
         'password',
-        'usuario', // Cambiado de 'user' a 'usuario para coincidir con migración
         'habilitado',
         'intentos',
         'login_activo',
         'saldo',
+        'datos_fiscales_principal', // Agrega este campo
+        'usuario_padre', // Agrega este campo si lo necesitas
     ];
 
     protected $hidden = [
@@ -41,10 +44,19 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'saldo' => 'decimal:2', // Cast para el saldo
         ];
     }
 
-    protected $appends = ['descripcion_rol', 'descripcio_depatamento', 'email', 'phone'];
+    protected $appends = [
+        'descripcion_rol', 
+        'descripcio_depatamento', 
+        'email', 
+        'phone',
+        'nombre',
+        'apellido_paterno',
+        'apellido_materno'
+    ];
 
     // Nueva relación con el correo principal
     public function mailPrincipal()
@@ -67,6 +79,12 @@ class User extends Authenticatable
         return $this->belongsTo(CatDepartamentos::class, 'id_departamento');
     }
 
+    // Relación con los datos fiscales principales
+    public function datosFiscalesPrincipal()
+    {
+        return $this->belongsTo(DatosFiscal::class, 'datos_fiscales_principal');
+    }
+
     public function getDescripcionRolAttribute()
     {
         return optional($this->rol)->nombre;
@@ -82,9 +100,26 @@ class User extends Authenticatable
     {
         return optional($this->mailPrincipal)->email;
     }
+
     public function getPhoneAttribute()
     {
         return optional($this->telefonoPrincipal)->telefono;
+    }
+
+    // Accessors para los datos personales desde datos fiscales principales
+    public function getNombreAttribute()
+    {
+        return optional($this->datosFiscalesPrincipal)->nombre;
+    }
+
+    public function getApellidoPaternoAttribute()
+    {
+        return optional($this->datosFiscalesPrincipal)->apellido_paterno;
+    }
+
+    public function getApellidoMaternoAttribute()
+    {
+        return optional($this->datosFiscalesPrincipal)->apellido_materno;
     }
 
     public function emails()

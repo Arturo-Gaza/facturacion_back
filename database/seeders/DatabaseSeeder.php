@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
 
      $this->call([
-            CatRegimenesFiscalesSeeder::class,
+            CatRegimenUsoCfdiSeeder::class,
             CatEstatusesSatSeeder::class,
             CatTiposDireccionSeeder::class,
             //CatTiposContactoSeeder::class,

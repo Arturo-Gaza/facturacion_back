@@ -13,9 +13,10 @@ return new class extends Migration
             $table->id('id_regimen');
             $table->string('clave', 10);
             $table->string('descripcion', 250);
-            $table->boolean('aplica_pf')->default(false);
-            $table->boolean('aplica_pm')->default(false);
-            $table->boolean('habilitado')->default(true);
+            $table->boolean('aplica_persona_fisica')->default(false);
+            $table->boolean('aplica_persona_moral')->default(false);
+            $table->date('fecha_inicio_vigencia');
+            $table->date('fecha_fin_vigencia')->nullable();
             $table->timestamps();
         });
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseHelper;
+use App\DTOs\UserProfileDTO;
 use App\Http\Requests\StoreUsuarioRequest;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use App\Models\UserEmail;
 use Exception;
-
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Info(
@@ -111,7 +112,7 @@ if ($user) {
         ]);
     
 } catch (\Exception $e) {
-    \Log::error('Error Google Auth: ' . $e->getMessage());
+    Log::error('Error Google Auth: ' . $e->getMessage());
     return response()->json([
         'error' => 'Error en autenticación',
         'message' => $e->getMessage() // Solo en desarrollo
@@ -252,10 +253,12 @@ if ($user) {
             return ApiResponseHelper::rollback($ex);
         }
 
+$userProfile = UserProfileDTO::fromUserModel($user);
+
         return response()->json([
             'success' => true,
             'message' => 'Usuario logueado correctamente',
-            'data' => $userresponse,
+            'data' =>  $userProfile->toArray(),
             'token' => $token,
 
         ], 200);

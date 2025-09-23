@@ -2,9 +2,11 @@
 
 namespace App\Repositories;
 
+use App\DTOs\UserProfileDTO;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
 use App\Models\DatosFiscal;
 use App\Models\Direccion;
+use App\Models\User;
 use App\Models\UsuarioRegimenFiscal;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
@@ -28,8 +30,16 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             $direccion['id_fiscal'] = $datosFiscales->id;
             Direccion::create($direccion);
         }
-        
-        return $datosFiscales->load('direcciones');
+        // Actualizar el usuario con los nuevos datos fiscales principales
+    $user = User::Find($datosFiscales->id_usuario);
+    $user->update([
+        'datos_fiscales_principal' => $datosFiscales->id
+    ]);
+         // Recargar el usuario con las relaciones actualizadas
+    $user->load(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal']);
+    
+    // Devolver el DTO
+    return UserProfileDTO::fromUserModel($user);
     }
 
 protected function guardarRegimenesFiscales($userId, array $regimenes, DatosFiscal $datosFiscales)
