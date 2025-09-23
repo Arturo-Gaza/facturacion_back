@@ -331,6 +331,8 @@ Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
 Route::get('solicitud/getByUsuario/{usuario_id}', [SolicitudController::class, 'getByUsuario']);
 Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::class, 'getGeneralByUsuario']);
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
+Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
+Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtenerImagen']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);
 Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);

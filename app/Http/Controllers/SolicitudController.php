@@ -27,6 +27,25 @@ class SolicitudController extends Controller
         }
     }
 
+       public function procesar(int $id)
+    {
+        try {
+            $all = $this->solicitudRepository->procesar($id);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+           public function obtenerImagen(int $id)
+    {
+        try {
+            $all = $this->solicitudRepository->obtenerImagen($id);
+            return ApiResponseHelper::sendResponse($all, 'Imagen obtenida', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
 
     public function getByUsuario(int $usuario_id)
     {

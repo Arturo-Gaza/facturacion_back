@@ -65,6 +65,21 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->get();
     }
 
+        public function obtenerImagen(int $id)
+    {
+        $solicitud = Solicitud::find($id);
+        if (!$solicitud->imagen_url || !Storage::disk('public')->exists($solicitud->getRawOriginal('imagen_url'))) {
+                Log::error("Imagen no encontrada para solicitud: {$solicitud->id}");
+                return null;
+            }
+
+            // Obtener la imagen en base64
+            $imagePath = $solicitud->getRutaImagenAttribute();
+            $imageData = base64_encode(file_get_contents($imagePath));
+        return $imageData;
+
+    }
+
     public function procesar(int $id_sol)
     {
             $solicitud = Solicitud::find($id_sol);
