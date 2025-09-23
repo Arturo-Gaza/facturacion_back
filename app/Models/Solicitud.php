@@ -21,6 +21,9 @@ class Solicitud extends Model
         'usuario_id',
         'imagen_url',
         'texto_ocr',
+        'texto_json',
+        'monto',
+        'establecimiento',
         'empleado_id',
         'estado_id'
     ];
