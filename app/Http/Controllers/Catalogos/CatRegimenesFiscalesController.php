@@ -44,6 +44,19 @@ class CatRegimenesFiscalesController extends Controller
         }
     }
 
+        public function getByMoralOFisica($esPersonaMoral)
+    {
+        try {
+            $regimen = $this->_regimenes->getByMoralOFisica($esPersonaMoral);
+            if (!$regimen) {
+                return ApiResponseHelper::rollback(null, 'Regimen no encontrado', 404);
+            }
+            return ApiResponseHelper::sendResponse($regimen, 'Regimen obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(StoreCatRegimenesFiscalesRequest $request)
     {
         DB::beginTransaction();

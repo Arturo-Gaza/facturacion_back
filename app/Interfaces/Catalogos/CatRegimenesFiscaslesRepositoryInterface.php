@@ -8,6 +8,7 @@ interface CatRegimenesFiscaslesRepositoryInterface
 {
     public function getAll();
     public function getByID($id): ?CatRegimenesFiscales;
+    public function getByMoralOFisica($esPersonaMoral);
     public function store(array $data): CatRegimenesFiscales;
     public function update(array $data, $id): ?CatRegimenesFiscales;
 }
