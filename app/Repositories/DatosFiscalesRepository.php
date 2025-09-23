@@ -68,6 +68,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             $regimen = UsuarioRegimenFiscal::create([
                 'id_usuario' => $userId,
                 'id_regimen' => $regimenData['id_regimen'],
+                'uso_cfdi'=>$regimenData['uso_cfdi'],
                 'predeterminado' => $regimenData['predeterminado'] ?? false
             ]);
 

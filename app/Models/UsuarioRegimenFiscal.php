@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use App\Models\DatosFiscal;
+
 class UsuarioRegimenFiscal extends Model
 {
     use HasFactory;
@@ -34,6 +35,7 @@ class UsuarioRegimenFiscal extends Model
     protected $fillable = [
         'id_usuario',
         'id_regimen',
+        'uso_cfdi',
         'predeterminado'
     ];
 
@@ -97,5 +99,14 @@ class UsuarioRegimenFiscal extends Model
             DatosFiscal::where('id_usuario', $this->id_usuario)
                 ->update(['id_regimen_predeterminado' => $this->id]);
         });
+    }
+    public function usoCfdi(): BelongsTo
+    {
+        return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi', 'usoCFDI');
+    }
+
+    public function getUsoCfdiDescripcionAttribute(): ?string
+    {
+        return $this->usoCfdi ? "{$this->usoCfdi->usoCFDI} - {$this->usoCfdi->descripcion}" : null;
     }
 }
