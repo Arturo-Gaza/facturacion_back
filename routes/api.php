@@ -250,7 +250,7 @@ Route::put('CatEstatusSat/update/{id}', [CatEstatusSatController::class, 'update
 //Cat Regimenes Fiscales
 Route::get('CatRegimenesFiscales/getAll', [CatRegimenesFiscalesController::class, 'getAll']);
 Route::get('CatRegimenesFiscales/getById/{id}',[CatRegimenesFiscalesController::class, 'getById']);
-Route::get('CatRegimenesFiscales/getByMoralOFisica/{id}',[CatRegimenesFiscalesController::class, 'getByMoralOFisica']);
+Route::get('CatRegimenesFiscales/getByMoralOFisica/{esPersonaMoral}',[CatRegimenesFiscalesController::class, 'getByMoralOFisica']);
 Route::post('CatRegimenesFiscales/register', [CatRegimenesFiscalesController::class, 'store']);
 Route::put('CatRegimenesFiscales/update/{id}', [CatRegimenesFiscalesController::class, 'update']);
 
