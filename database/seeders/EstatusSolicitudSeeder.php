@@ -15,6 +15,11 @@ class EstatusSolicitudSeeder extends Seeder
     {
 
         $estatus1 = new CatEstatusSolicitud();
+        $estatus1->descripcion_estatus_solicitud = 'Cargado';
+        $estatus1->mandarCorreo= false;
+        $estatus1->save();
+
+        $estatus1 = new CatEstatusSolicitud();
         $estatus1->descripcion_estatus_solicitud = 'En Proceso';
         $estatus1->mandarCorreo= false;
         $estatus1->save();

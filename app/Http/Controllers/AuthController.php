@@ -145,8 +145,32 @@ if ($user) {
         $user = $this->userRepo->store($request->all());
         return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
     }
-        public function registerCliente(Request $request)
+    public function registerCliente(Request $request)
     {
+
+            // Verificar si ya existe un usuario con ese email o teléfono
+    $usuarioExistente = $this->userRepo->findByEmailOrUser($request->email);
+    
+    if ($usuarioExistente) {
+        return ApiResponseHelper::throw(
+            null, 
+            'El email o teléfono ya está registrado', 
+            409 // Conflict
+        );
+    }
+    
+    // También verificar específicamente el teléfono si viene en el request
+    if ($request->has('telefono') && $request->telefono) {
+        $usuarioPorTelefono = $this->userRepo->findByEmailOrUser($request->telefono);
+        
+        if ($usuarioPorTelefono) {
+            return ApiResponseHelper::throw(
+                null, 
+                'El teléfono ya está registrado', 
+                409
+            );
+        }
+    }
         $user = $this->userRepo->storeCliente($request->all());
         return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
     }

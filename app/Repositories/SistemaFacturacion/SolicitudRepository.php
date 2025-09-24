@@ -100,7 +100,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'texto_ocr' => $textoOCR,
                 'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,
-                'texto_json' => json_encode($datosExtraidos)
+                'texto_json' => json_encode($datosExtraidos),
+                'estado_id'=>2
             ]);
         }
 
