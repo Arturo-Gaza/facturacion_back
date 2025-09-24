@@ -44,9 +44,11 @@ class CatRegimenesFiscalesController extends Controller
         }
     }
 
-        public function getByMoralOFisica($esPersonaMoral)
+    public function getByMoralOFisica($esPersonaMoral)
     {
         try {
+            $esPersonaMoral = filter_var($esPersonaMoral, FILTER_VALIDATE_BOOLEAN);
+
             $regimen = $this->_regimenes->getByMoralOFisica($esPersonaMoral);
             if (!$regimen) {
                 return ApiResponseHelper::rollback(null, 'Regimen no encontrado', 404);
@@ -66,7 +68,8 @@ class CatRegimenesFiscalesController extends Controller
                 'descripcion',
                 'aplica_pf',
                 'aplica_pm',
-                'habilitado']);
+                'habilitado'
+            ]);
             $regimen = $this->_regimenes->store($data);
             DB::commit();
             return ApiResponseHelper::sendResponse($regimen, 'Regimen fiscal creado correctamente', 201);
@@ -85,7 +88,8 @@ class CatRegimenesFiscalesController extends Controller
                 'descripcion',
                 'aplica_pf',
                 'aplica_pm',
-                'habilitado']);
+                'habilitado'
+            ]);
             $updated = $this->_regimenes->update($data, $id);
 
             if (!$updated) {

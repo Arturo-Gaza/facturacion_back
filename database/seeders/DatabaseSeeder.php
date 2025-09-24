@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
             CatRegimenUsoCfdiSeeder::class,
             CatEstatusesSatSeeder::class,
             CatTiposDireccionSeeder::class,
+             PromptTemplateSeeder::class,
             //CatTiposContactoSeeder::class,
             // Agrega aquí otros seeders que crees en el futuro
         ]);

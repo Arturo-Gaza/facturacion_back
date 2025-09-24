@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\PromptTemplate;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class AIDataExtractionService
+{
+    private string $apiKey;
+    private string $apiUrl;
+    private string $provider;
+
+    public function __construct(string $provider = null)
+    {
+        $this->provider = $provider ?: config('ocr.default_ai_provider');
+        $config = config("ocr.providers.{$this->provider}");
+        
+        $this->apiKey = $config['api_key'];
+        $this->apiUrl = $config['api_url'];
+    }
+
+    public function extractStructuredData(string $textoOCR, string $promptType = 'receipt_extraction'): array
+    {
+        $prompt = $this->getPromptTemplate($promptType, $textoOCR);
+
+        if ($this->provider === 'gemini') {
+            return $this->extractWithGemini($prompt, $textoOCR);
+        }
+        
+        return $this->fallbackExtraction($textoOCR);
+    }
+
+    private function extractWithGemini(string $prompt, string $textoOCR): array
+    {
+        try {
+            $response = Http::timeout(60)
+                ->retry(3, 1000)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'X-goog-api-key' => $this->apiKey
+                ])
+                ->post($this->apiUrl, [
+                    'contents' => [['parts' => [['text' => $prompt]]]],
+                    'generationConfig' => [
+                        'temperature' => 0.1,
+                        'maxOutputTokens' => 1000,
+                    ]
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $jsonString = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                return $this->parseJSONResponse($jsonString);
+            }
+        } catch (\Exception $e) {
+            Log::error("Error con AI API: " . $e->getMessage());
+        }
+
+        return $this->fallbackExtraction($textoOCR);
+    }
+
+    private function getPromptTemplate(string $type, string $textoOCR): string
+    {
+        // Primero intenta obtener de la base de datos
+        $template = PromptTemplate::where('type', $type)->first();
+        
+        if ($template) {
+            return str_replace('{$textoOCR}', $textoOCR, $template->prompt);
+        }
+
+        // Fallback a prompts predefinidos
+        return $this->getDefaultPrompt($type, $textoOCR);
+    }
+
+    private function getDefaultPrompt(string $type, string $textoOCR): string
+    {
+        $prompts = [
+            'receipt_extraction' => <<<PROMPT
+Del siguiente texto extraído de un ticket o factura, extrae la siguiente información en formato JSON:
+
+TEXTO:
+{$textoOCR}
+
+Estructura requerida:
+{
+    "establecimiento": "nombre del establecimiento o empresa",
+    "monto": "monto total numérico (sin símbolos de moneda)",
+    "fecha": "fecha de la transacción si está disponible",
+    "productos": ["lista de productos o servicios identificados"],
+    "moneda": "tipo de moneda (MXN, USD, etc.)"
+}
+
+Si algún dato no está presente, usa null. Devuelve ÚNICAMENTE el JSON.
+PROMPT,
+            
+            'invoice_extraction' => <<<PROMPT
+// Otro prompt para facturas...
+PROMPT
+        ];
+
+        return $prompts[$type] ?? $prompts['receipt_extraction'];
+    }
+
+    private function parseJSONResponse(string $jsonString): array
+    {
+        $jsonString = preg_replace('/```json|```/', '', $jsonString);
+        $jsonString = trim($jsonString);
+
+        try {
+            $datos = json_decode($jsonString, true, 512, JSON_THROW_ON_ERROR);
+            return is_array($datos) ? $datos : [];
+        } catch (\JsonException $e) {
+            Log::error("Error parseando JSON de IA: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    private function fallbackExtraction(string $textoOCR): array
+    {
+        preg_match('/(\$|MXN\s*)(\d+\.?\d*)/', $textoOCR, $matchesMonto);
+        $monto = $matchesMonto[2] ?? null;
+
+        $lineas = explode("\n", $textoOCR);
+        $establecimiento = trim($lineas[0] ?? '');
+
+        return [
+            'establecimiento' => $establecimiento ?: null,
+            'monto' => $monto ? (float)$monto : null,
+            'fecha' => null,
+            'productos' => [],
+            'moneda' => 'MXN'
+        ];
+    }
+}
