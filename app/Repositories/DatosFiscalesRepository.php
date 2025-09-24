@@ -110,10 +110,7 @@ public function getAll()
             $this->guardarUsosCfdiParaRegimen($datoFiscalRegimen, $usosCfdi);
         }
 
-        // Actualizar el dato fiscal con el régimen predeterminado
-        if ($idRegimenPredeterminado) {
-            $datosFiscales->update(['id_regimen_predeterminado' => $idRegimenPredeterminado]);
-        }
+
     }
 
     private function guardarUsosCfdiParaRegimen(DatosFiscalRegimenFiscal $datoFiscalRegimen, array $usosCfdi)
