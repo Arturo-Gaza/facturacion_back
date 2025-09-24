@@ -5,16 +5,26 @@ namespace App\Repositories;
 use App\DTOs\UserProfileDTO;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
 use App\Models\DatosFiscal;
+use App\Models\DatosFiscalRegimenFiscal;
+use App\Models\DatosFiscalRegimenUsoCfdi;
 use App\Models\Direccion;
 use App\Models\User;
 use App\Models\UsuarioRegimenFiscal;
+use Illuminate\Support\Facades\DB;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 {
-    public function getAll()
-    {
-        return DatosFiscal::with('direcciones')->get();
-    }
+public function getAll()
+{
+    return DatosFiscal::with([
+        'direcciones',
+        'regimenesFiscales.regimen', // Relación con el catálogo de regímenes
+        'regimenesFiscales.usosCfdi.usoCfdi', // Relación anidada con usos CFDI
+        'regimenPredeterminado.regimen', // Régimen predeterminado
+        'regimenPredeterminado.usosCfdi.usoCfdi', // Usos CFDI del régimen predeterminado
+        'usoCfdiPredeterminado' // Uso CFDI predeterminado directo
+    ])->get();
+}
 
     public function getByID($id): ?DatosFiscal
     {
@@ -28,7 +38,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
         if ($direccion && $datosFiscales) {
             $direccion['id_fiscal'] = $datosFiscales->id;
-             $direccion['id_tipo_direccion'] = 2;
+            $direccion['id_tipo_direccion'] = 2;
             Direccion::create($direccion);
         }
         // Actualizar el usuario con los nuevos datos fiscales principales
@@ -45,49 +55,105 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
     public function storeCompleto(array $data, array $direccion, array $regimenes)
     {
-        $datosFiscales = DatosFiscal::create($data);
-        $this->guardarRegimenesFiscales($data['id_usuario'], $regimenes, $datosFiscales);
+        DB::beginTransaction();
 
-        if ($direccion && $datosFiscales) {
-            $direccion['id_fiscal'] = $datosFiscales->id;
-            $direccion['id_tipo_direccion'] = 1;
-            Direccion::create($direccion);
+        try {
+            // Crear el dato fiscal
+            $datosFiscales = DatosFiscal::create($data);
+
+            // Guardar los regímenes fiscales
+            $this->guardarRegimenesFiscales($regimenes, $datosFiscales);
+
+            // Guardar la dirección
+            if ($direccion && $datosFiscales) {
+                $direccion['id_fiscal'] = $datosFiscales->id;
+                $direccion['id_tipo_direccion'] = 1;
+                Direccion::create($direccion);
+            }
+
+            // Actualizar el usuario con los nuevos datos fiscales principales
+            $user = User::find($datosFiscales->id_usuario);
+
+            DB::commit();
+
+            // Devolver el DTO
+            return UserProfileDTO::fromUserModel($user);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-        // Actualizar el usuario con los nuevos datos fiscales principales
-        $user = User::Find($datosFiscales->id_usuario);
-
-        // Devolver el DTO
-        return UserProfileDTO::fromUserModel($user);
     }
 
-    protected function guardarRegimenesFiscales($userId, array $regimenes, DatosFiscal $datosFiscales)
+    public function guardarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
     {
-        $regimenesGuardados = [];
+        $idDatoFiscal = $datosFiscales->id;
+        $idRegimenPredeterminado = null;
 
-        foreach ($regimenes as $regimenData) {
-            $regimen = UsuarioRegimenFiscal::create([
-                'id_usuario' => $userId,
-                'id_regimen' => $regimenData['id_regimen'],
-                'uso_cfdi'=>$regimenData['uso_cfdi'],
-                'predeterminado' => $regimenData['predeterminado'] ?? false
+        foreach ($regimenes as $regimen) {
+            $idRegimen = $regimen['id_regimen'];
+            $esRegimenPredeterminado = $regimen['predeterminado'] ?? false;
+            $usosCfdi = $regimen['usos_cfdi'] ?? [];
+
+            // Crear el registro en datos_fiscales_regimenes_fiscales
+            $datoFiscalRegimen = DatosFiscalRegimenFiscal::create([
+                'id_dato_fiscal' => $idDatoFiscal,
+                'id_regimen' => $idRegimen,
+                'predeterminado' => $esRegimenPredeterminado
             ]);
 
-            $regimenesGuardados[] = $regimen;
+            // Si es el régimen predeterminado, guardar su ID
+            if ($esRegimenPredeterminado) {
+                $idRegimenPredeterminado = $datoFiscalRegimen->id;
+            }
 
-            // Si es predeterminado, actualizar la referencia en datos_fiscales
-            if ($regimen->predeterminado) {
-                $datosFiscales->update(['id_regimen_predeterminado' => $regimen->id]);
+            // Guardar los usos CFDI para este régimen
+            $this->guardarUsosCfdiParaRegimen($datoFiscalRegimen, $usosCfdi);
+        }
+
+        // Actualizar el dato fiscal con el régimen predeterminado
+        if ($idRegimenPredeterminado) {
+            $datosFiscales->update(['id_regimen_predeterminado' => $idRegimenPredeterminado]);
+        }
+    }
+
+    private function guardarUsosCfdiParaRegimen(DatosFiscalRegimenFiscal $datoFiscalRegimen, array $usosCfdi)
+    {
+        $idUsoCfdiPredeterminado = null;
+        $predeterminadosCount = 0;
+
+        foreach ($usosCfdi as $usoCfdi) {
+            $usoCfdiCodigo = $usoCfdi['uso_cfdi'];
+            $esUsoPredeterminado = $usoCfdi['predeterminado'] ?? false;
+
+            // Validar que solo haya un predeterminado por régimen
+            if ($esUsoPredeterminado) {
+                $predeterminadosCount++;
+                if ($predeterminadosCount > 1) {
+                    throw new \Exception("Solo puede haber un uso de CFDI predeterminado por régimen");
+                }
+                $idUsoCfdiPredeterminado = $usoCfdiCodigo;
+            }
+
+            // Crear el registro en datos_fiscales_regimen_usos_cfdi
+            DatosFiscalRegimenUsoCfdi::create([
+                'id_dato_fiscal_regimen' => $datoFiscalRegimen->id,
+                'uso_cfdi' => $usoCfdiCodigo,
+                'predeterminado' => $esUsoPredeterminado
+            ]);
+        }
+
+        // Si no hay predeterminado en este régimen, establecer el primero como predeterminado
+        if ($predeterminadosCount === 0 && count($usosCfdi) > 0) {
+            $primerUsoCfdi = $usosCfdi[0]['uso_cfdi'];
+            
+            $primerRegistro = DatosFiscalRegimenUsoCfdi::where('id_dato_fiscal_regimen', $datoFiscalRegimen->id)
+                ->where('uso_cfdi', $primerUsoCfdi)
+                ->first();
+
+            if ($primerRegistro) {
+                $primerRegistro->update(['predeterminado' => true]);
             }
         }
-
-        // Si ningún régimen se marcó como predeterminado, marcar el primero
-        if (!$datosFiscales->id_regimen_predeterminado && count($regimenesGuardados) > 0) {
-            $primerRegimen = $regimenesGuardados[0];
-            $primerRegimen->update(['predeterminado' => true]);
-            $datosFiscales->update(['id_regimen_predeterminado' => $primerRegimen->id]);
-        }
-
-        return $regimenesGuardados;
     }
 
     public function store(array $data): DatosFiscal

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\Catalogos\CatRegimenesFiscales;
+use App\Models\Catalogos\CatUsoCfdi;
+use App\Models\CatUsoCfdi as ModelsCatUsoCfdi;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,7 +26,8 @@ class DatosFiscal extends Model
         'es_persona_moral',
         'rfc',
         'curp',
-        'id_regimen',
+        'id_regimen_predeterminado', // ← Cambiado de id_regimen
+        'id_uso_cfdi_predeterminado', // ← Agregar este campo
         'fecha_inicio_op',
         'id_estatus_sat',
         'datos_extra',
@@ -38,20 +42,32 @@ class DatosFiscal extends Model
         'updated_at' => 'datetime'
     ];
 
-    /**
-     * Relación con las direcciones
-     */
- public function regimenPredeterminado(): BelongsTo
+    // Relación muchos a muchos con regimenes fiscales
+    public function regimenesFiscales()
     {
-        return $this->belongsTo(UsuarioRegimenFiscal::class, 'id_regimen_predeterminado');
+        return $this->hasMany(DatosFiscalRegimenFiscal::class, 'id_dato_fiscal');
     }
-
-    /**
-     * Obtener todos los regímenes fiscales del usuario.
-     */
-    public function regimenesFiscales(): HasMany
+    
+    // Relación con el régimen predeterminado
+    public function regimenPredeterminado()
     {
-        return $this->hasMany(UsuarioRegimenFiscal::class, 'id_usuario', 'id_usuario');
+        return $this->belongsTo(DatosFiscalRegimenFiscal::class, 'id_regimen_predeterminado');
+    }
+    
+    // Relación directa con uso CFDI predeterminado
+    public function usoCfdiPredeterminado()
+    {
+        return $this->belongsTo(ModelsCatUsoCfdi::class, 'id_uso_cfdi_predeterminado', 'usoCFDI');
+    }
+    
+    // Obtener todos los usos CFDI a través de los regímenes (método de conveniencia)
+    public function getUsosCfdiAttribute()
+    {
+        return ModelsCatUsoCfdi::whereHas('datosFiscalesRegimenes', function($query) {
+            $query->whereIn('id_dato_fiscal_regimen', 
+                $this->regimenesFiscales()->pluck('id')
+            );
+        })->get();
     }
 
     /**
@@ -63,15 +79,15 @@ class DatosFiscal extends Model
     }
 
     /**
-     * Obtener todos los regímenes (método de conveniencia).
+     * Obtener el uso CFDI predeterminado (método de conveniencia).
      */
-    public function getTodosRegimenesAttribute()
+    public function getUsoCfdiPredeterminadoAttribute()
     {
-        return $this->regimenesFiscales()->with('regimen')->get();
+        return $this->usoCfdiPredeterminado ?? ($this->regimenPredeterminado->usoCfdiPredeterminado() ?? null);
     }
+
     public function direcciones(): HasMany
     {
         return $this->hasMany(Direccion::class, 'id_fiscal');
     }
-
 }

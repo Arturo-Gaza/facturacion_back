@@ -42,4 +42,5 @@ class CatRegimenesFiscales extends Model
             'usoCFDI'           // Foreign key en la tabla pivot para usoCFDI
         );
     }
+    
 }

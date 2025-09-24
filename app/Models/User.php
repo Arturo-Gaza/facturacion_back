@@ -155,4 +155,6 @@ class User extends Authenticatable
     {
         return $this->hasOne(DatosFiscal::class, 'id_usuario');
     }
+
+
 }
