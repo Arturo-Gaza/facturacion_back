@@ -148,29 +148,7 @@ if ($user) {
     public function registerCliente(Request $request)
     {
 
-            // Verificar si ya existe un usuario con ese email o teléfono
-    $usuarioExistente = $this->userRepo->findByEmailOrUser($request->email);
-    
-    if ($usuarioExistente) {
-        return ApiResponseHelper::throw(
-            null, 
-            'El email o teléfono ya está registrado', 
-            409 // Conflict
-        );
-    }
-    
-    // También verificar específicamente el teléfono si viene en el request
-    if ($request->has('telefono') && $request->telefono) {
-        $usuarioPorTelefono = $this->userRepo->findByEmailOrUser($request->telefono);
-        
-        if ($usuarioPorTelefono) {
-            return ApiResponseHelper::throw(
-                null, 
-                'El teléfono ya está registrado', 
-                409
-            );
-        }
-    }
+
         $user = $this->userRepo->storeCliente($request->all());
         return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
     }
@@ -210,12 +188,12 @@ if ($user) {
         }
 
   // Validar si el correo está verificado
-    if ($user->mailPrincipal && $user->mailPrincipal->true) {
+    if ($user->mailPrincipal && !$user->mailPrincipal->verificado) {
         return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
     }
 
     // Validar si el teléfono está verificado
-    if ($user->telefonoPrincipal && $user->telefonoPrincipal->true) {
+    if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado) {
         return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
     }
 
