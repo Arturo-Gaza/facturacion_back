@@ -273,6 +273,41 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         return "Error inesperado";
     }
+
+    public function desHabilitar($data)
+    {
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $passwordReset = PasswordInhabilitar::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+
+
+                // Si quieres marcarlo como usado aquí
+                $reset->used = true;
+                $reset->used_at = now();
+                $reset->save();
+
+                //  $usr = User::where('email', $email)->first();
+                $usr->habilitado = false;
+                $usr->save();
+                return "Usuario inhabilitado correctamente";
+            }
+        }
+
+
+        return "Error inesperado";
+    }
+
+
     public function validarCorreoRec($data)
     {
         $codigo = $data['codigo'];
@@ -364,13 +399,6 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                     DB::rollBack();
                     return null;
                 }
-                // Actualizar el registro en password_confirm_mail_tokens
-                $reset->update([
-                    'used' => true,
-                    'used_at' => now()
-                ]);
-
-   
 
                 DB::commit();
 

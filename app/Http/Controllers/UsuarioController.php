@@ -168,6 +168,21 @@ class UsuarioController extends Controller
         }
     }
 
+        public function desHabilitar(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email
+        ];
+
+        try {
+            $getById = $this->usuario->desHabilitar($data);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario inhablitado con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+        }
+    }
+
 
     public function update(UpdateUsuarioRequest $request, string $id)
     {

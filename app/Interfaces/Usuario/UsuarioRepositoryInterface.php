@@ -21,6 +21,7 @@ interface UsuarioRepositoryInterface
   public function enviarCorreoInhabilitar($data);
   public function validarCorreoInhabilitar($data);
   public function recPass($data);
+   public function desHabilitar($data);
   public function findByEmailOrUser(string $email): ?User;
   public function responseUser(string $email);
   public function aumentarIntento(int $intentos, $id);
