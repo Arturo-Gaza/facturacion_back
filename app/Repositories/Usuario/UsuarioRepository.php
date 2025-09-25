@@ -304,7 +304,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
 
 
-        return "Error inesperado";
+         throw new Exception('Error inesperado', 409);
     }
 
 
