@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Mail\MandarCorreo;
 use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
+use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
+use App\Models\PasswordInhabilitar;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabSolicitud;
 use App\Models\User;
@@ -65,10 +67,10 @@ class EmailService
     public function enviarCorreoRec($email)
     {
         $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
-    $query->where('email', $email);
-})->first();
+            $query->where('email', $email);
+        })->first();
         if ($usr) {
-            $codigo= str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $datosMail = [
                 'email' => $usr->email,
                 'nombre' => $usr->name . " " . $usr->apellidoP . " " . $usr->apellidoM,
@@ -94,7 +96,7 @@ class EmailService
                 return $e->getMessage();
             }
             return $usr;
-        }else{
+        } else {
             return "null";
         }
     }
@@ -102,10 +104,10 @@ class EmailService
     public function enviarCorreoConf($email)
     {
         $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
-    $query->where('email', $email);
-})->first();
+            $query->where('email', $email);
+        })->first();
         if ($usr) {
-            $codigo= str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $datosMail = [
                 'email' => $usr->email,
                 'nombre' => $usr->name . " " . $usr->apellidoP . " " . $usr->apellidoM,
@@ -131,7 +133,41 @@ class EmailService
                 return $e->getMessage();
             }
             return $usr;
-        }else{
+        } else {
+            return "null";
+        }
+    }
+
+    public function enviarCorreoInhabilitar($email)
+    {
+        $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
+            $query->where('email', $email);
+        })->first();
+        if ($usr) {
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $datosMail = [
+                'email' => $usr->email,
+                'nombre' => $usr->name . " " . $usr->apellidoP . " " . $usr->apellidoM,
+                'codigo' => $codigo,
+            ];
+            // Guardar nuevo código
+            PasswordInhabilitar::create([
+                'email' => $datosMail['email'],
+                'codigo' =>  Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+
+
+            try {
+                Mail::to($datosMail["email"])->send(new MandarCorreoInhabilitar($datosMail));
+                return "Exito";
+            } catch (\Exception $e) {
+                // Guardar el error en log, base de datos, o notificar al admin
+                Log::error('Error al enviar correo: ' . $e->getMessage());
+                return $e->getMessage();
+            }
+            return $usr;
+        } else {
             return "null";
         }
     }

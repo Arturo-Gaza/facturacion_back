@@ -54,9 +54,15 @@ Route::post('usuario/enviarCorreoRec', [UsuarioController::class, 'enviarCorreoR
 Route::post('usuario/enviarCorreoConf', [UsuarioController::class, 'enviarCorreoConf']);
 Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorreoRec']);
 Route::post('usuario/enviarSMSConf', [UsuarioController::class, 'enviarSMSConf']);
-
 Route::post('usuario/validarCorreoConf', [UsuarioController::class, 'validarCorreoConf']);
+
+Route::post('usuario/enviarCorreoInhabilitar', [UsuarioController::class, 'enviarCorreoInhabilitar']);
+Route::post('usuario/validarCorreoInhabilitar', [UsuarioController::class, 'validarCorreoInhabilitar']);
+
 Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
+
+Route::post('usuario/habilitar', [UsuarioController::class, 'habilitar']);
+Route::post('usuario/desHabilitar', [UsuarioController::class, 'deshabilitar']);
 
 Route::get('/test', function () {
     return 'ok';

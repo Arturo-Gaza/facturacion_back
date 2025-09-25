@@ -96,6 +96,15 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
+        public function enviarCorreoInhabilitar(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->enviarCorreoInhabilitar($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
+    }
         public function enviarSMSConf(Request $request)
     {
         $data = [
@@ -125,6 +134,19 @@ class UsuarioController extends Controller
             'email' => $request->email,
         ];
         $usuario = $this->usuario->validarCorreoConf($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
+
+    public function validarCorreoInhabilitar(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->validarCorreoInhabilitar($data);
         if (!$usuario) {
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
         }
