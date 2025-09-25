@@ -8,6 +8,7 @@ interface DatosFiscalesRepositoryInterface
 {
     public function getAll();
     public function getByID($id): ?DatosFiscal;
+     public function getByUsr($id);
     public function store(array $data): DatosFiscal;
     public function storeConDomicilio(array $data,array $direccion );
      public function storeCompleto(array $data,array $direccion,array $regimenesData );

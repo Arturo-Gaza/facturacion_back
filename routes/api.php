@@ -339,6 +339,7 @@ Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);
 
 Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
 Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getById']);
+Route::get('datosFiscales/getByUsr/{id}', [DatosFiscalesController::class, 'getByUsr']);
 Route::post('datosFiscales/register', [DatosFiscalesController::class, 'store']);
 
 Route::post('datosFiscales/registerCompleto', [DatosFiscalesController::class, 'storeCompleto']);

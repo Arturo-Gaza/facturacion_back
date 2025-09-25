@@ -99,7 +99,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if ($request->hasFile('imagen')) {
             $rutaImagen = $solicitud->guardarImagen($request->file('imagen'));
             $solicitud->imagen_url = $rutaImagen;
-        }
+        } 
 
         $solicitud->save();
 
@@ -187,20 +187,5 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
 
         return $resultados;
-    }
-
-    /**
-     * Verificar conectividad con la API
-     */
-    public function verificarConexion(): bool
-    {
-        try {
-            $response = Http::timeout(10)
-                ->get("https://vision.googleapis.com/v1/images:annotate?key={$this->apiKey}");
-
-            return $response->status() !== 401; // 401 sería clave inválida
-        } catch (\Exception $e) {
-            return false;
-        }
     }
 }

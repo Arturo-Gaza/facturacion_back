@@ -39,6 +39,18 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
+        public function getByUsr($id)
+    {
+        try {
+            $datosFiscales = $this->datosFiscalesRepository->getByUsr($id);
+            if (!$datosFiscales) {
+                return ApiResponseHelper::sendResponse(null, 'Registros no encontrados', 404);
+            }
+            return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
 
     public function store(Request $request)
     {

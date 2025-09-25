@@ -14,21 +14,28 @@ use Illuminate\Support\Facades\DB;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 {
-public function getAll()
-{
-    return DatosFiscal::with([
-        'direcciones',
-        'regimenesFiscales.regimen', // Relación con el catálogo de regímenes
-        'regimenesFiscales.usosCfdi.usoCfdi', // Relación anidada con usos CFDI
-        'regimenPredeterminado.regimen', // Régimen predeterminado
-        'regimenPredeterminado.usosCfdi.usoCfdi', // Usos CFDI del régimen predeterminado
-        'usoCfdiPredeterminado' // Uso CFDI predeterminado directo
-    ])->get();
-}
+    public function getAll()
+    {
+        return DatosFiscal::with([
+            'direcciones',
+            'regimenesFiscales.regimen', // Relación con el catálogo de regímenes
+            'regimenesFiscales.usosCfdi.usoCfdi', // Relación anidada con usos CFDI
+            'regimenPredeterminado.regimen', // Régimen predeterminado
+            'regimenPredeterminado.usosCfdi.usoCfdi', // Usos CFDI del régimen predeterminado
+            'usoCfdiPredeterminado' // Uso CFDI predeterminado directo
+        ])->get();
+    }
 
     public function getByID($id): ?DatosFiscal
     {
         return DatosFiscal::with('direcciones')->find($id);
+    }
+
+    public function getByUsr($id)
+    {
+        return DatosFiscal::with('direcciones')
+            ->where('id_usuario', $id)
+            ->get();
     }
 
     public function storeConDomicilio(array $data, array $direccion)
@@ -109,8 +116,6 @@ public function getAll()
             // Guardar los usos CFDI para este régimen
             $this->guardarUsosCfdiParaRegimen($datoFiscalRegimen, $usosCfdi);
         }
-
-
     }
 
     private function guardarUsosCfdiParaRegimen(DatosFiscalRegimenFiscal $datoFiscalRegimen, array $usosCfdi)
@@ -142,7 +147,7 @@ public function getAll()
         // Si no hay predeterminado en este régimen, establecer el primero como predeterminado
         if ($predeterminadosCount === 0 && count($usosCfdi) > 0) {
             $primerUsoCfdi = $usosCfdi[0]['uso_cfdi'];
-            
+
             $primerRegistro = DatosFiscalRegimenUsoCfdi::where('id_dato_fiscal_regimen', $datoFiscalRegimen->id)
                 ->where('uso_cfdi', $primerUsoCfdi)
                 ->first();
