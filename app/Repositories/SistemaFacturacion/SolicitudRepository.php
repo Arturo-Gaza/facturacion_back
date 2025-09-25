@@ -99,9 +99,11 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if ($request->hasFile('imagen')) {
             $rutaImagen = $solicitud->guardarImagen($request->file('imagen'));
             $solicitud->imagen_url = $rutaImagen;
-        } 
-
+        }
         $solicitud->save();
+        $this->procesar($solicitud->id);
+        $solicitud->save();
+
 
         return $solicitud;
     }
