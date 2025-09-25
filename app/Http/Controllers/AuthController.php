@@ -32,93 +32,90 @@ class AuthController extends Controller
     {
         $this->userRepo = $userRepo;
     }
-public function redirectToGoogle()
-{
-    return Socialite::driver('google')->redirect();
-}
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
 
 
-public function handleGoogleCallback()
-{
-    try {
-        session()->forget('google_token');
-$googleUser = Socialite::driver('google')->user();
+    public function handleGoogleCallback()
+    {
+        try {
+            session()->forget('google_token');
+            $googleUser = Socialite::driver('google')->user();
 
-// Extraer nombre y apellidos del nombre completo
-$name = $googleUser->getName();
-$nameParts = explode(' ', $name);
-$user=$this->userRepo->findByEmailOrUser($googleUser->email);
-if ($user) {
-    $user->update([
-        'name' => $nameParts[0] ?? '',
-        'apellidoP' => $nameParts[1] ?? null,
-        'apellidoM' => $nameParts[2] ?? null,
-        'google_id' => $googleUser->getId(),
-        'avatar' => $googleUser->getAvatar(),
-        'habilitado' => true,
-        'intentos' => 0,
-        'login_activo' => true,
-        'idRol' => 2,
-        'email_verified_at' => now(),
-    ]);
+            // Extraer nombre y apellidos del nombre completo
+            $name = $googleUser->getName();
+            $nameParts = explode(' ', $name);
+            $user = $this->userRepo->findByEmailOrUser($googleUser->email);
+            if ($user) {
+                $user->update([
+                    'name' => $nameParts[0] ?? '',
+                    'apellidoP' => $nameParts[1] ?? null,
+                    'apellidoM' => $nameParts[2] ?? null,
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'habilitado' => true,
+                    'intentos' => 0,
+                    'login_activo' => true,
+                    'idRol' => 2,
+                    'email_verified_at' => now(),
+                ]);
+            } else {
+                // Crear el usuario primero
+                $user = User::create([
+                    'name' => $nameParts[0] ?? '',
+                    'apellidoP' => $nameParts[1] ?? null,
+                    'apellidoM' => $nameParts[2] ?? null,
+                    'google_id' => $googleUser->getId(),
+                    'avatar' => $googleUser->getAvatar(),
+                    'password' => null,
+                    'user' => strtolower(str_replace(' ', '', $googleUser->getName())),
+                    'habilitado' => true,
+                    'intentos' => 0,
+                    'login_activo' => true,
+                    'idRol' => 2,
+                    'email_verified_at' => now(),
+                    // id_mail_principal se establecerá después de crear el email
+                ]);
 
-}else{
-    // Crear el usuario primero
-    $user = User::create([
-        'name' => $nameParts[0] ?? '',
-        'apellidoP' => $nameParts[1] ?? null,
-        'apellidoM' => $nameParts[2] ?? null,
-        'google_id' => $googleUser->getId(),
-        'avatar' => $googleUser->getAvatar(),
-        'password' => null,
-        'user' => strtolower(str_replace(' ', '', $googleUser->getName())),
-        'habilitado' => true,
-        'intentos' => 0,
-        'login_activo' => true,
-        'idRol' => 2,
-        'email_verified_at' => now(),
-        // id_mail_principal se establecerá después de crear el email
-    ]);
-    
-    // Crear el registro en user_emails
-    $userEmail = UserEmail::create([
-        'user_id' => $user->id,
-        'email' => $googleUser->email,
-        'verificado' => true,
-    ]);
-    
-    // Actualizar el usuario con el id_mail_principal
-    $user->update(['id_mail_principal' => $userEmail->id]);
+                // Crear el registro en user_emails
+                $userEmail = UserEmail::create([
+                    'user_id' => $user->id,
+                    'email' => $googleUser->email,
+                    'verificado' => true,
+                ]);
 
-}
+                // Actualizar el usuario con el id_mail_principal
+                $user->update(['id_mail_principal' => $userEmail->id]);
+            }
 
 
-     $userresponse = $this->userRepo->responseUser($user->email);
-    // Generar token de acceso (si es una API)
-    $tokenGoogle = $user->createToken('google-token')->plainTextToken;
-    $token = $this->userRepo->generateToken($user);
-           try {
-            $this->userRepo->loginActive($user->id);
+            $userresponse = $this->userRepo->responseUser($user->email);
+            // Generar token de acceso (si es una API)
+            $tokenGoogle = $user->createToken('google-token')->plainTextToken;
+            $token = $this->userRepo->generateToken($user);
+            try {
+                $this->userRepo->loginActive($user->id);
 
-            DB::commit();
-        } catch (Exception $ex) {
-            DB::rollBack();
-            return ApiResponseHelper::rollback($ex);
+                DB::commit();
+            } catch (Exception $ex) {
+                DB::rollBack();
+                return ApiResponseHelper::rollback($ex);
+            }
+            return view('google-callback', [
+                'user' => $userresponse,
+                'token' => $token,
+                'tokenGoogle' => $tokenGoogle,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error Google Auth: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error en autenticación',
+                'message' => $e->getMessage() // Solo en desarrollo
+            ], 500);
         }
-        return view('google-callback', [
-            'user' => $userresponse,
-            'token' => $token,
-            'tokenGoogle' => $tokenGoogle,
-        ]);
-    
-} catch (\Exception $e) {
-    Log::error('Error Google Auth: ' . $e->getMessage());
-    return response()->json([
-        'error' => 'Error en autenticación',
-        'message' => $e->getMessage() // Solo en desarrollo
-    ], 500);
-}
-}
+    }
     /**
      * @OA\Post(
      *     path="/api/auth/register",
@@ -147,10 +144,13 @@ if ($user) {
     }
     public function registerCliente(Request $request)
     {
+        try {
 
-
-        $user = $this->userRepo->storeCliente($request->all());
-        return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+            $user = $this->userRepo->storeCliente($request->all());
+            return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+        } catch (Exception $e) {
+             return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
+        }
     }
 
     /**
@@ -184,18 +184,17 @@ if ($user) {
         $userresponse = $this->userRepo->responseUser($request->email);
         if ($user == null) {
             return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
-
         }
 
-  // Validar si el correo está verificado
-    if ($user->mailPrincipal && !$user->mailPrincipal->verificado) {
-        return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
-    }
+        // Validar si el correo está verificado
+        if ($user->mailPrincipal && !$user->mailPrincipal->verificado) {
+            return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
+        }
 
-    // Validar si el teléfono está verificado
-    if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado) {
-        return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
-    }
+        // Validar si el teléfono está verificado
+        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado) {
+            return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
+        }
 
         if ($user->intentos >= 3) {
             return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 401);
@@ -206,41 +205,41 @@ if ($user) {
                 return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 401);
             } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
-                   // $user->intentos=$user->intentos+1;
-                   // $user->update($user->toArray(),$user->id);
+                    // $user->intentos=$user->intentos+1;
+                    // $user->update($user->toArray(),$user->id);
 
                     //ESTE ME PERMITE EN AUMENTA EL NUMERO DE INTENTOS INTENTOS**
-                     DB::beginTransaction();
-                     try {
-                         $this->userRepo->aumentarIntento($user->intentos, $user->id);
+                    DB::beginTransaction();
+                    try {
+                        $this->userRepo->aumentarIntento($user->intentos, $user->id);
 
-                         DB::commit();
-                     } catch (Exception $ex) {
-                         DB::rollBack();
-                         return ApiResponseHelper::rollback($ex);
-                     }
+                        DB::commit();
+                    } catch (Exception $ex) {
+                        DB::rollBack();
+                        return ApiResponseHelper::rollback($ex);
+                    }
 
-                     return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
+                    return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
                 }
             }
         }
 
 
-        
- if ($user->two_factor_enabled) {
-        // Generar código de verificación
-        $user->generateTwoFactorCode();
-        
-        // Enviar código por email (puedes adaptar para SMS u otros métodos)
-       // $user->notify(new TwoFactorCodeNotification());
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Se requiere verificación de dos factores',
-            'two_factor_required' => true,
-            'user_id' => $user->id,
-        ], 200);
-    }
+
+        if ($user->two_factor_enabled) {
+            // Generar código de verificación
+            $user->generateTwoFactorCode();
+
+            // Enviar código por email (puedes adaptar para SMS u otros métodos)
+            // $user->notify(new TwoFactorCodeNotification());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Se requiere verificación de dos factores',
+                'two_factor_required' => true,
+                'user_id' => $user->id,
+            ], 200);
+        }
 
 
         $token = $this->userRepo->generateToken($user);
@@ -255,7 +254,7 @@ if ($user) {
             return ApiResponseHelper::rollback($ex);
         }
 
-$userProfile = UserProfileDTO::fromUserModel($user);
+        $userProfile = UserProfileDTO::fromUserModel($user);
 
         return response()->json([
             'success' => true,
@@ -264,7 +263,7 @@ $userProfile = UserProfileDTO::fromUserModel($user);
             'token' => $token,
 
         ], 200);
-        return ApiResponseHelper::sendResponse($userresponse, 'Usuario logueado correctamente', 201,$token);
+        return ApiResponseHelper::sendResponse($userresponse, 'Usuario logueado correctamente', 201, $token);
     }
 
     /**
