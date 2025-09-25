@@ -16,6 +16,7 @@ use App\Models\UsuarioRol;
 use App\Services\EmailService;
 use App\Services\TwilioService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
