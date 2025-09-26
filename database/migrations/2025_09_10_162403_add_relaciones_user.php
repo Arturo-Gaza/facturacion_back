@@ -14,6 +14,8 @@ public function up()
         $table->foreign('id_telefono_principal')->references('id')->on('user_phones')->onDelete('cascade');;
         $table->foreign('usuario_padre')->references('id')->on('users');
         $table->foreign('datos_fiscales_principal')->references('id')->on('datos_fiscales');
+
+        $table->foreign('datos_fiscales_personal')->references('id')->on('datos_fiscales');
     });
       Schema::table('datos_fiscales', function (Blueprint $table) {
         $table->foreign('email_facturacion_id')

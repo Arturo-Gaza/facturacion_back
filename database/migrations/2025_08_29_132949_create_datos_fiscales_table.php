@@ -12,12 +12,16 @@ return new class extends Migration
         Schema::create('datos_fiscales', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_usuario')->constrained('users');
+            $table->string('idCIF', 13)->nullable();
+            $table->string('lugar_emision')->nullable();
+            $table->date('fecha_emision')->nullable();
             $table->string('nombre_razon', 250);
             $table->string('nombre_comercial', 250)->nullable();
             $table->boolean('es_persona_moral')->default(false);
             $table->string('rfc', 13);
             $table->string('curp', 18)->nullable();
             $table->date('fecha_inicio_op')->nullable();
+             $table->date('fecha_ult_cambio_op')->nullable();
             $table->foreignId('id_estatus_sat')
                 ->nullable()
                 ->constrained('cat_estatuses_sat', 'id_estatus_sat');

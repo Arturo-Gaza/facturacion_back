@@ -30,7 +30,8 @@ class User extends Authenticatable
         'intentos',
         'login_activo',
         'saldo',
-        'datos_fiscales_principal', // Agrega este campo
+        'datos_fiscales_principal',
+        'datos_fiscales_personal', 
         'usuario_padre', // Agrega este campo si lo necesitas
     ];
 
@@ -84,6 +85,10 @@ class User extends Authenticatable
     {
         return $this->belongsTo(DatosFiscal::class, 'datos_fiscales_principal');
     }
+        public function datosFiscalesPersonal()
+    {
+        return $this->belongsTo(DatosFiscal::class, 'datos_fiscales_personal');
+    }
 
     public function getDescripcionRolAttribute()
     {
@@ -132,21 +137,6 @@ class User extends Authenticatable
         return $this->hasMany(UserPhone::class);
     }
 
-    /**
-     * Obtener los regímenes fiscales del usuario.
-     */
-    public function regimenesFiscales(): HasMany
-    {
-        return $this->hasMany(UsuarioRegimenFiscal::class, 'id_usuario');
-    }
-
-    /**
-     * Obtener el régimen fiscal predeterminado del usuario.
-     */
-    public function regimenFiscalPredeterminado()
-    {
-        return $this->regimenesFiscales()->predeterminado()->first();
-    }
 
     /**
      * Obtener los datos fiscales del usuario.

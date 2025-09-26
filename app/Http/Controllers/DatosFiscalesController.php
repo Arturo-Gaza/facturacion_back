@@ -91,13 +91,9 @@ class DatosFiscalesController extends Controller
                 'primer_apellido',
                 'segundo_apellido',
                 'nombre_comercial',
-                'es_persona_moral',
                 'rfc',
-                'curp',
-                'fecha_inicio_op',
-                'id_estatus_sat',
-                'datos_extra',
-                'email_facturacion_id'
+                'curp'
+                
             ]);
             $direccionData = $request->input('direccion');
             $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData );
@@ -123,7 +119,11 @@ class DatosFiscalesController extends Controller
                 'es_persona_moral',
                 'rfc',
                 'curp',
-                'id_estatus_sat'
+                'id_estatus_sat',
+                        'idCIF',
+        'lugar_emision',
+        'fecha_emision',
+        'fecha_ult_cambio_op',
             ]);
             $direccionData = $request->input('direccion');
              $regimenesData = $request->input('regimenes');

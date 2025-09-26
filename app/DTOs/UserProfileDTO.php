@@ -23,7 +23,7 @@ class UserProfileDTO
     {
         // Obtener datos fiscales principales
 
-        $tieneDatosFiscalesPrincipal = $user->datosFiscalesPrincipal !== null;
+        $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
         return new self(
             id: $user->id,
             nombre: $user->datosFiscalesPrincipal?->nombre_razon, // Nullsafe operator
@@ -36,7 +36,7 @@ class UserProfileDTO
             id_departamento: $user->id_departamento,
             departamento: $user->descripcio_depatamento,
             saldo: (float) $user->saldo,
-            datosCompletos: $tieneDatosFiscalesPrincipal
+            datosCompletos: $tieneDatosFiscalesPersonal
 
         );
     }

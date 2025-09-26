@@ -51,7 +51,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         // Actualizar el usuario con los nuevos datos fiscales principales
         $user = User::Find($datosFiscales->id_usuario);
         $user->update([
-            'datos_fiscales_principal' => $datosFiscales->id
+            'datos_fiscales_personal' => $datosFiscales->id
         ]);
         // Recargar el usuario con las relaciones actualizadas
         $user->load(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal']);

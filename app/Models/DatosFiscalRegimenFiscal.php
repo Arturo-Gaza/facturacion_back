@@ -14,6 +14,7 @@ class DatosFiscalRegimenFiscal extends Model
     protected $fillable = [
         'id_dato_fiscal',
         'id_regimen',
+        'fecha_inicio_regimen',
         'predeterminado'
     ];
     

@@ -13,20 +13,20 @@ return new class extends Migration
     {
         Schema::create('datos_fiscales_regimenes_fiscales', function (Blueprint $table) {
             $table->id();
-
+            $table->date('fecha_inicio_regimen')->nullable();
             // Relación con datos_fiscales
             $table->foreignId('id_dato_fiscal')
                 ->constrained('datos_fiscales')
                 ->onDelete('cascade');
 
             // Relación con cat_regimenes_fiscales
-    $table->unsignedBigInteger('id_regimen');
+            $table->unsignedBigInteger('id_regimen');
 
-    // ✅ LUEGO crear la llave foránea
-    $table->foreign('id_regimen')
-          ->references('id_regimen')
-          ->on('cat_regimenes_fiscales')
-          ->onDelete('cascade');
+            // ✅ LUEGO crear la llave foránea
+            $table->foreign('id_regimen')
+                ->references('id_regimen')
+                ->on('cat_regimenes_fiscales')
+                ->onDelete('cascade');
 
             // Campo para marcar el régimen predeterminado
             $table->boolean('predeterminado')->default(false);

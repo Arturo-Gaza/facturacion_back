@@ -12,7 +12,7 @@ class CatTiposDireccionSeeder extends Seeder
     {
         $tipos = [
             ['clave' => 'FISCAL', 'descripcion' => 'Dirección fiscal para facturación'],
-            ['clave' => 'ENVIO', 'descripcion' => 'Dirección para envío de mercancías'],
+            ['clave' => 'PERSONAL', 'descripcion' => 'Dirección personal'],
             ['clave' => 'OFICINA', 'descripcion' => 'Dirección de oficinas corporativas'],
             ['clave' => 'SUCURSAL', 'descripcion' => 'Dirección de sucursal'],
         ];

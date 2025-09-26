@@ -26,6 +26,10 @@ class DatosFiscal extends Model
         'es_persona_moral',
         'rfc',
         'curp',
+        'idCIF',
+        'lugar_emision',
+        'fecha_emision',
+        'fecha_ult_cambio_op',
         'id_regimen_predeterminado', // ← Cambiado de id_regimen
         'id_uso_cfdi_predeterminado', // ← Agregar este campo
         'fecha_inicio_op',
