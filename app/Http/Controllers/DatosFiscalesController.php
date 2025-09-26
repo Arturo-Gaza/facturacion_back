@@ -27,7 +27,7 @@ class DatosFiscalesController extends Controller
         }
     }
 
-        public function extraerDatosCFDI(Request $data)
+    public function extraerDatosCFDI(Request $data)
     {
         try {
             $all = $this->datosFiscalesRepository->extraerDatosCFDI($data);
@@ -49,7 +49,7 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
-        public function getByUsr($id)
+    public function getByUsr($id)
     {
         try {
             $datosFiscales = $this->datosFiscalesRepository->getByUsr($id);
@@ -103,10 +103,10 @@ class DatosFiscalesController extends Controller
                 'nombre_comercial',
                 'rfc',
                 'curp'
-                
+
             ]);
             $direccionData = $request->input('direccion');
-            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data,$direccionData );
+            $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data, $direccionData);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
@@ -116,7 +116,7 @@ class DatosFiscalesController extends Controller
         }
     }
 
-        public function storeCompleto(Request $request)
+    public function storeCompleto(Request $request)
     {
         DB::beginTransaction();
         try {
@@ -130,15 +130,16 @@ class DatosFiscalesController extends Controller
                 'rfc',
                 'curp',
                 'id_estatus_sat',
-                        'idCIF',
-        'lugar_emision',
-        'fecha_emision',
-        'fecha_ult_cambio_op',
-        'predeterminado'
+                'idCIF',
+                'lugar_emision',
+                'fecha_emision',
+                'fecha_ult_cambio_op',
+                'fecha_inicio_op',
+                'predeterminado'
             ]);
             $direccionData = $request->input('direccion');
-             $regimenesData = $request->input('regimenes');
-            $datosFiscales = $this->datosFiscalesRepository->storeCompleto($data,$direccionData,$regimenesData );
+            $regimenesData = $request->input('regimenes');
+            $datosFiscales = $this->datosFiscalesRepository->storeCompleto($data, $direccionData, $regimenesData);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
