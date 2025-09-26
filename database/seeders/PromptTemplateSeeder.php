@@ -122,7 +122,109 @@ Estructura requerida:
 Evalúa la legibilidad y calidad del texto OCR.
 PROMPT,
                 'description' => 'Prompt para evaluar la calidad del texto extraído por OCR',
+            ],
+            [
+                'name' => 'Extracción de datos de Constancia de Situación Fiscal',
+                'type' => 'cfdi_extraction',
+                'prompt' => <<<PROMPT
+Del siguiente texto extraído de una Constancia de Situación Fiscal (CFDI) del SAT, extrae la siguiente información en formato JSON:
+
+TEXTO:
+{\$textoOCR}
+
+Estructura requerida:
+{
+    "rfc": "RFC del contribuyente",
+    "curp": "CURP del contribuyente",
+    "nombre_completo": "Nombre completo del contribuyente",
+    "fecha_inicio_operaciones": "Fecha de inicio de operaciones",
+    "estatus": "Estatus en el padrón (ACTIVO, BAJA, etc.)",
+    "fecha_ultimo_cambio": "Fecha del último cambio de estado",
+    "codigo_postal": "Código Postal",
+    "colonia": "Colonia",
+    "municipio": "Municipio o demarcación territorial",
+    "entidad_federativa": "Entidad federativa",
+    "regimenes": ["lista de regímenes fiscales"],
+    "email": "Correo electrónico",
+    "telefono": "Número de teléfono",
+    "fecha_emision": "Fecha de emisión de la constancia"
+}
+
+INSTRUCCIONES ESPECÍFICAS:
+- Para RFC: buscar patrón de 12-13 caracteres alfanuméricos (ej: BUCO941019955)
+- Para CURP: buscar patrón de 18 caracteres alfanuméricos (ej: BUCO941019HDFSMS00)
+- El nombre completo suele estar después de "Nombre(s):", "PrimerApellido:" y "SegundoApellido:"
+- Las fechas: buscar en formatos como "15 DE MARZO DE 2019" o "15/03/2019"
+- Para regímenes: buscar después de "Regímenes:" o "Régimen"
+- El estatus usualmente es "ACTIVO" o "BAJA"
+- La fecha de emisión suele estar en "Lugar y Fecha de Emisión"
+
+BUSCAR ESPECÍFICAMENTE ESTAS ETIQUETAS COMUNES:
+- RFC:, CURP:, Nombre(s):, PrimerApellido:, SegundoApellido:
+- Fecha inicio de operaciones:, Estatus en el padrón:
+- Código Postal:, Nombre de la Colonia:, Nombre del Municipio:
+- Nombre de la Entidad Federativa:, Correo Electrónico:
+- Regímenes:, Fecha de Emisión:
+
+Si algún dato no está presente, usar null. Devuelve ÚNICAMENTE el JSON válido.
+PROMPT,
+                'description' => 'Prompt para extraer datos de Constancia de Situación Fiscal del SAT',
+            ],
+
+            [
+                'name' => 'Limpieza y corrección de texto de CFDI',
+                'type' => 'cfdi_cleaning',
+                'prompt' => <<<PROMPT
+Analiza el siguiente texto extraído de una Constancia de Situación Fiscal y corrígelo mejorando los espacios y formato:
+
+TEXTO ORIGINAL:
+{\$textoOCR}
+
+INSTRUCCIONES DE CORRECCIÓN:
+1. Corrige los espacios faltantes entre palabras (ej: "OSCARALFREDO" → "OSCAR ALFREDO")
+2. Separa correctamente los campos unidos (ej: "Fechainiciodeoperaciones" → "Fecha inicio de operaciones")
+3. Mantén la estructura de etiquetas como "RFC:", "CURP:", etc.
+4. Conserva todos los datos originales, solo mejora el formato
+5. No inventes información, solo corrige el formato
+
+Devuelve ÚNICAMENTE el texto corregido, sin comentarios adicionales.
+PROMPT,
+                'description' => 'Prompt para limpiar y corregir formato de texto de CFDI',
+            ],
+
+            [
+                'name' => 'Validación de Constancia de Situación Fiscal',
+                'type' => 'cfdi_validation',
+                'prompt' => <<<PROMPT
+Valida la siguiente Constancia de Situación Fiscal y devuelve un JSON con el análisis:
+
+TEXTO:
+{\$textoOCR}
+
+Estructura requerida:
+{
+    "es_valida": true/false,
+    "rfc_valido": true/false,
+    "curp_valido": true/false,
+    "datos_completos": "completo|parcial|incompleto",
+    "fecha_emision_valida": true/false,
+    "estatus_actual": "ACTIVO|BAJA|PENDIENTE",
+    "errores_detectados": ["lista de errores o inconsistencias"],
+    "advertencias": ["aspectos a verificar manualmente"]
+}
+
+CRITERIOS DE VALIDACIÓN:
+- RFC debe tener formato correcto (12-13 caracteres)
+- CURP debe tener formato correcto (18 caracteres)  
+- Debe incluir fecha de emisión reciente
+- Debe tener estatus claro (ACTIVO/BAJA)
+- Debe contener datos básicos completos (nombre, dirección, etc.)
+
+Devuelve ÚNICAMENTE el JSON de validación.
+PROMPT,
+                'description' => 'Prompt para validar integridad de Constancia de Situación Fiscal',
             ]
+        
         ];
 
         foreach ($prompts as $promptData) {

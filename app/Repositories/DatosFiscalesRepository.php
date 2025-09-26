@@ -10,10 +10,25 @@ use App\Models\DatosFiscalRegimenUsoCfdi;
 use App\Models\Direccion;
 use App\Models\User;
 use App\Models\UsuarioRegimenFiscal;
+use App\Services\AIDataExtractionService;
+use App\Services\OCRService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Smalot\PdfParser\Parser;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 {
+    private OCRService $ocrService;
+    private AIDataExtractionService $aiService;
+
+    public function __construct(
+        OCRService $ocrService = null,
+        AIDataExtractionService $aiService = null
+    ) {
+        $this->ocrService = $ocrService ?: new OCRService();
+        $this->aiService = $aiService ?: new AIDataExtractionService();
+    }
+
     public function getAll()
     {
         return DatosFiscal::with([
@@ -180,4 +195,33 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         }
         return $datosFiscales;
     }
+
+    public function extraerDatosCFDI(Request $request)
+    {
+        if ($request->hasFile('archivo')) {
+            $archivo = $request->file('archivo');
+        }
+        $textoExtraido = $this->extraerTextoDePDF($archivo);
+        return $textoExtraido;
+    }
+    private function extraerTextoDePDF($archivo)
+    {
+        try {
+            // Usar Smalot/pdfparser (recomendado)
+            $parser = new Parser();
+
+            // Obtener la ruta temporal del archivo
+            $pdf = $parser->parseFile($archivo->getPathname());
+
+            // Extraer todo el texto
+            $texto = $pdf->getText();
+            $texto =$this->aiService->extractStructuredData($texto,'cfdi_extraction');
+
+            return $texto ?: '';
+        } catch (\Exception $e) {
+
+            return null;
+        }
+    }
+
 }

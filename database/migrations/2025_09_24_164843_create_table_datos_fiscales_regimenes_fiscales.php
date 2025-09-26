@@ -33,8 +33,6 @@ return new class extends Migration
 
             $table->timestamps();
 
-            // Asegurar que solo haya un predeterminado por dato_fiscal
-            $table->unique(['id_dato_fiscal', 'predeterminado']);
 
             // Evitar duplicados de régimen por dato fiscal
             $table->unique(['id_dato_fiscal', 'id_regimen']);

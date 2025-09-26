@@ -27,6 +27,16 @@ class DatosFiscalesController extends Controller
         }
     }
 
+        public function extraerDatosCFDI(Request $data)
+    {
+        try {
+            $all = $this->datosFiscalesRepository->extraerDatosCFDI($data);
+            return ApiResponseHelper::sendResponse($all, 'Datos fiscales obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista de datos fiscales', 500);
+        }
+    }
+
     public function getById($id)
     {
         try {

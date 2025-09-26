@@ -3,10 +3,12 @@
 namespace App\Interfaces;
 
 use App\Models\DatosFiscal;
+use Illuminate\Http\Request;
 
 interface DatosFiscalesRepositoryInterface
 {
     public function getAll();
+     public function extraerDatosCFDI(Request $data);
     public function getByID($id): ?DatosFiscal;
      public function getByUsr($id);
     public function store(array $data): DatosFiscal;
