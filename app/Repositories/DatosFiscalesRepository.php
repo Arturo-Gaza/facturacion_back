@@ -97,9 +97,10 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 $direccion['id_tipo_direccion'] = 1;
                 Direccion::create($direccion);
             }
+            $user = User::find($datosFiscales->id_usuario);
             if ($data["predeterminado"]) {
                 // Actualizar el usuario con los nuevos datos fiscales principales
-                $user = User::find($datosFiscales->id_usuario);
+                
 
                 $user->update([
                     'datos_fiscales_principal' => $datosFiscales->id
