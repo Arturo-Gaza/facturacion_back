@@ -34,7 +34,12 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     public function getByUsr($id)
     {
         return DatosFiscal::with('direcciones')
-            ->where('id_usuario', $id)
+            ->whereHas('usuario', function ($query) use ($id) {
+                $query->where('id', $id);
+            })
+            ->whereDoesntHave('usuario', function ($query) {
+                $query->whereColumn('datos_fiscales_personal', 'datos_fiscales.id');
+            })
             ->get();
     }
 
@@ -77,10 +82,14 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 $direccion['id_tipo_direccion'] = 1;
                 Direccion::create($direccion);
             }
+            if ($data["predeterminado"]) {
+                // Actualizar el usuario con los nuevos datos fiscales principales
+                $user = User::find($datosFiscales->id_usuario);
 
-            // Actualizar el usuario con los nuevos datos fiscales principales
-            $user = User::find($datosFiscales->id_usuario);
-
+                $user->update([
+                    'datos_fiscales_principal' => $datosFiscales->id
+                ]);
+            }
             DB::commit();
 
             // Devolver el DTO

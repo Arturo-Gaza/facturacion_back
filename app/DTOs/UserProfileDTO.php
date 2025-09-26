@@ -26,9 +26,9 @@ class UserProfileDTO
         $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
         return new self(
             id: $user->id,
-            nombre: $user->datosFiscalesPrincipal?->nombre_razon, // Nullsafe operator
-            primer_apellido: $user->datosFiscalesPrincipal?->primer_apellido,
-            segundo_apellido: $user->datosFiscalesPrincipal?->segundo_apellido,
+            nombre: $user->datosFiscalesPersonal?->nombre_razon, // Nullsafe operator
+            primer_apellido: $user->datosFiscalesPersonal?->primer_apellido,
+            segundo_apellido: $user->datosFiscalesPersonal?->segundo_apellido,
             email: $user->email,
             rol: $user->descripcion_rol,
             id_rol: $user->idRol,

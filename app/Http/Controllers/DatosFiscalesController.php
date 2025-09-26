@@ -124,6 +124,7 @@ class DatosFiscalesController extends Controller
         'lugar_emision',
         'fecha_emision',
         'fecha_ult_cambio_op',
+        'predeterminado'
             ]);
             $direccionData = $request->input('direccion');
              $regimenesData = $request->input('regimenes');
