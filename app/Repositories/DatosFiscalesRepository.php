@@ -124,12 +124,14 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             $idRegimen = $regimen['id_regimen'];
             $esRegimenPredeterminado = $regimen['predeterminado'] ?? false;
             $usosCfdi = $regimen['usos_cfdi'] ?? [];
+            $fecha_inicio_regimen = $regimen['fecha_inicio_regimen'];
 
             // Crear el registro en datos_fiscales_regimenes_fiscales
             $datoFiscalRegimen = DatosFiscalRegimenFiscal::create([
                 'id_dato_fiscal' => $idDatoFiscal,
                 'id_regimen' => $idRegimen,
-                'predeterminado' => $esRegimenPredeterminado
+                'predeterminado' => $esRegimenPredeterminado,
+                'fecha_inicio_regimen'=>$fecha_inicio_regimen 
             ]);
 
             // Si es el régimen predeterminado, guardar su ID
