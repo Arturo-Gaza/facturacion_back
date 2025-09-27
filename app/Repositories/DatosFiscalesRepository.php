@@ -15,6 +15,7 @@ use App\Services\OCRService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Smalot\PdfParser\Parser;
+use Spatie\PdfToText\Pdf;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 {
@@ -100,7 +101,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             $user = User::find($datosFiscales->id_usuario);
             if ($data["predeterminado"]) {
                 // Actualizar el usuario con los nuevos datos fiscales principales
-                
+
 
                 $user->update([
                     'datos_fiscales_principal' => $datosFiscales->id
@@ -132,7 +133,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 'id_dato_fiscal' => $idDatoFiscal,
                 'id_regimen' => $idRegimen,
                 'predeterminado' => $esRegimenPredeterminado,
-                'fecha_inicio_regimen'=>$fecha_inicio_regimen 
+                'fecha_inicio_regimen' => $fecha_inicio_regimen
             ]);
 
             // Si es el régimen predeterminado, guardar su ID
@@ -210,15 +211,11 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     private function extraerTextoDePDF($archivo)
     {
         try {
-            // Usar Smalot/pdfparser (recomendado)
-            $parser = new Parser();
+        $texto = (new Pdf())
+            ->setPdf($archivo) // Usar el archivo recibido, no 'book.pdf'
+            ->text();
 
-            // Obtener la ruta temporal del archivo
-            $pdf = $parser->parseFile($archivo->getPathname());
-
-            // Extraer todo el texto
-            $texto = $pdf->getText();
-            $texto =$this->aiService->extractStructuredData($texto,'cfdi_extraction');
+            $texto = $this->aiService->extractStructuredData($texto, 'cfdi_extraction');
 
             return $texto ?: '';
         } catch (\Exception $e) {
@@ -226,5 +223,4 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             return null;
         }
     }
-
 }
