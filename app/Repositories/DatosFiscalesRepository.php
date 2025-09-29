@@ -50,10 +50,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     public function getByUsr($id)
     {
         return DatosFiscal::with([
-            'domicilioFiscal',
-            'regimenesFiscales.datoFiscal',
-            'regimenesFiscales.usosCfdi'
-        ])
+                'domicilioFiscal',
+                'regimenesFiscales.usosCfdi'
+            ])
             ->whereHas('usuario', function ($query) use ($id) {
                 $query->where('id', $id);
             })

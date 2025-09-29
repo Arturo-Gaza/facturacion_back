@@ -12,6 +12,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class DatosFiscal extends Model
 {
     protected $table = 'datos_fiscales';
+
+    public static $snakeAttributes = false;
+
     
     protected $primaryKey = 'id';
     
@@ -50,7 +53,11 @@ class DatosFiscal extends Model
         return $this->hasMany(DatosFiscalRegimenFiscal::class, 'id_dato_fiscal');
     }
     
-
+public function domicilioFiscal()
+{
+    return $this->hasOne(Direccion::class, 'id_fiscal')
+                ->where('id_tipo_direccion', 1); // 1 = domicilio fiscal
+}
     
 
     
