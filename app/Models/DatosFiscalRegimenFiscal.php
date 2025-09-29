@@ -20,6 +20,7 @@ class DatosFiscalRegimenFiscal extends Model
 
     protected $appends = ['nombre_regimen'];
     protected $hidden = ['created_at', 'updated_at'];
+    public static $snakeAttributes = false;
 
 
     public function getNombreRegimenAttribute()
