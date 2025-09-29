@@ -125,7 +125,6 @@ class DatosFiscalesController extends Controller
                 'nombre_razon',
                 'primer_apellido',
                 'segundo_apellido',
-                'nombre_comercial',
                 'es_persona_moral',
                 'rfc',
                 'curp',
@@ -137,8 +136,8 @@ class DatosFiscalesController extends Controller
                 'fecha_inicio_op',
                 'predeterminado'
             ]);
-            $direccionData = $request->input('direccion');
-            $regimenesData = $request->input('regimenes');
+            $direccionData = $request->input('domicilioFiscal');
+            $regimenesData = $request->input('regimenesFiscales');
             $datosFiscales = $this->datosFiscalesRepository->storeCompleto($data, $direccionData, $regimenesData);
 
             DB::commit();
@@ -171,8 +170,8 @@ class DatosFiscalesController extends Controller
                 'fecha_inicio_op',
                 'predeterminado'
             ]);
-            $direccionData = $request->input('direccion');
-            $regimenesData = $request->input('regimenes');
+            $direccionData = $request->input('domicilioFiscal');
+            $regimenesData = $request->input('regimenesFiscales');
             $idDatosFiscales=$data["idDatosFiscales"];
             $datosFiscales = $this->datosFiscalesRepository->updateCompleto( $data,  $direccionData,  $regimenesData, $idDatosFiscales);
 
