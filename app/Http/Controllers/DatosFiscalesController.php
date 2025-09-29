@@ -153,6 +153,7 @@ class DatosFiscalesController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->only([
+                'id',
                 'idDatosFiscales',
                 'id_usuario',
                 'nombre_razon',
@@ -172,7 +173,7 @@ class DatosFiscalesController extends Controller
             ]);
             $direccionData = $request->input('domicilioFiscal');
             $regimenesData = $request->input('regimenesFiscales');
-            $idDatosFiscales=$data["idDatosFiscales"];
+            $idDatosFiscales=$data["id"];
             $datosFiscales = $this->datosFiscalesRepository->updateCompleto( $data,  $direccionData,  $regimenesData, $idDatosFiscales);
 
             DB::commit();
