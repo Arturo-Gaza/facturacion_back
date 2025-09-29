@@ -15,11 +15,11 @@ class DatosFiscal extends Model
 
     public static $snakeAttributes = false;
 
-    
+
     protected $primaryKey = 'id';
-    
+
     public $timestamps = true;
-    
+
     protected $fillable = [
         'id_usuario',
         'nombre_razon',
@@ -49,26 +49,39 @@ class DatosFiscal extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
+    protected $appends = ['predeterminado']; // Agregar el campo a la serialización
 
     // Relación muchos a muchos con regimenes fiscales
     public function regimenesFiscales()
     {
         return $this->hasMany(DatosFiscalRegimenFiscal::class, 'id_dato_fiscal');
     }
-    
-public function domicilioFiscal()
-{
-    return $this->hasOne(Direccion::class, 'id_fiscal')
-                ->where('id_tipo_direccion', 1); // 1 = domicilio fiscal
-}
-    
 
-    
+    public function domicilioFiscal()
+    {
+        return $this->hasOne(Direccion::class, 'id_fiscal')
+            ->where('id_tipo_direccion', 1); // 1 = domicilio fiscal
+    }
+
+    public function getPredeterminadoAttribute()
+    {
+        // Consulta directa sin cargar la relación completa
+        $usuario = User::find($this->usuario_id);
+
+        if ($usuario) {
+            return $this->id == $usuario->datos_fiscales_principal ||
+                $this->id == $usuario->datos_fiscales_personal;
+        }
+
+        return false;
+    }
+
     // Obtener todos los usos CFDI a través de los regímenes (método de conveniencia)
     public function getUsosCfdiAttribute()
     {
-        return ModelsCatUsoCfdi::whereHas('datosFiscalesRegimenes', function($query) {
-            $query->whereIn('id_dato_fiscal_regimen', 
+        return ModelsCatUsoCfdi::whereHas('datosFiscalesRegimenes', function ($query) {
+            $query->whereIn(
+                'id_dato_fiscal_regimen',
                 $this->regimenesFiscales()->pluck('id')
             );
         })->get();
@@ -99,5 +112,4 @@ public function domicilioFiscal()
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
-
 }
