@@ -10,29 +10,37 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class DatosFiscalRegimenFiscal extends Model
 {
     protected $table = 'datos_fiscales_regimenes_fiscales';
-    
+
     protected $fillable = [
         'id_dato_fiscal',
         'id_regimen',
         'fecha_inicio_regimen',
         'predeterminado'
     ];
-    
+
+    protected $appends = ['nombre_regimen'];
+
+    public function getNombreRegimenAttribute()
+    {
+        return $this->regimen ? $this->regimen->clave ."-". $this->regimen->descripcion : null;
+    }
+
+
     public function datoFiscal(): BelongsTo
     {
         return $this->belongsTo(DatosFiscal::class, 'id_dato_fiscal');
     }
-    
+
     public function regimen(): BelongsTo
     {
         return $this->belongsTo(CatRegimenesFiscales::class, 'id_regimen');
     }
-    
+
     public function usosCfdi(): HasMany
     {
         return $this->hasMany(DatosFiscalRegimenUsoCfdi::class, 'id_dato_fiscal_regimen');
     }
-    
+
     // Obtener el uso CFDI predeterminado
     public function usoCfdiPredeterminado()
     {

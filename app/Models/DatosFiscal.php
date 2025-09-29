@@ -30,8 +30,6 @@ class DatosFiscal extends Model
         'lugar_emision',
         'fecha_emision',
         'fecha_ult_cambio_op',
-        'id_regimen_predeterminado', // ← Cambiado de id_regimen
-        'id_uso_cfdi_predeterminado', // ← Agregar este campo
         'fecha_inicio_op',
         'id_estatus_sat',
         'datos_extra',
@@ -52,17 +50,9 @@ class DatosFiscal extends Model
         return $this->hasMany(DatosFiscalRegimenFiscal::class, 'id_dato_fiscal');
     }
     
-    // Relación con el régimen predeterminado
-    public function regimenPredeterminado()
-    {
-        return $this->belongsTo(DatosFiscalRegimenFiscal::class, 'id_regimen_predeterminado');
-    }
+
     
-    // Relación directa con uso CFDI predeterminado
-    public function usoCfdiPredeterminado()
-    {
-        return $this->belongsTo(ModelsCatUsoCfdi::class, 'id_uso_cfdi_predeterminado', 'usoCFDI');
-    }
+
     
     // Obtener todos los usos CFDI a través de los regímenes (método de conveniencia)
     public function getUsosCfdiAttribute()

@@ -51,7 +51,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     {
         return DatosFiscal::with([
                 'direcciones',
-                'regimenesFiscales',
+                'regimenesFiscales.datoFiscal',
                 'regimenesFiscales.usosCfdi'
             ])
             ->whereHas('usuario', function ($query) use ($id) {
