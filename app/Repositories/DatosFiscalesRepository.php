@@ -50,10 +50,10 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     public function getByUsr($id)
     {
         return DatosFiscal::with([
-                'direcciones',
-                'regimenesFiscales.datoFiscal',
-                'regimenesFiscales.usosCfdi'
-            ])
+            'domicilioFiscal',
+            'regimenesFiscales.datoFiscal',
+            'regimenesFiscales.usosCfdi'
+        ])
             ->whereHas('usuario', function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -164,11 +164,13 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
             DB::commit();
 
+            // Cargar el modelo completo con todas las relaciones y ocultar timestamps
             $datosFiscalesCompleto = DatosFiscal::with([
-                'direcciones',
-                'regimenesFiscales',
+                'domicilioFiscal',
                 'regimenesFiscales.usosCfdi'
             ])->find($datosFiscales->id);
+
+         
 
             return $datosFiscalesCompleto;
         } catch (\Exception $e) {
