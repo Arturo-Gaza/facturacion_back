@@ -49,10 +49,11 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
     public function getByUsr($id)
     {
-        return DatosFiscal::with([
+        $data = DatosFiscal::with([
                 'domicilioFiscal',
                 'regimenesFiscales.usosCfdi'
             ])
+            
             ->whereHas('usuario', function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -60,6 +61,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 $query->whereColumn('datos_fiscales_personal', 'datos_fiscales.id');
             })
             ->get();
+            
+
+        return $data;
     }
 
     public function storeConDomicilio(array $data, array $direccion)

@@ -25,7 +25,12 @@ class DatosFiscalRegimenFiscal extends Model
 
     public function getNombreRegimenAttribute()
     {
-        return $this->regimen ? $this->regimen->clave ."-". $this->regimen->descripcion : null;
+        if ($this->id_regimen) {
+            // Consulta directa sin relación
+            $regimen = CatRegimenesFiscales::find($this->id_regimen);
+            return $regimen ? $regimen->clave . "-" . $regimen->descripcion : null;
+        }
+        return null;
     }
 
 
