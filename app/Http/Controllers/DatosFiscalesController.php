@@ -149,6 +149,41 @@ class DatosFiscalesController extends Controller
         }
     }
 
+    public function updateCompleto(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->only([
+                'idDatosFiscales',
+                'id_usuario',
+                'nombre_razon',
+                'primer_apellido',
+                'segundo_apellido',
+                'nombre_comercial',
+                'es_persona_moral',
+                'rfc',
+                'curp',
+                'id_estatus_sat',
+                'idCIF',
+                'lugar_emision',
+                'fecha_emision',
+                'fecha_ult_cambio_op',
+                'fecha_inicio_op',
+                'predeterminado'
+            ]);
+            $direccionData = $request->input('direccion');
+            $regimenesData = $request->input('regimenes');
+            $idDatosFiscales=$data["idDatosFiscales"];
+            $datosFiscales = $this->datosFiscalesRepository->updateCompleto( $data,  $direccionData,  $regimenesData, $idDatosFiscales);
+
+            DB::commit();
+            return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
+
     public function update(Request $request, $id)
     {
         DB::beginTransaction();

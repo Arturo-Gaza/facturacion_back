@@ -14,5 +14,6 @@ interface DatosFiscalesRepositoryInterface
     public function store(array $data): DatosFiscal;
     public function storeConDomicilio(array $data,array $direccion );
      public function storeCompleto(array $data,array $direccion,array $regimenesData );
+     public function updateCompleto(array $data, array $direccion, array $regimenes, $idDatosFiscales );
     public function update(array $data, $id): ?DatosFiscal;
 }

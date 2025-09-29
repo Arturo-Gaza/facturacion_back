@@ -49,7 +49,11 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
     public function getByUsr($id)
     {
-        return DatosFiscal::with('direcciones')
+        return DatosFiscal::with([
+                'direcciones',
+                'regimenesFiscales',
+                'regimenesFiscales.usosCfdi'
+            ])
             ->whereHas('usuario', function ($query) use ($id) {
                 $query->where('id', $id);
             })
@@ -114,6 +118,91 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
+        }
+    }
+
+
+
+    public function updateCompleto(array $data, array $direccion, array $regimenes, $idDatosFiscales)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Buscar los datos fiscales existentes
+            $datosFiscales = DatosFiscal::findOrFail($idDatosFiscales);
+
+            // Actualizar los datos fiscales
+            $datosFiscales->update($data);
+
+            // Actualizar los regímenes fiscales
+            $this->actualizarRegimenesFiscales($regimenes, $datosFiscales);
+
+            // Actualizar la dirección
+            if ($direccion) {
+                $direccionExistente = Direccion::where('id_fiscal', $datosFiscales->id)
+                    ->where('id_tipo_direccion', 1)
+                    ->first();
+
+                if ($direccionExistente) {
+                    $direccionExistente->update($direccion);
+                } else {
+                    // Crear nueva dirección si no existe
+                    $direccion['id_fiscal'] = $datosFiscales->id;
+                    $direccion['id_tipo_direccion'] = 1;
+                    Direccion::create($direccion);
+                }
+            }
+
+            $user = User::find($datosFiscales->id_usuario);
+
+            // Actualizar datos fiscales principales si es necesario
+            if ($data["predeterminado"]) {
+                $user->update([
+                    'datos_fiscales_principal' => $datosFiscales->id
+                ]);
+            }
+
+            DB::commit();
+
+            $datosFiscalesCompleto = DatosFiscal::with([
+                'direcciones',
+                'regimenesFiscales',
+                'regimenesFiscales.usosCfdi'
+            ])->find($datosFiscales->id);
+
+            return $datosFiscalesCompleto;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+    private function actualizarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
+    {
+        // Obtener IDs de regímenes actuales
+        $regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_dato_fiscal')->toArray();
+
+        // Obtener IDs de regímenes nuevos
+        $nuevosRegimenes = array_column($regimenes, 'id_dato_fiscal');
+
+        // Encontrar regímenes a eliminar
+        $eliminar = array_diff($regimenesActuales, $nuevosRegimenes);
+
+        // Encontrar regímenes a agregar
+        $agregar = array_diff($nuevosRegimenes, $regimenesActuales);
+
+        // Eliminar regímenes
+        if (!empty($eliminar)) {
+            $datosFiscales->regimenesFiscales()
+                ->whereIn('id_regimen', $eliminar)
+                ->delete();
+        }
+
+        // Agregar nuevos regímenes
+        foreach ($agregar as $idRegimen) {
+            $datosFiscales->regimenesFiscales()->create([
+                'id_regimen' => $idRegimen
+            ]);
         }
     }
 
@@ -211,9 +300,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     private function extraerTextoDePDF($archivo)
     {
         try {
-        $texto = (new Pdf())
-            ->setPdf($archivo) // Usar el archivo recibido, no 'book.pdf'
-            ->text();
+            $texto = (new Pdf())
+                ->setPdf($archivo) // Usar el archivo recibido, no 'book.pdf'
+                ->text();
 
             $texto = $this->aiService->extractStructuredData($texto, 'cfdi_extraction');
 
