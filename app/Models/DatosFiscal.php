@@ -47,6 +47,8 @@ class DatosFiscal extends Model
         'updated_at' => 'datetime'
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // Relación muchos a muchos con regimenes fiscales
     public function regimenesFiscales()
     {

@@ -14,6 +14,8 @@ class DatosFiscalRegimenUsoCfdi extends Model
         'uso_cfdi',
         'predeterminado'
     ];
+    protected $hidden = ['created_at', 'updated_at'];
+
     
     public function datoFiscalRegimen(): BelongsTo
     {
