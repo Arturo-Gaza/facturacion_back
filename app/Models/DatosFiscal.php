@@ -94,4 +94,10 @@ class DatosFiscal extends Model
     {
         return $this->hasMany(Direccion::class, 'id_fiscal');
     }
+
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_usuario', 'id');
+    }
+
 }
