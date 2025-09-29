@@ -49,21 +49,7 @@ class DatosFiscal extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-        protected $appends = ['predeterminado']; // Agregar el campo a la serialización
 
-    /**
-     * Determina si estos datos fiscales son los predeterminados para el usuario
-     */
-    public function getPredeterminadoAttribute()
-    {
-        // Verificar si el usuario tiene estos datos fiscales como principales o personales
-        if ($this->usuario) {
-            return $this->id == $this->usuario->datos_fiscales_principal || 
-                   $this->id == $this->usuario->datos_fiscales_personal;
-        }
-        
-        return false;
-    }
     // Relación muchos a muchos con regimenes fiscales
     public function regimenesFiscales()
     {
