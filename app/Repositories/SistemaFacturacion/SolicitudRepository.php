@@ -141,6 +141,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getByUsuario(int $usuario_id)
     {
         return Solicitud::where('usuario_id', $usuario_id)
+            ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
     }
