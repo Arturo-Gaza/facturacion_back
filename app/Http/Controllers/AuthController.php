@@ -202,7 +202,7 @@ class AuthController extends Controller
 
             if (!$user->habilitado == 1) {
 
-                return ApiResponseHelper::rollback(null, 'Usuario inhabilitado', 401);
+                return ApiResponseHelper::rollback(null, 'Usuario bloqueado', 401);
             } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
                     // $user->intentos=$user->intentos+1;
@@ -258,7 +258,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Usuario logueado correctamente',
+            'message' => 'Inicio de sesión correcto',
             'data' =>  $userProfile->toArray(),
             'token' => $token,
 

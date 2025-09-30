@@ -177,7 +177,7 @@ class UsuarioController extends Controller
 
         try {
             $getById = $this->usuario->desHabilitar($data);
-            return ApiResponseHelper::sendResponse($getById, 'Usuario inhablitado con exito ', 200);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
         }
