@@ -13,6 +13,7 @@ interface UsuarioRepositoryInterface
   public function getAllUserAsignado($idCarga);
   public function getByID($id);
   public function getDatos($id);
+   public function editarDatos($data,$id);
   public function getAllHabilitados();
   public function enviarCorreoRec($data);
   public function enviarCorreoConf($data);

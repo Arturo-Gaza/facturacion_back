@@ -80,6 +80,18 @@ class UsuarioController extends Controller
         }
     }
 
+    public function editarDatos(Request $request)
+    {
+                try {
+                    $id = [
+            'id' => $request->id,
+        ];
+            $usr = $this->usuario->editarDatos($request,$id);
+            return ApiResponseHelper::sendResponse($usr, 'Usuario editado con exito', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro' , 500);
+        }
+    }
 
 
     public function getAllHabilitados()

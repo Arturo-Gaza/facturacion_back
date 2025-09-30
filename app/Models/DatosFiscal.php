@@ -61,6 +61,11 @@ class DatosFiscal extends Model
         return $this->hasOne(Direccion::class, 'id_fiscal')
             ->where('id_tipo_direccion', 1); // 1 = domicilio fiscal
     }
+        public function domicilioPersonal()
+    {
+        return $this->hasOne(Direccion::class, 'id_fiscal')
+            ->where('id_tipo_direccion', 2); // 1 = domicilio fiscal
+    }
 
     public function getPredeterminadoAttribute()
     {

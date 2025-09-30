@@ -18,6 +18,8 @@ use App\Services\EmailService;
 use App\Services\TwilioService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Http\Request;
+
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -195,8 +197,47 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     }
     public function getDatos($id): ?UserProfileDTO
     {
-        $usr= User::where('id', $id)->first();
+        $usr = User::where('id', $id)->first();
         return UserProfileDTO::fromUserModel($usr);
+    }
+
+    public function editarDatos($request, $id)
+    {
+        DB::beginTransaction();
+        $user = User::with(['datosFiscalesPersonal.domicilioPersonal'])
+            ->where('id', $id)
+            ->firstOrFail();
+        $datosFiscales = $user->datosFiscalesPersonal;
+        $direccionActual = $datosFiscales->domicilioPersonal;
+        $datosFiscalesData = [
+            'nombre_razon' => $request->nombre ?? null,
+            'primer_apellido' => $request->primer_apellido ?? null,
+            'segundo_apellido' => $request->segundo_apellido ?? null,
+        ];
+        $direccon = $request->direccionPersonal;
+        $direccionDataCompleta = [
+            'calle' => $direccon["calle"] ?? null,
+            'num_exterior' => $direccon["num_exterior"] ?? null,
+            'num_interior' => $direccon["num_interior"] ?? null,
+            'colonia' => $direccon["colonia"] ?? null,
+            'localidad' => $direccon["localidad"] ?? null,
+            'municipio' => $direccon["municipio"] ?? null,
+            'estado' => $direccon["estado"] ?? null,
+            'codigo_postal' => $direccon["codigo_postal"] ?? null
+        ];
+        if ($datosFiscales) {
+            $datosFiscales->update($datosFiscalesData);
+        }
+        if ($direccionActual) {
+            $direccionActual->update($direccionDataCompleta);
+        }
+
+        DB::commit();
+        $user = User::where('id', $id)
+            ->firstOrFail();;
+                $user->load(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal']);
+
+        return UserProfileDTO::fromUserModel($user);
     }
 
     public function getAllHabilitados()
@@ -311,7 +352,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
 
 
-         throw new Exception('Error inesperado', 409);
+        throw new Exception('Error inesperado', 409);
     }
 
 
@@ -384,7 +425,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return null;
     }
 
-        public function validarCorreoInhabilitar($data)
+    public function validarCorreoInhabilitar($data)
     {
         DB::beginTransaction();
         $codigo = $data['codigo'];
@@ -452,7 +493,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $existingEmail = UserEmail::where('email', $email)->first();
         if ($existingEmail) {
             if ($existingEmail->verificado) {
-                 throw new \Exception('Usuario existente ', 409);
+                throw new \Exception('Usuario existente ', 409);
             } else {
                 // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
                 $userToDelete = User::where('id_mail_principal', $existingEmail->id)
