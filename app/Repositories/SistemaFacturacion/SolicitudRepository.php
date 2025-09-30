@@ -50,9 +50,26 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'texto_ocr' => $textoOCR,
                 'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,
-                'texto_json' => json_encode($datosExtraidos)
+                'texto_json' => json_encode($datosExtraidos),
             ]);
         }
+
+        return $solicitud->fresh();
+    }
+     public function enviar(int $id_sol)
+    {
+        $solicitud = Solicitud::find($id_sol);
+
+        if (!$solicitud) {
+            return null;
+        }
+ 
+ 
+            $solicitud->update([
+ 
+                'estado_id'=>2
+            ]);
+ 
 
         return $solicitud->fresh();
     }
