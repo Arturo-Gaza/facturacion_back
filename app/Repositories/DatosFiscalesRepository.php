@@ -225,7 +225,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         foreach ($regimenes as $regimen) {
             $idRegimen = $regimen['id_regimen'];
             $esRegimenPredeterminado = $regimen['predeterminado'] ?? false;
-            $usosCfdi = $regimen['usos_cfdi'] ?? [];
+            $usosCfdi = $regimen['usosCfdi'] ?? [];
             $fecha_inicio_regimen = $regimen['fecha_inicio_regimen'];
 
             // Crear el registro en datos_fiscales_regimenes_fiscales
