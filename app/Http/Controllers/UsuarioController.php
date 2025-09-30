@@ -80,12 +80,10 @@ class UsuarioController extends Controller
         }
     }
 
-    public function editarDatos(Request $request)
+    public function editarDatos(Request $request,$id)
     {
                 try {
-                    $id = [
-            'id' => $request->id,
-        ];
+                 
             $usr = $this->usuario->editarDatos($request,$id);
             return ApiResponseHelper::sendResponse($usr, 'Usuario editado con exito', 200);
         } catch (Exception $ex) {
