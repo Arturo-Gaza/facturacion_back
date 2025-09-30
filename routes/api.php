@@ -351,5 +351,6 @@ Route::post('datosFiscales/register', [DatosFiscalesController::class, 'store'])
 Route::post('datosFiscales/extraerDatosCFDI', [DatosFiscalesController::class, 'extraerDatosCFDI']);
 
 Route::post('datosFiscales/registerCompleto', [DatosFiscalesController::class, 'storeCompleto']);
+Route::put('datosFiscales/updateCompleto', [DatosFiscalesController::class, 'updateCompleto']);
 Route::post('datosFiscales/registerConDomicilio', [DatosFiscalesController::class, 'storeConDomicilio']);
 Route::put('datosFiscales/update/{id}', [DatosFiscalesController::class, 'update']);
