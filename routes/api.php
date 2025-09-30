@@ -342,6 +342,8 @@ Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::c
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
+
+Route::get('solicitud/eliminar/{id}', [SolicitudController::class, 'eliminar']);
 Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtenerImagen']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);

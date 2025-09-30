@@ -10,6 +10,7 @@ interface SolicitudRepositoryInterface
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
       public function enviar(int $id);
+      public function eliminar(int $id);
      public function obtenerImagen(int $id);
      public function getGeneralByUsuario(int $usuario_id);
     public function getByID($id): ?Solicitud;

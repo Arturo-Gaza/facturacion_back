@@ -56,21 +56,26 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $solicitud->fresh();
     }
-     public function enviar(int $id_sol)
+    public function enviar(int $id_sol)
     {
         $solicitud = Solicitud::find($id_sol);
-
         if (!$solicitud) {
             return null;
         }
- 
- 
-            $solicitud->update([
- 
-                'estado_id'=>2
-            ]);
- 
-
+        $solicitud->update([
+            'estado_id' => 2
+        ]);
+        return $solicitud->fresh();
+    }
+    public function eliminar(int $id_sol)
+    {
+        $solicitud = Solicitud::find($id_sol);
+        if (!$solicitud) {
+            return null;
+        }
+        $solicitud->update([
+            'estado_id' => 5
+        ]);
         return $solicitud->fresh();
     }
 
