@@ -188,10 +188,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     private function actualizarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
     {
         // Obtener IDs de regímenes actuales
-        $regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_dato_fiscal')->toArray();
-
+$regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_regimen')->toArray();
         // Obtener IDs de regímenes nuevos
-        $nuevosRegimenes = array_column($regimenes, 'id_dato_fiscal');
+        $nuevosRegimenes = array_column($regimenes, 'id_regimen');
 
         // Encontrar regímenes a eliminar
         $eliminar = array_diff($regimenesActuales, $nuevosRegimenes);
