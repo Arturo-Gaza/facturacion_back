@@ -73,6 +73,8 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
 
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
+Route::put('usuario/editarDatos', [UsuarioController::class, 'editarDatos']);
+
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
@@ -339,6 +341,7 @@ Route::get('solicitud/getByUsuario/{usuario_id}', [SolicitudController::class, '
 Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::class, 'getGeneralByUsuario']);
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
+Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
 Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtenerImagen']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);
