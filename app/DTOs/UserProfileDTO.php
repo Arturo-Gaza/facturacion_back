@@ -17,6 +17,8 @@ class UserProfileDTO
         public ?string $departamento,
         public float $saldo,
         public ?bool $datosCompletos,
+        public ?bool $tienDatoFiscal,
+        public ?array $direccionPersonal,
     ) {}
 
     public static function fromUserModel($user): self
@@ -24,6 +26,7 @@ class UserProfileDTO
         // Obtener datos fiscales principales
 
         $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
+         $tieneDatosFiscalesPredeterminado = $user->datosFiscalesPrincipal !== null;
         return new self(
             id: $user->id,
             nombre: $user->datosFiscalesPersonal?->nombre_razon, // Nullsafe operator
@@ -36,8 +39,9 @@ class UserProfileDTO
             id_departamento: $user->id_departamento,
             departamento: $user->descripcio_depatamento,
             saldo: (float) $user->saldo,
-            datosCompletos: $tieneDatosFiscalesPersonal
-
+            datosCompletos: $tieneDatosFiscalesPersonal,
+            direccionPersonal:$user->direccionPersonal->toArray() ,
+            tienDatoFiscal:$tieneDatosFiscalesPredeterminado
         );
     }
 
@@ -55,7 +59,9 @@ class UserProfileDTO
             'id_departamento' => $this->id_departamento,
             'departamento' => $this->departamento,
             'saldo' => $this->saldo,
-            'datosCompletos' => $this->datosCompletos
+            'datosCompletos' => $this->datosCompletos,
+            'direccionPersonal' => $this->direccionPersonal,
+            'tienDatoFiscal'=>$this->tienDatoFiscal
         ];
     }
 }

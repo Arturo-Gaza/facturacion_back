@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Usuario;
 
+use App\DTOs\UserProfileDTO;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\PasswordReset;
@@ -191,6 +192,11 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function getByID($id): ?User
     {
         return User::where('id', $id)->first();
+    }
+    public function getDatos($id): ?UserProfileDTO
+    {
+        $usr= User::where('id', $id)->first();
+        return UserProfileDTO::fromUserModel($usr);
     }
 
     public function getAllHabilitados()

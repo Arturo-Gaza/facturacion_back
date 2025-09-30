@@ -71,6 +71,8 @@ Route::get('/test', function () {
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
+
+Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
@@ -78,12 +80,11 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     //Cierre de sesión
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
 
-    Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
     Route::get('usuario/getCompras', [UsuarioController::class, 'getCompras']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
     Route::put('usuario/deleteUser/{id}', [UsuarioController::class, 'deleteUser']);
-
+Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
 
     //Ruta para tabla Solicitudes
     //Route::get('tabSolicitudes/getAll', [TabSolicitudesController::class, 'getAll']);

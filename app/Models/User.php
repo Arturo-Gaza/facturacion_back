@@ -19,7 +19,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
     use TwoFactorAuthenticatable;
-    
+
     protected $fillable = [
         'idRol',
         'id_mail_principal',
@@ -31,7 +31,7 @@ class User extends Authenticatable
         'login_activo',
         'saldo',
         'datos_fiscales_principal',
-        'datos_fiscales_personal', 
+        'datos_fiscales_personal',
         'usuario_padre', // Agrega este campo si lo necesitas
     ];
 
@@ -50,9 +50,9 @@ class User extends Authenticatable
     }
 
     protected $appends = [
-        'descripcion_rol', 
-        'descripcio_depatamento', 
-        'email', 
+        'descripcion_rol',
+        'descripcio_depatamento',
+        'email',
         'phone',
         'nombre',
         'apellido_paterno',
@@ -85,9 +85,20 @@ class User extends Authenticatable
     {
         return $this->belongsTo(DatosFiscal::class, 'datos_fiscales_principal');
     }
-        public function datosFiscalesPersonal()
+    public function datosFiscalesPersonal()
     {
         return $this->belongsTo(DatosFiscal::class, 'datos_fiscales_personal');
+    }
+    public function direccionPersonal()
+    {
+        return $this->hasOneThrough(
+            Direccion::class,
+            DatosFiscal::class,
+            'id', // Foreign key on DatosFiscal table
+            'id_fiscal', // Foreign key on Direccion table  
+            'datos_fiscales_personal', // Local key on User table
+            'id' // Local key on DatosFiscal table
+        )->where('direcciones.id_tipo_direccion', 2);
     }
 
     public function getDescripcionRolAttribute()
@@ -145,6 +156,4 @@ class User extends Authenticatable
     {
         return $this->hasOne(DatosFiscal::class, 'id_usuario');
     }
-
-
 }
