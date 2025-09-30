@@ -27,6 +27,11 @@ class UserProfileDTO
 
         $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
          $tieneDatosFiscalesPredeterminado = $user->datosFiscalesPrincipal !== null;
+          // Manejar dirección personal (puede ser null)
+    $direccionPersonalArray = null;
+    if ($user->direccionPersonal) {
+        $direccionPersonalArray = $user->direccionPersonal->toArray();
+    }
         return new self(
             id: $user->id,
             nombre: $user->datosFiscalesPersonal?->nombre_razon, // Nullsafe operator
@@ -40,7 +45,7 @@ class UserProfileDTO
             departamento: $user->descripcio_depatamento,
             saldo: (float) $user->saldo,
             datosCompletos: $tieneDatosFiscalesPersonal,
-            direccionPersonal:$user->direccionPersonal->toArray() ,
+            direccionPersonal:$direccionPersonalArray,
             tienDatoFiscal:$tieneDatosFiscalesPredeterminado
         );
     }
