@@ -188,7 +188,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     private function actualizarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
     {
         // Obtener IDs de regímenes actuales
-$regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_regimen')->toArray();
+        $regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_regimen')->toArray();
         // Obtener IDs de regímenes nuevos
         $nuevosRegimenes = array_column($regimenes, 'id_regimen');
 
@@ -205,12 +205,16 @@ $regimenesActuales = $datosFiscales->regimenesFiscales()->pluck('id_regimen')->t
                 ->delete();
         }
 
-        // Agregar nuevos regímenes
-        foreach ($agregar as $idRegimen) {
-            $datosFiscales->regimenesFiscales()->create([
-                'id_regimen' => $idRegimen
-            ]);
-        }
+    foreach ($agregar as $idRegimen) {
+        // Buscar el régimen completo en el array para obtener la fecha
+        $regimenCompleto = collect($regimenes)->firstWhere('id_regimen', $idRegimen);
+        
+        $datosFiscales->regimenesFiscales()->create([
+            'id_regimen' => $idRegimen,
+            'fecha_inicio_regimen' => $regimenCompleto['fecha_inicio_regimen'] ?? now()->format('Y-m-d'),
+            // Agrega otros campos si los necesitas
+        ]);
+    }
     }
 
     public function guardarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
