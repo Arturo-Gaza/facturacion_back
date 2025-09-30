@@ -41,7 +41,6 @@ class DatosFiscal extends Model
 
     protected $casts = [
         'es_persona_moral' => 'boolean',
-        'fecha_inicio_op' => 'date',
         'datos_extra' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
