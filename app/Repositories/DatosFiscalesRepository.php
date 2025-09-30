@@ -205,16 +205,20 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 ->delete();
         }
 
-    foreach ($agregar as $idRegimen) {
-        // Buscar el régimen completo en el array para obtener la fecha
-        $regimenCompleto = collect($regimenes)->firstWhere('id_regimen', $idRegimen);
-        
-        $datosFiscales->regimenesFiscales()->create([
-            'id_regimen' => $idRegimen,
-            'fecha_inicio_regimen' => $regimenCompleto['fecha_inicio_regimen'] ?? now()->format('Y-m-d'),
-            // Agrega otros campos si los necesitas
-        ]);
-    }
+        foreach ($agregar as $idRegimen) {
+            $regimenCompleto = collect($regimenes)->firstWhere('id_regimen', $idRegimen);
+
+            $datoFiscalRegimen = $datosFiscales->regimenesFiscales()->create([
+                'id_regimen' => $idRegimen,
+                'fecha_inicio_regimen' => $regimenCompleto['fecha_inicio_regimen'] ?? now()->format('Y-m-d'),
+                'predeterminado' => $regimenCompleto['predeterminado'] ?? false,
+            ]);
+
+            // Guardar los usos CFDI para el nuevo régimen
+            if (isset($regimenCompleto['usosCfdi'])) {
+                $this->guardarUsosCfdiParaRegimen($datoFiscalRegimen, $regimenCompleto['usosCfdi']);
+            }
+        }
     }
 
     public function guardarRegimenesFiscales(array $regimenes, DatosFiscal $datosFiscales)
