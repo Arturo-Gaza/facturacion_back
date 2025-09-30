@@ -66,7 +66,7 @@ class DatosFiscal extends Model
     public function getPredeterminadoAttribute()
     {
         // Consulta directa sin cargar la relación completa
-        $usuario = User::find($this->usuario_id);
+        $usuario = User::find($this->id_usuario);
 
         if ($usuario) {
             return $this->id == $usuario->datos_fiscales_principal ||
