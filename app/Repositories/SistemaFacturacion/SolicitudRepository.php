@@ -47,6 +47,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $datosExtraidos = $this->aiService->extractStructuredData($textoOCR);
 
             $solicitud->update([
+                'num_ticket'=>$datosExtraidos['num_ticket'],
                 'texto_ocr' => $textoOCR,
                 'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,

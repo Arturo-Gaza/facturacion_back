@@ -21,6 +21,7 @@ TEXTO:
 
 Estructura requerida:
 {
+    "num_ticket":numero o id del ticket,
     "establecimiento": "nombre del establecimiento o empresa",
     "monto": "monto total numérico (sin símbolos de moneda)",
     "fecha": "fecha de la transacción si está disponible",

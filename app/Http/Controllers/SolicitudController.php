@@ -50,7 +50,7 @@ class SolicitudController extends Controller
     {
         try {
             $all = $this->solicitudRepository->eliminar($id);
-            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+            return ApiResponseHelper::sendResponse($all, 'Ticket eliminado con éxito', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
@@ -106,7 +106,7 @@ class SolicitudController extends Controller
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
-            return ApiResponseHelper::rollback($ex);
+            return ApiResponseHelper::rollback($ex,$ex->getMessage());
         }
     }
 

@@ -14,15 +14,15 @@ return new class extends Migration
             $table->id('id_direccion');
             $table->foreignId('id_fiscal')->constrained('datos_fiscales')->onDelete('cascade');
             $table->foreignId('id_tipo_direccion')->constrained('cat_tipos_direccion', 'id_tipo_direccion');
-            $table->string('calle', 250);
-            $table->string('num_exterior', 50);
+            $table->string('calle', 250)->nullable();
+            $table->string('num_exterior', 50)->nullable();
             $table->string('num_interior', 50)->nullable();
-            $table->string('colonia', 150);
+            $table->string('colonia', 150)->nullable();
             $table->string('localidad', 150)->nullable();
-            $table->string('municipio', 150);
-            $table->string('estado', 150);
+            $table->string('municipio', 150)->nullable();
+            $table->string('estado', 150)->nullable();
             $table->string('codigo_postal', 10);
-            $table->string('pais', 100)->default('México');
+            $table->string('pais', 100)->default('México')->nullable();
             $table->timestamps();
         });
     }

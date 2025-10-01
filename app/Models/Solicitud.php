@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Http\UploadedFile; 
+use Illuminate\Http\UploadedFile;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +18,7 @@ class Solicitud extends Model
     protected $table = 'solicitudes';
 
     protected $fillable = [
+        'num_ticket',
         'usuario_id',
         'imagen_url',
         'texto_ocr',
@@ -56,14 +57,27 @@ class Solicitud extends Model
      */
     public function guardarImagen(UploadedFile $archivo, string $carpeta = 'solicitudes'): string
     {
+
+        // Generar hash del contenido del archivo
+        $hash = md5_file($archivo->getPathname());
+
+        // Verificar si ya existe un archivo con el mismo hash
+        $archivosExistentes = Storage::disk('public')->files($carpeta);
         // Eliminar imagen anterior si existe
         if ($this->imagen_url && Storage::exists($this->imagen_url)) {
             Storage::delete($this->imagen_url);
         }
+        foreach ($archivosExistentes as $archivoExistente) {
+            $hashExistente = md5_file(Storage::disk('public')->path($archivoExistente));
+            if ($hash === $hashExistente) {
+                throw new \Exception('El archivo ya existe en el sistema');
+            }
+        }
+
 
         // Guardar nueva imagen
         $ruta = $archivo->store($carpeta, 'public');
-        
+
         return $ruta;
     }
 
