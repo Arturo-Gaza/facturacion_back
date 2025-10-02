@@ -86,20 +86,20 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('usuario/getCompras', [UsuarioController::class, 'getCompras']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
     Route::put('usuario/deleteUser/{id}', [UsuarioController::class, 'deleteUser']);
-Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
+    Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
 
     //Ruta para tabla Solicitudes
     //Route::get('tabSolicitudes/getAll', [TabSolicitudesController::class, 'getAll']);
     //RRoute::get('tabSolicitudes/getById/{id}', [TabSolicitudesController::class, 'getByID']);
-   //Route::get('tabSolicitudes/getByIdSolicitud/{id}', [TabSolicitudesController::class, 'getByIDSolicitud']);
+    //Route::get('tabSolicitudes/getByIdSolicitud/{id}', [TabSolicitudesController::class, 'getByIDSolicitud']);
     //Route::post('tabSolicitudes/register', [TabSolicitudesController::class, 'store']);
-     //Route::put('tabSolicitudes/update/{id}', [TabSolicitudesController::class, 'update']);
-     //Route::post('tabSolicitudes/asignar', [TabSolicitudesController::class, 'asignar']);
+    //Route::put('tabSolicitudes/update/{id}', [TabSolicitudesController::class, 'update']);
+    //Route::post('tabSolicitudes/asignar', [TabSolicitudesController::class, 'asignar']);
     // Route::post('tabSolicitudes/reasignar', [TabSolicitudesController::class, 'reasignar']);
-     //Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
-     //Route::post('tabSolicitudes/reporte', [TabSolicitudesController::class, 'reporte']);
-     //Route::post('tabSolicitudes/formatearSolicitud/{id}', [TabSolicitudesController::class, 'formatearSolicitud']);
-     //Route::get('tabSolicitudes/getCotizaciones/{id}', [TabSolicitudesController::class, 'getCotizaciones']);
+    //Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
+    //Route::post('tabSolicitudes/reporte', [TabSolicitudesController::class, 'reporte']);
+    //Route::post('tabSolicitudes/formatearSolicitud/{id}', [TabSolicitudesController::class, 'formatearSolicitud']);
+    //Route::get('tabSolicitudes/getCotizaciones/{id}', [TabSolicitudesController::class, 'getCotizaciones']);
 
     //Ruta para tabla SolicitudesDetalle
     Route::get('tabSolicitudesDetalle/getAll', [TabSolicitudesDetalleController::class, 'getAll']);
@@ -215,7 +215,7 @@ Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::put('tabCotizacionesSolicitudDetalle/update', [TabcotizacionesDetalleController::class, 'update']);
     Route::post('tabCotizacionesSolicitudDetalle/delete', [TabcotizacionesDetalleController::class, 'delete']);
 
-        //Ruta para tab cotizaciones  solicitud
+    //Ruta para tab cotizaciones  solicitud
     Route::get('tabCotizacionesSolicitudes/getAll', [TabCotizacionesSolicitudesController::class, 'getAll']);
     Route::get('tabCotizacionesSolicitudes/getById/{id}', [TabCotizacionesSolicitudesController::class, 'getById']);
     Route::get('tabCotizacionesSolicitudes/getByIdDetalle/{id}', [TabCotizacionesSolicitudesController::class, 'getByIdDetalle']);
@@ -230,7 +230,7 @@ Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::put('TabArchivosObservacionesDetalle/update/{id}', [TabArchivosObservacionesDetalleController::class, 'update']);
     Route::post('TabArchivosObservacionesDetalle/delete', [TabArchivosObservacionesDetalleController::class, 'delete']);
 
-   //Ruta para tab observaciones solicitud detalle
+    //Ruta para tab observaciones solicitud detalle
     Route::get('TabObservacionesSolicitudReqInfo/getAll', [TabObservacionesSolicitudReqInfoController::class, 'getAll']);
     Route::get('TabObservacionesSolicitudReqInfo/getById/{id}', [TabObservacionesSolicitudReqInfoController::class, 'getById']);
     Route::get('TabObservacionesSolicitudReqInfo/getByIdSolicitud/{id}', [TabObservacionesSolicitudReqInfoController::class, 'getByIdSolicitud']);
@@ -243,8 +243,6 @@ Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
     Route::post('TabArchivosObservacionesSolicitudReqInfo/register', [TabArchivosObservacionesSolicitudReqInfoController::class, 'store']);
     Route::put('TabArchivosObservacionesSolicitudReqInfo/update/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'update']);
     Route::post('TabArchivosObservacionesSolicitudReqInfo/delete', [TabArchivosObservacionesSolicitudReqInfoController::class, 'delete']);
-
-
 });
 
 
@@ -252,51 +250,51 @@ Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);
 
 //Cat Estatus Sat
 Route::get('CatEstatusSat/getAll', [CatEstatusSatController::class, 'getAll']);
-Route::get('CatEstatusSat/getById/{id}',[CatEstatusSatController::class, 'getById']);
+Route::get('CatEstatusSat/getById/{id}', [CatEstatusSatController::class, 'getById']);
 Route::post('CatEstatusSat/register', [CatEstatusSatController::class, 'store']);
 Route::put('CatEstatusSat/update/{id}', [CatEstatusSatController::class, 'update']);
 
 //Cat Regimenes Fiscales
 Route::get('CatRegimenesFiscales/getAll', [CatRegimenesFiscalesController::class, 'getAll']);
-Route::get('CatRegimenesFiscales/getById/{id}',[CatRegimenesFiscalesController::class, 'getById']);
-Route::get('CatRegimenesFiscales/getByMoralOFisica/{esPersonaMoral}',[CatRegimenesFiscalesController::class, 'getByMoralOFisica']);
+Route::get('CatRegimenesFiscales/getById/{id}', [CatRegimenesFiscalesController::class, 'getById']);
+Route::get('CatRegimenesFiscales/getByMoralOFisica/{esPersonaMoral}', [CatRegimenesFiscalesController::class, 'getByMoralOFisica']);
 Route::post('CatRegimenesFiscales/register', [CatRegimenesFiscalesController::class, 'store']);
 Route::put('CatRegimenesFiscales/update/{id}', [CatRegimenesFiscalesController::class, 'update']);
 
 //Cat Tipo contrato
 Route::get('CatTipoContacto/getAll', [CatTipoContactoController::class, 'getAll']);
-Route::get('CatTipoContacto/getById/{id}',[CatTipoContactoController::class, 'getById']);
+Route::get('CatTipoContacto/getById/{id}', [CatTipoContactoController::class, 'getById']);
 Route::post('CatTipoContacto/register', [CatTipoContactoController::class, 'store']);
 Route::put('CatTipoContacto/update/{id}', [CatTipoContactoController::class, 'update']);
 
 //Cat Tipo Direccion
 Route::get('CatTipoDireccion/getAll', [CatTipoDireccionController::class, 'getAll']);
-Route::get('CatTipoDireccion/getById/{id}',[CatTipoDireccionController::class, 'getById']);
+Route::get('CatTipoDireccion/getById/{id}', [CatTipoDireccionController::class, 'getById']);
 Route::post('CatTipoDireccion/register', [CatTipoDireccionController::class, 'store']);
 Route::put('CatTipoDireccion/update/{id}', [CatTipoDireccionController::class, 'update']);
 
 //Tab Clientes
 Route::get('TabClientes/getAll', [TabClientesController::class, 'getAll']);
-Route::get('TabClientes/getById/{id}',[TabClientesController::class, 'getById']);
+Route::get('TabClientes/getById/{id}', [TabClientesController::class, 'getById']);
 Route::post('TabClientes/register', [TabClientesController::class, 'store']);
 Route::put('TabClientes/update/{id}', [TabClientesController::class, 'update']);
 
 //Tab Clientes Fiscales
 Route::get('TabClientesFiscales/getAll', [TabClientesFiscalesController::class, 'getAll']);
-Route::get('TabClientesFiscales/getById/{id}',[TabClientesFiscalesController::class, 'getById']);
+Route::get('TabClientesFiscales/getById/{id}', [TabClientesFiscalesController::class, 'getById']);
 Route::post('TabClientesFiscales/register', [TabClientesFiscalesController::class, 'store']);
 Route::put('TabClientesFiscales/update/{id}', [TabClientesFiscalesController::class, 'update']);
 
 //Tab Contactos
 Route::get('TabContacto/getAll', [TabContactoController::class, 'getAll']);
-Route::get('TabContacto/getById/{id}',[TabContactoController::class, 'getById']);
+Route::get('TabContacto/getById/{id}', [TabContactoController::class, 'getById']);
 Route::post('TabContacto/register', [TabContactoController::class, 'store']);
 Route::put('TabContacto/update/{id}', [TabContactoController::class, 'update']);
 Route::post('TabContacto/mandarSMS', [TabContactoController::class, 'mandarSMS']);
 
 //Tab Direcciones
 Route::get('TabDirecciones/getAll', [TabDireccionesController::class, 'getAll']);
-Route::get('TabDirecciones/getById/{id}',[TabDireccionesController::class, 'getById']);
+Route::get('TabDirecciones/getById/{id}', [TabDireccionesController::class, 'getById']);
 Route::post('TabDirecciones/register', [TabDireccionesController::class, 'store']);
 Route::put('TabDirecciones/update/{id}', [TabDireccionesController::class, 'update']);
 
@@ -353,6 +351,8 @@ Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
 Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getById']);
 Route::get('datosFiscales/getByUsr/{id}', [DatosFiscalesController::class, 'getByUsr']);
 Route::post('datosFiscales/register', [DatosFiscalesController::class, 'store']);
+
+Route::post('datosFiscales/eliminarReceptor/{id}', [DatosFiscalesController::class, 'eliminarReceptor']);
 
 Route::post('datosFiscales/extraerDatosCFDI', [DatosFiscalesController::class, 'extraerDatosCFDI']);
 
