@@ -26,4 +26,6 @@ class DatosFiscalRegimenUsoCfdi extends Model
     {
         return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi', 'usoCFDI');
     }
+
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Catalogos\CatRegimenesFiscales;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,7 +27,12 @@ class Solicitud extends Model
         'monto',
         'establecimiento',
         'empleado_id',
-        'estado_id'
+        'estado_id',
+        'id_receptor',
+        'usoCFDI'
+    ];
+    protected $appends=[
+        'clave'
     ];
 
     protected $casts = [
@@ -130,4 +136,23 @@ class Solicitud extends Model
     {
         return $query->where('usuario_id', $usuarioId);
     }
+    public function receptor()
+    {
+        return $this->belongsTo(DatosFiscal::class, 'id_receptor');
+    }
+    public function usoCfdi()
+    {
+        return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi_id');
+    }
+
+        public function regimen()
+    {
+        return $this->belongsTo(CatRegimenesFiscales::class, 'id_regimen', 'id_regimen');
+    }
+    public function getClaveAttribute()
+    {
+        return $this->regimen?->clave; // Asumiendo que la columna se llama 'clave'
+    }
+
+
 }

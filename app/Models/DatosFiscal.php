@@ -97,7 +97,13 @@ class DatosFiscal extends Model
      */
     public function getRegimenPredeterminadoAttribute()
     {
-        return $this->regimenPredeterminado->regimen ?? null;
+        // Buscar el régimen marcado como predeterminado en datos_fiscales_regimenes_fiscales
+        $regimenFiscal = $this->regimenesFiscales()
+                            ->where('predeterminado', true)
+                            ->with('regimen') // Cargar la relación con cat_regimenes_fiscales
+                            ->first();
+        
+        return $regimenFiscal->regimen ?? null;
     }
 
     /**
@@ -105,7 +111,22 @@ class DatosFiscal extends Model
      */
     public function getUsoCfdiPredeterminadoAttribute()
     {
-        return $this->usoCfdiPredeterminado ?? ($this->regimenPredeterminado->usoCfdiPredeterminado() ?? null);
+        // Primero buscar el régimen predeterminado
+        $regimenPredeterminado = $this->regimenesFiscales()
+                                    ->where('predeterminado', true)
+                                    ->first();
+
+        if ($regimenPredeterminado) {
+            // Buscar el uso CFDI predeterminado en datos_fiscales_regimen_usos_cfdi
+            $usoCfdi = $regimenPredeterminado->usosCfdi()
+                                            ->where('predeterminado', true)
+                                            ->with('usoCfdi') // Cargar la relación con cat_usos_cfdi
+                                            ->first();
+            
+            return $usoCfdi->usoCfdi ?? null;
+        }
+
+        return null;
     }
 
     public function direcciones(): HasMany
@@ -116,5 +137,9 @@ class DatosFiscal extends Model
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'id_usuario', 'id');
+    }
+    public function solicitudes()
+    {
+        return $this->hasMany(Solicitud::class, 'id_receptor');
     }
 }

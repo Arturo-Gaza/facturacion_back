@@ -4,6 +4,7 @@ namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Models\Solicitud;
+use App\Models\User;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
 use Illuminate\Http\Client\RequestException;
@@ -47,7 +48,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $datosExtraidos = $this->aiService->extractStructuredData($textoOCR);
 
             $solicitud->update([
-                'num_ticket'=>$datosExtraidos['num_ticket'],
+                'num_ticket' => $datosExtraidos['num_ticket'],
                 'texto_ocr' => $textoOCR,
                 'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,
@@ -114,8 +115,15 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function store(Request $request): Solicitud
     {
         $solicitud = new Solicitud();
+        $usr = User::find($request['usuario_id']);
         $solicitud->usuario_id = $request->usuario_id;
         $solicitud->estado_id = 1; // Estado por defecto
+
+        $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
+        $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
+
+        $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI ;
+
 
         // Guardar imagen
         if ($request->hasFile('imagen')) {
@@ -169,6 +177,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         // Obtener conteos con los nombres de estado desde el catálogo
         $conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
+            ->whereNot('estado_id', 5)
             ->where('solicitudes.created_at', '>=', now()->subDays(30))
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
             ->selectRaw('cat_estatus_solicitud.descripcion_estatus_solicitud as estado, COUNT(*) as count')
