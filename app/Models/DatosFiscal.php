@@ -36,7 +36,8 @@ class DatosFiscal extends Model
         'fecha_inicio_op',
         'id_estatus_sat',
         'datos_extra',
-        'email_facturacion_id'
+        'email_facturacion_id',
+        'habilitado'
     ];
 
     protected $casts = [

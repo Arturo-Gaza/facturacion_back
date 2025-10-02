@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\UsuarioRegimenFiscal;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Smalot\PdfParser\Parser;
@@ -60,6 +61,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             ->whereHas('usuario', function ($query) use ($id) {
                 $query->where('id', $id);
             })
+            ->where('habilitado',true)
             ->whereDoesntHave('usuario', function ($query) {
                 $query->whereColumn('datos_fiscales_personal', 'datos_fiscales.id');
             })
@@ -301,6 +303,28 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($datosFiscales) {
             $datosFiscales->update($data);
         }
+        return $datosFiscales;
+    }
+    public function eliminarReceptor($id)
+    {
+        $datosFiscales = DatosFiscal::find($id);
+
+        if (!$datosFiscales) {
+            throw new Exception("Receptor no encontrado");
+        }
+
+        if ($datosFiscales->predeterminado) {
+            throw new Exception("Este receptor es el predeterminado, no puede ser eliminado");
+        }
+        
+
+        // Opción 1: Deshabilitar
+        $datosFiscales->habilitado = 0;
+        $datosFiscales->save();
+
+        // Opción 2: Si usas soft delete
+        // $datosFiscales->delete();
+
         return $datosFiscales;
     }
 

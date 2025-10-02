@@ -217,4 +217,19 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
+
+    public function eliminarReceptor( $id)
+    {
+        DB::beginTransaction();
+        try {
+            $updated = $this->datosFiscalesRepository->eliminarReceptor($id);
+
+
+            DB::commit();
+            return ApiResponseHelper::sendResponse($updated, 'Receptor eliminado correctamente', 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex, $ex->getMessage());
+        }
+    }
 }
