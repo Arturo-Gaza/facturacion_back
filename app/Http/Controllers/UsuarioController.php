@@ -70,7 +70,7 @@ class UsuarioController extends Controller
         }
     }
 
-        public function getDatos($id)
+    public function getDatos($id)
     {
         try {
             $getById = $this->usuario->getDatos($id);
@@ -80,14 +80,14 @@ class UsuarioController extends Controller
         }
     }
 
-    public function editarDatos(Request $request,$id)
+    public function editarDatos(Request $request, $id)
     {
-                try {
-                 
-            $usr = $this->usuario->editarDatos($request,$id);
+        try {
+
+            $usr = $this->usuario->editarDatos($request, $id);
             return ApiResponseHelper::sendResponse($usr, 'Usuario editado con exito', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro' , 500);
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
     }
 
@@ -107,7 +107,7 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
     }
-        public function enviarCorreoConf(Request $request)
+    public function enviarCorreoConf(Request $request)
     {
         $data = [
             'email' => $request->email,
@@ -116,7 +116,7 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
-        public function enviarCorreoInhabilitar(Request $request)
+    public function enviarCorreoInhabilitar(Request $request)
     {
         $data = [
             'email' => $request->email,
@@ -125,7 +125,16 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
-        public function enviarSMSConf(Request $request)
+    public function enviarCorreoEliminar(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->enviarCorreoEliminar($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
+    }
+    public function enviarSMSConf(Request $request)
     {
         $data = [
             'phone' => $request->phone,
@@ -147,7 +156,7 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
-        public function validarCorreoConf(Request $request)
+    public function validarCorreoConf(Request $request)
     {
         $data = [
             'codigo' => $request->codigo,
@@ -172,6 +181,18 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
+    public function validarCorreoEliminar(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->validarCorreoEliminar($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
     public function recPass(Request $request)
     {
         $data = [
@@ -188,7 +209,7 @@ class UsuarioController extends Controller
         }
     }
 
-        public function desHabilitar(Request $request)
+    public function desHabilitar(Request $request)
     {
         $data = [
             'codigo' => $request->codigo,
@@ -198,6 +219,20 @@ class UsuarioController extends Controller
         try {
             $getById = $this->usuario->desHabilitar($data);
             return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+        }
+    }
+    public function eliminar(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email
+        ];
+
+        try {
+            $getById = $this->usuario->eliminar($data);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario eliminado con exito ', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
         }
@@ -216,7 +251,7 @@ class UsuarioController extends Controller
                 'user' => $request->user,
                 'habilitado' => $request->habilitado,
                 'idRol' => $request->idRol,
-                'id_departamento'=> $request->id_departamento
+                'id_departamento' => $request->id_departamento
             ];
         } else {
             $data = [
@@ -228,7 +263,7 @@ class UsuarioController extends Controller
                 'user' => $request->user,
                 'habilitado' => $request->habilitado,
                 'idRol' => $request->idRol,
-                'id_departamento'=> $request->id_departamento
+                'id_departamento' => $request->id_departamento
             ];
         }
         DB::beginTransaction();

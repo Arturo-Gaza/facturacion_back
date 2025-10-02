@@ -7,6 +7,7 @@ use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
+use App\Models\PasswordEliminar;
 use App\Models\PasswordInhabilitar;
 use App\Models\User;
 use App\Models\UserSistema;
@@ -277,6 +278,17 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $usr;
     }
 
+    public function enviarCorreoEliminar($data)
+    {
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $usr = $this->emailService->enviarCorreoEliminar($email);
+        return $usr;
+    }
+
     public function enviarSMSConf($data)
     {
         $usr = $this->findByEmailOrUser($data['phone']);
@@ -345,9 +357,39 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 $reset->save();
 
                 //  $usr = User::where('email', $email)->first();
-                $usr->habilitado = false;
+                $usr->id_estatus_usuario = 2;
                 $usr->save();
                 return "Usuario inhabilitado correctamente";
+            }
+        }
+
+
+        throw new Exception('Error inesperado', 409);
+    }
+    public function eliminar($data)
+    {
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr)
+            return null;
+        $email = $usr->email;
+
+        $passwordReset = PasswordInhabilitar::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                // Si quieres marcarlo como usado aquí
+                $reset->used = true;
+                $reset->used_at = now();
+                $reset->save();
+
+                //  $usr = User::where('email', $email)->first();
+                $usr->id_estatus_usuario = 3;
+                $usr->save();
+                return "Usuario eliminado correctamente";
             }
         }
 
@@ -456,10 +498,41 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         DB::rollBack();
         return null;
     }
+    public function validarCorreoEliminar($data)
+    {
+        DB::beginTransaction();
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($data['email']);
+        if (!$usr) {
+            DB::rollBack();
+            return null;
+        }
+        $email = $usr->email;
+        $expiraEnMinutos = 10;
+        $passwordReset = PasswordEliminar::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    DB::rollBack();
+                    return null;
+                }
+
+                DB::commit();
+
+                return "Código válido";
+            }
+        }
+        DB::rollBack();
+        return null;
+    }
 
     public function findByEmailOrUser(string $email): ?User
     {
-        return User::where('habilitado', true)
+        return User::where('id_estatus_usuario', 1)
             ->where(function ($query) use ($email) {
                 $query->whereHas('mailPrincipal', function ($q) use ($email) {
                     $q->where('email', $email);

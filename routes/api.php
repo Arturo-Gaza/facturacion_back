@@ -59,10 +59,15 @@ Route::post('usuario/validarCorreoConf', [UsuarioController::class, 'validarCorr
 Route::post('usuario/enviarCorreoInhabilitar', [UsuarioController::class, 'enviarCorreoInhabilitar']);
 Route::post('usuario/validarCorreoInhabilitar', [UsuarioController::class, 'validarCorreoInhabilitar']);
 
+Route::post('usuario/enviarCorreoEliminar', [UsuarioController::class, 'enviarCorreoEliminar']);
+Route::post('usuario/validarCorreoEliminar', [UsuarioController::class, 'validarCorreoEliminar']);
+
+
 Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
 
 Route::post('usuario/habilitar', [UsuarioController::class, 'habilitar']);
 Route::post('usuario/desHabilitar', [UsuarioController::class, 'deshabilitar']);
+Route::post('usuario/eliminar', [UsuarioController::class, 'eliminar']);
 
 Route::get('/test', function () {
     return 'ok';

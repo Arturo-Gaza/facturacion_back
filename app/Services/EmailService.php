@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Mail\MandarCorreo;
 use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
+use App\Mail\MandarCorreoEliminar;
 use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
 use App\Models\PasswordInhabilitar;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabSolicitud;
+use App\Models\Solicitud;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -22,7 +24,7 @@ class EmailService
 {
     public function enviarCorreoSolicitud(array $datos)
     {
-        $solicitud = TabSolicitud::find($datos['ticket']);
+        $solicitud = Solicitud::find($datos['ticket']);
         $usrSol = User::find($solicitud->id_usuario_solicitud);
         $usrComp = User::find($solicitud->id_usuario_asignacion);
         $esatus = CatEstatusSolicitud::find($datos['id_estatus']);
@@ -160,6 +162,39 @@ class EmailService
 
             try {
                 Mail::to($datosMail["email"])->send(new MandarCorreoInhabilitar($datosMail));
+                return "Exito";
+            } catch (\Exception $e) {
+                // Guardar el error en log, base de datos, o notificar al admin
+                Log::error('Error al enviar correo: ' . $e->getMessage());
+                return $e->getMessage();
+            }
+            return $usr;
+        } else {
+            return "null";
+        }
+    }
+    public function enviarCorreoEliminar($email)
+    {
+        $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
+            $query->where('email', $email);
+        })->first();
+        if ($usr) {
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $datosMail = [
+                'email' => $usr->email,
+                'nombre' => $usr->name . " " . $usr->apellidoP . " " . $usr->apellidoM,
+                'codigo' => $codigo,
+            ];
+            // Guardar nuevo código
+            PasswordInhabilitar::create([
+                'email' => $datosMail['email'],
+                'codigo' =>  Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+
+
+            try {
+                Mail::to($datosMail["email"])->send(new MandarCorreoEliminar($datosMail));
                 return "Exito";
             } catch (\Exception $e) {
                 // Guardar el error en log, base de datos, o notificar al admin

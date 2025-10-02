@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\UserPhone;
 use App\Models\UserEmail;
+use App\Models\CatEstatusUsuario;
 use App\Models\Catalogos\CatRoles;
 use App\Models\SistemaTickets\CatDepartamentos;
 use App\Models\DatosFiscal; // Agrega esta importación
@@ -59,6 +60,10 @@ class User extends Authenticatable
         'apellido_materno'
     ];
 
+    public function estatusUsuario()
+    {
+        return $this->belongsTo(CatEstatusUsuario::class, 'id_estatus_usuario');
+    }
     // Nueva relación con el correo principal
     public function mailPrincipal()
     {
@@ -155,5 +160,48 @@ class User extends Authenticatable
     public function datosFiscales()
     {
         return $this->hasOne(DatosFiscal::class, 'id_usuario');
+    }
+     /**
+     * Scope para usuarios activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->whereHas('estatusUsuario', function($q) {
+            $q->where('clave', 'activo');
+        });
+    }
+
+    /**
+     * Scope para usuarios bloqueados
+     */
+    public function scopeBloqueados($query)
+    {
+        return $query->whereHas('estatusUsuario', function($q) {
+            $q->where('clave', 'bloqueado');
+        });
+    }
+
+    /**
+     * Verificar si el usuario está activo
+     */
+    public function getEstaActivoAttribute()
+    {
+        return $this->estatusUsuario && $this->estatusUsuario->clave === 'activo';
+    }
+
+    /**
+     * Verificar si el usuario está bloqueado
+     */
+    public function getEstaBloqueadoAttribute()
+    {
+        return $this->estatusUsuario && $this->estatusUsuario->clave === 'bloqueado';
+    }
+
+    /**
+     * Verificar si el usuario está eliminado
+     */
+    public function getEstaEliminadoAttribute()
+    {
+        return $this->estatusUsuario && $this->estatusUsuario->clave === 'eliminado';
     }
 }

@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DepartamentosSeeder::class);
         $this->call(TiposSeeder::class);
         $this->call(CategoriaSeeder::class);
-        $this->call(UserSeeder::class);
+        
         # $this->call(UbicacionSeeder::class);
         $this->call(EstatusSolicitudSeeder::class);
         #$this->call(MonedaSeeder::class);
@@ -33,8 +33,10 @@ class DatabaseSeeder extends Seeder
      $this->call([
             CatRegimenUsoCfdiSeeder::class,
             CatEstatusesSatSeeder::class,
+            
             CatTiposDireccionSeeder::class,
              PromptTemplateSeeder::class,
+             UserSeeder::class,
             //CatTiposContactoSeeder::class,
             // Agrega aquí otros seeders que crees en el futuro
         ]);

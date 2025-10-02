@@ -55,7 +55,7 @@ class AuthController extends Controller
                     'apellidoM' => $nameParts[2] ?? null,
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
-                    'habilitado' => true,
+
                     'intentos' => 0,
                     'login_activo' => true,
                     'idRol' => 2,
@@ -71,7 +71,6 @@ class AuthController extends Controller
                     'avatar' => $googleUser->getAvatar(),
                     'password' => null,
                     'user' => strtolower(str_replace(' ', '', $googleUser->getName())),
-                    'habilitado' => true,
                     'intentos' => 0,
                     'login_activo' => true,
                     'idRol' => 2,
@@ -200,9 +199,13 @@ class AuthController extends Controller
             return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 401);
         } else {
 
-            if (!$user->habilitado == 1) {
+            if ($user->id_estatus_usuario == 2) {
 
                 return ApiResponseHelper::rollback(null, 'Usuario bloqueado', 401);
+            } 
+            if ($user->id_estatus_usuario == 3) {
+
+                return ApiResponseHelper::rollback(null, 'Usuario dado de baja', 401);
             } else {
                 if (!$user || !Hash::check($request->password, $user->password)) {
                     // $user->intentos=$user->intentos+1;
