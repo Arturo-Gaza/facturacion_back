@@ -736,7 +736,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $user;
     }
 
-    function generarPasswordAvanzado($longitudMin = 15, $longitudMax = 20)
+    function generarPasswordAvanzado($longitudMin = 8, $longitudMax = 10)
     {
         $longitud = random_int($longitudMin, $longitudMax);
 
