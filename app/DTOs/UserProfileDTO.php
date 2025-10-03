@@ -19,6 +19,7 @@ class UserProfileDTO
         public ?bool $datosCompletos,
         public ?bool $tienDatoFiscal,
         public ?array $direccionPersonal,
+        public ?bool $password_temporal
     ) {}
 
     public static function fromUserModel($user): self
@@ -46,7 +47,8 @@ class UserProfileDTO
             saldo: (float) $user->saldo,
             datosCompletos: $tieneDatosFiscalesPersonal,
             direccionPersonal:$direccionPersonalArray,
-            tienDatoFiscal:$tieneDatosFiscalesPredeterminado
+            tienDatoFiscal:$tieneDatosFiscalesPredeterminado,
+            password_temporal:$user->password_temporal
         );
     }
 
@@ -66,7 +68,8 @@ class UserProfileDTO
             'saldo' => $this->saldo,
             'datosCompletos' => $this->datosCompletos,
             'direccionPersonal' => $this->direccionPersonal,
-            'tienDatoFiscal'=>$this->tienDatoFiscal
+            'tienDatoFiscal'=>$this->tienDatoFiscal,
+            'password_temporal'=>$this->password_temporal
         ];
     }
 }

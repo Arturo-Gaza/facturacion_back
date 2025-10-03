@@ -6,6 +6,7 @@ use App\Mail\MandarCorreo;
 use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
 use App\Mail\MandarCorreoEliminar;
+use App\Mail\MandarCorreoHijo;
 use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
@@ -206,6 +207,28 @@ class EmailService
         } else {
             return "null";
         }
+    }
+    public function enviarCorreoHijo($email, $password)
+    {
+       
+            $datosMail = [
+                'email' => $email,
+                'password_temporal' => $password,
+                'url_login' => 'https://tudominio.com/login'
+            ];
+
+
+
+            try {
+                Mail::to($datosMail["email"])->send(new MandarCorreoHijo($datosMail));
+                return "Exito";
+            } catch (\Exception $e) {
+                // Guardar el error en log, base de datos, o notificar al admin
+                Log::error('Error al enviar correo: ' . $e->getMessage());
+                return $e->getMessage();
+            }
+            return $usr;
+        
     }
 
 

@@ -195,13 +195,14 @@ class AuthController extends Controller
             return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
         }
 
+
         // Validar si el correo está verificado
-        if ($user->mailPrincipal && !$user->mailPrincipal->verificado) {
+        if ($user->mailPrincipal && !$user->mailPrincipal->verificado && !$user->password_temporal) {
             return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
         }
 
         // Validar si el teléfono está verificado
-        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado) {
+        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
             return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
         }
 
@@ -254,7 +255,7 @@ class AuthController extends Controller
             ], 200);
         }
 
-
+        
         $token = $this->userRepo->generateToken($user);
 
         DB::beginTransaction();

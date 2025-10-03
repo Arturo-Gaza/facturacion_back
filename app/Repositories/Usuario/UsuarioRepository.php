@@ -655,12 +655,15 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
 
         $password = $this->generarPasswordAvanzado();
+        $usr = $this->emailService->enviarCorreoHijo($email,$password);
+
         // 3. Crear nuevo usuario
         $passwordHash = Hash::make($password);
         $user = User::create([
             'password'  => $passwordHash,
-            'idRol'     => $data['idRol'] ?? 2,
-            'usuario_padre' => $idPadre
+            'idRol'     => $data['idRol'] ?? 3,
+            'usuario_padre' => $idPadre,
+            'password_temporal' => true
         ]);
 
         // 4. Guardar correo y teléfono

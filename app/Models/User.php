@@ -33,7 +33,8 @@ class User extends Authenticatable
         'saldo',
         'datos_fiscales_principal',
         'datos_fiscales_personal',
-        'usuario_padre', // Agrega este campo si lo necesitas
+        'usuario_padre',
+        'password_temporal'
     ];
 
     protected $hidden = [
