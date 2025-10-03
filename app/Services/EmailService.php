@@ -9,6 +9,7 @@ use App\Mail\MandarCorreoEliminar;
 use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
+use App\Models\PasswordEliminar;
 use App\Models\PasswordInhabilitar;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabSolicitud;
@@ -186,7 +187,7 @@ class EmailService
                 'codigo' => $codigo,
             ];
             // Guardar nuevo código
-            PasswordInhabilitar::create([
+            PasswordEliminar::create([
                 'email' => $datosMail['email'],
                 'codigo' =>  Hash::make($codigo),
                 'created_at' => Carbon::now(),
