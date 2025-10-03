@@ -32,6 +32,7 @@ interface UsuarioRepositoryInterface
   public function aumentarIntento(int $intentos, $id);
   public function store(array $data);
   public function storeCliente(array $data);
+    public function storeHijo(array $data);
   public function update(array $data, $id);
   public function deleteUser(array $data, $id);
   public function updatePassword(array $data, $id);

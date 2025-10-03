@@ -236,7 +236,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         DB::commit();
         $user = User::where('id', $id)
             ->firstOrFail();;
-                $user->load(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal']);
+        $user->load(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal']);
 
         return UserProfileDTO::fromUserModel($user);
     }
@@ -374,7 +374,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             return null;
         $email = $usr->email;
 
-        $passwordReset = PasswordInhabilitar::where('email', $email)
+        $passwordReset = PasswordEliminar::where('email', $email)
             ->where('used', false)
             ->get();
 
@@ -626,6 +626,88 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         ]);
 
         return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
+    }
+
+    public function storeHijo(array $data)
+    {
+        $email = $data['email'];
+        $idPadre   = $data['id_usuario'];
+
+        // 1. Buscar email existente
+        $existingEmail = UserEmail::where('email', $email)->first();
+        if ($existingEmail) {
+            if ($existingEmail->verificado) {
+                throw new \Exception('Usuario existente ', 409);
+            } else {
+                // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
+                $userToDelete = User::where('id_mail_principal', $existingEmail->id)
+                    ->orWhereHas('emails', function ($query) use ($email) {
+                        $query->where('email', $email);
+                    })
+                    ->first();
+
+                if ($userToDelete) {
+                    $userToDelete->delete(); // Esto eliminará todo en cascada
+                } else {
+                    $existingEmail->delete();
+                }
+            }
+        }
+
+        $password = $this->generarPasswordAvanzado();
+        // 3. Crear nuevo usuario
+        $passwordHash = Hash::make($password);
+        $user = User::create([
+            'password'  => $passwordHash,
+            'idRol'     => $data['idRol'] ?? 2,
+            'usuario_padre' => $idPadre
+        ]);
+
+        // 4. Guardar correo y teléfono
+        $correo = $user->emails()->create([
+            'email' => $email,
+        ]);
+
+
+
+        $user->update([
+            'id_mail_principal' => $correo->id
+        ]);
+
+        return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
+    }
+
+    function generarPasswordAvanzado($longitudMin = 15, $longitudMax = 20)
+    {
+        $longitud = random_int($longitudMin, $longitudMax);
+
+        $caracteres = [
+            'mayusculas' => 'ABCDEFGHJKLMNPQRSTUVWXYZ', // Eliminé I, O para evitar confusión
+            'minusculas' => 'abcdefghjkmnpqrstuvwxyz',  // Eliminé i, l, o
+            'numeros' => '23456789',                    // Eliminé 0, 1
+            'especiales' => '!@#$%&*+-=?'
+        ];
+
+        $password = '';
+
+        // Un carácter de cada tipo
+        foreach ($caracteres as $tipo => $caracteresTipo) {
+            $password .= $caracteresTipo[random_int(0, strlen($caracteresTipo) - 1)];
+        }
+
+        // Todos los caracteres combinados
+        $todos = implode('', $caracteres);
+
+        // Completar
+        for ($i = strlen($password); $i < $longitud; $i++) {
+            $password .= $todos[random_int(0, strlen($todos) - 1)];
+        }
+
+        // Convertir a array, mezclar y volver a string
+        $passwordArray = str_split($password);
+        shuffle($passwordArray);
+
+        return implode('', $passwordArray);
     }
 
 

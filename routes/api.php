@@ -69,6 +69,8 @@ Route::post('usuario/habilitar', [UsuarioController::class, 'habilitar']);
 Route::post('usuario/desHabilitar', [UsuarioController::class, 'deshabilitar']);
 Route::post('usuario/eliminar', [UsuarioController::class, 'eliminar']);
 
+
+
 Route::get('/test', function () {
     return 'ok';
 });
@@ -76,6 +78,8 @@ Route::get('/test', function () {
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
+Route::post('auth/registerHijo', [AuthController::class, 'registerHijo']);
+
 
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
 Route::put('usuario/editarDatos/{id}', [UsuarioController::class, 'editarDatos']);

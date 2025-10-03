@@ -151,6 +151,16 @@ class AuthController extends Controller
              return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
         }
     }
+        public function registerHijo(Request $request)
+    {
+        try {
+
+            $user = $this->userRepo->storeHijo($request->all());
+            return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+        } catch (Exception $e) {
+             return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
+        }
+    }
 
     /**
      * @OA\Post(
