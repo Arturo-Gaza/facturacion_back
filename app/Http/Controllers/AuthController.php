@@ -247,7 +247,16 @@ class AuthController extends Controller
                 }
             }
         }
+        if ($user->password_temporal) {
+            if ($user->mailPrincipal) {
+                $user->mailPrincipal->verificado = true;
+                $user->mailPrincipal->save();
+            }
 
+            $user->password = null;
+
+            $user->save();
+        }
 
 
         if ($user->two_factor_enabled) {
