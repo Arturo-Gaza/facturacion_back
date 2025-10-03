@@ -730,7 +730,8 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         $user->update([
             'password'  => $data['password'],
-            'id_telefono_principal' => $telefono->id
+            'id_telefono_principal' => $telefono->id,
+            'password_temporal'=>false
         ]);
         return $user;
     }
