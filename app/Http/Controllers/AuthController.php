@@ -148,17 +148,27 @@ class AuthController extends Controller
             $user = $this->userRepo->storeCliente($request->all());
             return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
         } catch (Exception $e) {
-             return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
+            return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
         }
     }
-        public function registerHijo(Request $request)
+    public function registerHijo(Request $request)
     {
         try {
 
             $user = $this->userRepo->storeHijo($request->all());
+            return ApiResponseHelper::sendResponse($user, 'Uasuario registrado correctamente', 201);
+        } catch (Exception $e) {
+            return ApiResponseHelper::throw(null, $e->getMessage(), 400);
+        }
+    }
+    public function completarHijo(Request $request)
+    {
+        try {
+
+            $user = $this->userRepo->completarHijo($request->all());
             return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
         } catch (Exception $e) {
-             return ApiResponseHelper::throw(null, $e->getMessage(), 400);
+            return ApiResponseHelper::throw(null, $e->getMessage(), 400);
         }
     }
 
@@ -213,7 +223,7 @@ class AuthController extends Controller
             if ($user->id_estatus_usuario == 2) {
 
                 return ApiResponseHelper::rollback(null, 'Usuario bloqueado', 401);
-            } 
+            }
             if ($user->id_estatus_usuario == 3) {
 
                 return ApiResponseHelper::rollback(null, 'Usuario dado de baja', 401);
@@ -255,7 +265,7 @@ class AuthController extends Controller
             ], 200);
         }
 
-        
+
         $token = $this->userRepo->generateToken($user);
 
         DB::beginTransaction();

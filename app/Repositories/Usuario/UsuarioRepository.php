@@ -639,7 +639,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'id_telefono_principal' => $telefono->id
         ]);
 
-        return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
+        return   $user;
     }
 
     public function storeHijo(array $data)
@@ -691,7 +691,48 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'id_mail_principal' => $correo->id
         ]);
 
-        return response()->json(['message' => 'usuario registrado', 'user' => $user], 201);
+        return $user;
+    }
+
+    public function completarHijo(array $data)
+    {
+        $email = $data['email'];
+        $tel   = $data['tel'];
+        $user= $this->findByEmailOrUser($email);
+          $existingPhone = UserPhone::where('telefono', $tel)->first();
+        if ($existingPhone) {
+            if ($existingPhone->verificado) {
+                throw new \Exception('Usuario existente ', 409);
+            } else {
+                // Eliminar usuario completo
+                $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
+                    ->orWhereHas('phones', function ($query) use ($tel) {
+                        $query->where('telefono', $tel);
+                    })
+                    ->first();
+
+                if ($userToDelete) {
+                    $userToDelete->delete(); // Esto eliminará todo en cascada
+                } else {
+                    $existingPhone->delete();
+                }
+            }
+        }
+
+        // 3. Crear nuevo usuario
+        $data['password'] = Hash::make($data['password']);
+
+
+
+        $telefono = $user->phones()->create([
+            'telefono' => $tel,
+        ]);
+
+        $user->update([
+            'password'  => $data['password'],
+            'id_telefono_principal' => $telefono->id
+        ]);
+        return $user;
     }
 
     function generarPasswordAvanzado($longitudMin = 15, $longitudMax = 20)

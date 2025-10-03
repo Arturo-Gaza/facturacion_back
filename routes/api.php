@@ -80,6 +80,8 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
 Route::post('auth/registerHijo', [AuthController::class, 'registerHijo']);
 
+Route::post('auth/completarHijo', [AuthController::class, 'completarHijo']);
+
 
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
 Route::put('usuario/editarDatos/{id}', [UsuarioController::class, 'editarDatos']);
