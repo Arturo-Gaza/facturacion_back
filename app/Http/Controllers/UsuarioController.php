@@ -234,7 +234,7 @@ class UsuarioController extends Controller
             $getById = $this->usuario->eliminar($data);
             return ApiResponseHelper::sendResponse($getById, 'Usuario eliminado con exito ', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
 
