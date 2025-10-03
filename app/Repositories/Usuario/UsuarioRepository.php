@@ -160,6 +160,20 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $data1;
     }
 
+    public function getColaboradores($id)
+    {
+        $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal'])
+            ->where('usuario_padre', $id)
+            ->get();
+        // Crear array de DTOs
+        $dtos = $users->map(function ($user) use ($id) {
+            return UserProfileDTO::fromUserModel($user);
+        })->toArray();
+
+        // Devolver el array de DTOs
+        return $dtos;
+    }
+
     public function getAllUserAsignado($idCarga)
     {
         $usuario = User::select(
@@ -655,7 +669,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
 
         $password = $this->generarPasswordAvanzado();
-        $usr = $this->emailService->enviarCorreoHijo($email,$password);
+        $usr = $this->emailService->enviarCorreoHijo($email, $password);
 
         // 3. Crear nuevo usuario
         $passwordHash = Hash::make($password);

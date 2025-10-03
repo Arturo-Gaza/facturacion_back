@@ -38,6 +38,15 @@ class UsuarioController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
+    public function getColaboradores($id)
+    {
+        try {
+            $getAllUser = $this->usuario->getColaboradores($id);
+            return ApiResponseHelper::sendResponse($getAllUser, 'Usuarios obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
 
 
     public function getAllUserAlmacen($idCarga)

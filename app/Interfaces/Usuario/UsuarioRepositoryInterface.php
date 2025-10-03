@@ -9,6 +9,7 @@ interface UsuarioRepositoryInterface
   public function getAll();
   public function getCompras();
   public function getAllUser();
+  public function getColaboradores($id);
   public function getAllUserAlmacen($idCarga);
   public function getAllUserAsignado($idCarga);
   public function getByID($id);

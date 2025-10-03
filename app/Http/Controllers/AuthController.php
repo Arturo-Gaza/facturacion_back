@@ -158,7 +158,7 @@ class AuthController extends Controller
             $user = $this->userRepo->storeHijo($request->all());
             return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
         } catch (Exception $e) {
-             return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
+             return ApiResponseHelper::throw(null, $e->getMessage(), 400);
         }
     }
 
