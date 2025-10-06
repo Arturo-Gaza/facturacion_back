@@ -51,25 +51,50 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         )->find($id);
     }
 
-    public function getByUsr($id)
-    {
-        $data = DatosFiscal::with([
+public function getByUsr($id)
+{
+    $user = User::find($id);
+    
+    if (!$user) {
+        return []; // o lanzar excepción según tu estándar
+    }
+
+    // Si es usuario padre (rol 2)
+    if ($user->idRol == 2 ||$user->idRol == 1 ) {
+        return DatosFiscal::with([
             'domicilioFiscal',
             'regimenesFiscales.usosCfdi'
         ])
+        ->whereHas('usuario', function ($query) use ($id) {
+            $query->where('id', $id);
+        })
+        ->where('habilitado', true)
+        ->whereDoesntHave('usuario', function ($query) {
+            $query->whereColumn('datos_fiscales_personal', 'datos_fiscales.id');
+        })
+        ->get();
 
-            ->whereHas('usuario', function ($query) use ($id) {
-                $query->where('id', $id);
-            })
-            ->where('habilitado',true)
-            ->whereDoesntHave('usuario', function ($query) {
-                $query->whereColumn('datos_fiscales_personal', 'datos_fiscales.id');
-            })
+    // Si es usuario hijo (rol 3)
+    } elseif ($user->idRol == 3) {
+        $data = $user->facturantesPermitidos()
+            ->with([
+                'domicilioFiscal',
+                'regimenesFiscales.usosCfdi'
+            ])
+            ->where('habilitado', true)
             ->get();
-
+            
+        // Marcar cuál es el predeterminado
+        $data->each(function ($facturante) use ($user) {
+            $facturante->es_predeterminado = (bool) $facturante->pivot->predeterminado;
+        });
 
         return $data;
+
+    } else {
+        return [];
     }
+}
 
     public function storeConDomicilio(array $data, array $direccion)
     {

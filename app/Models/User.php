@@ -162,12 +162,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(DatosFiscal::class, 'id_usuario');
     }
-     /**
+    /**
      * Scope para usuarios activos
      */
     public function scopeActivos($query)
     {
-        return $query->whereHas('estatusUsuario', function($q) {
+        return $query->whereHas('estatusUsuario', function ($q) {
             $q->where('clave', 'activo');
         });
     }
@@ -177,7 +177,7 @@ class User extends Authenticatable
      */
     public function scopeBloqueados($query)
     {
-        return $query->whereHas('estatusUsuario', function($q) {
+        return $query->whereHas('estatusUsuario', function ($q) {
             $q->where('clave', 'bloqueado');
         });
     }
@@ -204,5 +204,11 @@ class User extends Authenticatable
     public function getEstaEliminadoAttribute()
     {
         return $this->estatusUsuario && $this->estatusUsuario->clave === 'eliminado';
+    }
+    public function facturantesPermitidos()
+    {
+        return $this->belongsToMany(DatosFiscal::class, 'usuario_hijo_facturantes', 'id_usuario_hijo', 'id_dato_fiscal')
+            ->withPivot('predeterminado')
+            ->withTimestamps();
     }
 }

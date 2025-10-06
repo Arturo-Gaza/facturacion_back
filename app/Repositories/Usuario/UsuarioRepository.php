@@ -5,6 +5,7 @@ namespace App\Repositories\Usuario;
 use App\DTOs\UserProfileDTO;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
+use App\Models\DatosFiscal;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
 use App\Models\PasswordEliminar;
@@ -646,7 +647,8 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $email = $data['email'];
         $idPadre   = $data['id_usuario'];
-
+        $facturantes = $data['facturantes'] ?? [];
+        $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
         if ($existingEmail) {
@@ -675,7 +677,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $passwordHash = Hash::make($password);
         $user = User::create([
             'password'  => $passwordHash,
-            'idRol'     => $data['idRol'] ?? 3,
+            'idRol'     =>  3,
             'usuario_padre' => $idPadre,
             'password_temporal' => true
         ]);
@@ -687,19 +689,55 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
 
 
+        if (!empty($facturantes)) {
+            $this->asignarFacturantesEnTransaccion($user->id, $facturantes, $facturantePredeterminado, $idPadre);
+        }
+        
+
         $user->update([
-            'id_mail_principal' => $correo->id
+            'id_mail_principal' => $correo->id,
+            'datos_fiscales_principal'=>$facturantePredeterminado
         ]);
 
         return $user;
     }
 
+    protected function asignarFacturantesEnTransaccion($idHijo, $facturantes, $facturantePredeterminado, $idPadre)
+{
+    // Verificar que los datos fiscales pertenecen al padre
+    $facturantesValidos = DatosFiscal::where('id_usuario', $idPadre)
+        ->whereIn('id', $facturantes)
+        ->pluck('id')
+        ->toArray();
+
+    if (count($facturantes) !== count($facturantesValidos)) {
+        throw new \Exception('Uno o más facturantes no pertenecen al usuario padre', 400);
+    }
+
+    // Validar facturante predeterminado
+    if ($facturantePredeterminado && !in_array($facturantePredeterminado, $facturantesValidos)) {
+        throw new \Exception('El facturante predeterminado no pertenece al usuario padre', 400);
+    }
+
+    // Asignar facturantes
+    $facturantesConPivot = [];
+    foreach ($facturantesValidos as $facturanteId) {
+        $facturantesConPivot[$facturanteId] = [
+            'predeterminado' => ($facturanteId == $facturantePredeterminado)
+        ];
+    }
+
+    $userHijo = User::find($idHijo);
+    $userHijo->facturantesPermitidos()->sync($facturantesConPivot);
+}
+
+
     public function completarHijo(array $data)
     {
         $email = $data['email'];
         $tel   = $data['tel'];
-        $user= $this->findByEmailOrUser($email);
-          $existingPhone = UserPhone::where('telefono', $tel)->first();
+        $user = $this->findByEmailOrUser($email);
+        $existingPhone = UserPhone::where('telefono', $tel)->first();
         if ($existingPhone) {
             if ($existingPhone->verificado) {
                 throw new \Exception('Usuario existente ', 409);
@@ -731,10 +769,29 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $user->update([
             'password'  => $data['password'],
             'id_telefono_principal' => $telefono->id,
-            'password_temporal'=>false
+            'password_temporal' => false
         ]);
         return $user;
     }
+    /**
+ * Actualizar facturantes de un usuario hijo existente
+ */
+public function actualizarFacturantesHijo($idHijo, array $data)
+{
+    $facturantes = $data['facturantes'] ?? [];
+    $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
+    
+    $userHijo = User::where('idRol', 3)->findOrFail($idHijo);
+    $idPadre = $userHijo->usuario_padre;
+
+    if (empty($facturantes)) {
+        // Si no se envían facturantes, eliminar todas las asignaciones
+        $userHijo->facturantesPermitidos()->detach();
+        return;
+    }
+
+    //$this->asignarFacturantesAHijo($idHijo, $facturantes, $facturantePredeterminado, $idPadre);
+}
 
     function generarPasswordAvanzado($longitudMin = 8, $longitudMax = 10)
     {
