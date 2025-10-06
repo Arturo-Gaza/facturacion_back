@@ -9,6 +9,7 @@ use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -112,6 +113,20 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->find($id);
     }
 
+    public function actualizarReceptor(Request $request)
+    {
+        $idSolicitud = $request->id_solicitud;
+        $idNuevoReceptor = $request->id_receptor;
+        $solicitud = Solicitud::findOrFail($idSolicitud);
+        DB::transaction(function () use ($solicitud, $idNuevoReceptor) {
+            // Actualizar el receptor
+            $solicitud->update([
+                'id_receptor' => $idNuevoReceptor
+            ]);
+        });
+        return $solicitud;
+    }
+
     public function store(Request $request): Solicitud
     {
         $solicitud = new Solicitud();
@@ -122,7 +137,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
         $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
 
-        $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI ;
+        $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
 
 
         // Guardar imagen

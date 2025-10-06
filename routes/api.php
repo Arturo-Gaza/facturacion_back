@@ -357,6 +357,7 @@ Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtener
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);
 Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);
+Route::post('solicitud/actualizarReceptor', [SolicitudController::class, 'actualizarReceptor']);
 
 Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
 Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getById']);

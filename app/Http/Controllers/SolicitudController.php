@@ -46,6 +46,16 @@ class SolicitudController extends Controller
         }
     }
 
+        public function actualizarReceptor(Request $request)
+    {
+        try {
+            $all = $this->solicitudRepository->actualizarReceptor($request);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes actualizada con exito', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
     public function eliminar(int $id)
     {
         try {
