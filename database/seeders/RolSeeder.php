@@ -28,5 +28,10 @@ class RolSeeder extends Seeder
         $Rol3->habilitado = true;
         $Rol3->save();
 
+                $Rol3 = new CatRoles();
+        $Rol3->nombre = "Mesa de ayuda";
+        $Rol3->habilitado = true;
+        $Rol3->save();
+
     }
 }
