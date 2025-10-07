@@ -50,31 +50,19 @@ class AuthController extends Controller
             $user = $this->userRepo->findByEmailOrUser($googleUser->email);
             if ($user) {
                 $user->update([
-                    'name' => $nameParts[0] ?? '',
-                    'apellidoP' => $nameParts[1] ?? null,
-                    'apellidoM' => $nameParts[2] ?? null,
-                    'google_id' => $googleUser->getId(),
-                    'avatar' => $googleUser->getAvatar(),
-
                     'intentos' => 0,
                     'login_activo' => true,
-                    'idRol' => 2,
-                    'email_verified_at' => now(),
                 ]);
             } else {
                 // Crear el usuario primero
                 $user = User::create([
-                    'name' => $nameParts[0] ?? '',
-                    'apellidoP' => $nameParts[1] ?? null,
-                    'apellidoM' => $nameParts[2] ?? null,
+
                     'google_id' => $googleUser->getId(),
                     'avatar' => $googleUser->getAvatar(),
                     'password' => null,
-                    'user' => strtolower(str_replace(' ', '', $googleUser->getName())),
                     'intentos' => 0,
                     'login_activo' => true,
                     'idRol' => 2,
-                    'email_verified_at' => now(),
                     // id_mail_principal se establecerá después de crear el email
                 ]);
 
@@ -106,6 +94,9 @@ class AuthController extends Controller
                 'user' => $userresponse,
                 'token' => $token,
                 'tokenGoogle' => $tokenGoogle,
+                'name' => $nameParts[0] ?? '',
+                'primer_apellido' => $nameParts[1] ?? null,
+                'segundo_apellido' => $nameParts[2] ?? null,
             ]);
         } catch (\Exception $e) {
             Log::error('Error Google Auth: ' . $e->getMessage());
