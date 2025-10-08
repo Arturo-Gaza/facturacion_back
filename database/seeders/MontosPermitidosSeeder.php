@@ -13,7 +13,7 @@ class MontosPermitidosSeeder extends Seeder
         $montos = [50.00, 100.00, 200.00, 500.00, 1000.00];
         
         foreach ($montos as $monto) {
-            DB::table('montos_permitidos')->insert([
+            DB::table('cat_montos_permitidos')->insert([
                 'monto' => $monto,
                 'activo' => true,
                 'created_at' => now(),

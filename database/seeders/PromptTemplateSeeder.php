@@ -215,16 +215,57 @@ Valida la siguiente Constancia de Situación Fiscal y devuelve un JSON con el an
 TEXTO:
 {\$textoOCR}
 
-Estructura requerida:
 {
-    "es_valida": true/false,
-    "rfc_valido": true/false,
-    "curp_valido": true/false,
-    "datos_completos": "completo|parcial|incompleto",
-    "fecha_emision_valida": true/false,
-    "estatus_actual": "ACTIVO|BAJA|PENDIENTE",
-    "errores_detectados": ["lista de errores o inconsistencias"],
-    "advertencias": ["aspectos a verificar manualmente"]
+    "id": null,
+    "id_usuario": null,
+    "idCIF": "valor_extraído_o_null",
+    "lugar_emision": "valor_extraído_o_null",
+    "fecha_emision": "YYYY-MM-DD",
+    "nombre_razon": "valor_extraído_o_null",
+    "nombre_comercial": "valor_extraído_o_null",
+    "es_persona_moral": true/false,
+    "rfc": "valor_extraído_o_null",
+    "curp": "valor_extraído_o_null",
+    "fecha_inicio_op": "YYYY-MM-DD",
+    "fecha_ult_cambio_op": "YYYY-MM-DD",
+    "id_estatus_sat": 1, 
+    "datos_extra": null,
+    "email_facturacion_id": null,
+    "primer_apellido": "valor_extraído_o_null",
+    "segundo_apellido": "valor_extraído_o_null",
+    "predeterminado": false,
+    "domicilioFiscal": {
+        "id_direccion": null,
+        "id_fiscal": null,
+        "id_tipo_direccion": 1,
+        "calle": "valor_extraído_o_null",
+        "num_exterior": "valor_extraído_o_null",
+        "num_interior": "valor_extraído_o_null",
+        "colonia": "valor_extraído_o_null",
+        "localidad": "valor_extraído_o_null",
+        "municipio": "valor_extraído_o_null",
+        "estado": "valor_extraído_o_null",
+        "codigo_postal": "valor_extraído_o_null",
+        "pais": "México"
+    },
+    "regimenesFiscales": [
+        {
+            "id": null,
+            "fecha_inicio_regimen": "YYYY-MM-DD",
+            "id_dato_fiscal": null,
+            "id_regimen": null,
+            "predeterminado": true/false,
+            "nombre_regimen": "valor_extraído_o_null",
+            "usosCfdi": [
+                {
+                    "id": null,
+                    "id_dato_fiscal_regimen": null,
+                    "uso_cfdi": "valor_extraído_o_null",
+                    "predeterminado": true/false
+                }
+            ]
+        }
+    ]
 }
 
 CRITERIOS DE VALIDACIÓN:
