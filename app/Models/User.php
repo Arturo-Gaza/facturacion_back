@@ -27,7 +27,7 @@ class User extends Authenticatable
         'id_telefono_principal',
         'id_departamento',
         'password',
-        'habilitado',
+        'id_estatus_usuario',
         'intentos',
         'login_activo',
         'saldo',

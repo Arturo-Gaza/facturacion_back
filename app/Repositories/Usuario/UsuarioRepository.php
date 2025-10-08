@@ -165,6 +165,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal'])
             ->where('usuario_padre', $id)
+            ->whereNot('id_estatus_usuario',3)
             ->get();
         // Crear array de DTOs
         $dtos = $users->map(function ($user) use ($id) {
