@@ -365,7 +365,7 @@ public function getByUsr($id)
     {
         try {
             $texto = (new Pdf())
-                ->setPdf($archivo) // Usar el archivo recibido, no 'book.pdf'
+                ->setPdf($archivo) 
                 ->text();
 
             $texto = $this->aiService->extractStructuredData($texto, 'cfdi_extraction');
@@ -373,7 +373,7 @@ public function getByUsr($id)
             return $texto ?: '';
         } catch (\Exception $e) {
 
-            return null;
+            throw $e;
         }
     }
 }
