@@ -411,6 +411,54 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         throw new Exception('Error inesperado', 409);
     }
+    public function desHabilitarPorAdmin($data)
+    {
+        $email_padre = $data['email_padre'];
+        $email_hijo = $data['email_hijo'];
+        $usrPadre = $this->findByEmailOrUser($email_padre);
+        $usrHijo = $this->findByEmailOrUser($email_hijo);
+
+        if (!$usrPadre) {
+            throw new Exception('Usuario padre no encontrado', 404);
+        }
+
+        if (!$usrHijo) {
+            throw new Exception('Usuario hijo no encontrado', 404);
+        }
+        if ($usrHijo->usuario_padre == $usrPadre->id) {
+            // Verificar si el código ha expirado
+
+            //  $usr = User::where('email', $email)->first();
+            $usrHijo->id_estatus_usuario = 2;
+            $usrHijo->save();
+            return "Usuario inhabilitado correctamente";
+        }
+        throw new Exception('Error inesperado', 409);
+    }
+    public function eliminarPorAdmin($data)
+    {
+                $email_padre = $data['email_padre'];
+        $email_hijo = $data['email_hijo'];
+        $usrPadre = $this->findByEmailOrUser($email_padre);
+        $usrHijo = $this->findByEmailOrUser($email_hijo);
+
+        if (!$usrPadre) {
+            throw new Exception('Usuario padre no encontrado', 404);
+        }
+
+        if (!$usrHijo) {
+            throw new Exception('Usuario hijo no encontrado', 404);
+        }
+        if ($usrHijo->usuario_padre == $usrPadre->id) {
+            // Verificar si el código ha expirado
+
+            //  $usr = User::where('email', $email)->first();
+            $usrHijo->id_estatus_usuario = 3;
+            $usrHijo->save();
+            return "Usuario inhabilitado correctamente";
+        }
+        throw new Exception('Error inesperado', 409);
+    }
 
 
     public function validarCorreoRec($data)
@@ -692,44 +740,44 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         if (!empty($facturantes)) {
             $this->asignarFacturantesEnTransaccion($user->id, $facturantes, $facturantePredeterminado, $idPadre);
         }
-        
+
 
         $user->update([
             'id_mail_principal' => $correo->id,
-            'datos_fiscales_principal'=>$facturantePredeterminado
+            'datos_fiscales_principal' => $facturantePredeterminado
         ]);
 
         return $user;
     }
 
     protected function asignarFacturantesEnTransaccion($idHijo, $facturantes, $facturantePredeterminado, $idPadre)
-{
-    // Verificar que los datos fiscales pertenecen al padre
-    $facturantesValidos = DatosFiscal::where('id_usuario', $idPadre)
-        ->whereIn('id', $facturantes)
-        ->pluck('id')
-        ->toArray();
+    {
+        // Verificar que los datos fiscales pertenecen al padre
+        $facturantesValidos = DatosFiscal::where('id_usuario', $idPadre)
+            ->whereIn('id', $facturantes)
+            ->pluck('id')
+            ->toArray();
 
-    if (count($facturantes) !== count($facturantesValidos)) {
-        throw new \Exception('Uno o más facturantes no pertenecen al usuario padre', 400);
+        if (count($facturantes) !== count($facturantesValidos)) {
+            throw new \Exception('Uno o más facturantes no pertenecen al usuario padre', 400);
+        }
+
+        // Validar facturante predeterminado
+        if ($facturantePredeterminado && !in_array($facturantePredeterminado, $facturantesValidos)) {
+            throw new \Exception('El facturante predeterminado no pertenece al usuario padre', 400);
+        }
+
+        // Asignar facturantes
+        $facturantesConPivot = [];
+        foreach ($facturantesValidos as $facturanteId) {
+            $facturantesConPivot[$facturanteId] = [
+                'predeterminado' => ($facturanteId == $facturantePredeterminado)
+            ];
+        }
+
+        $userHijo = User::find($idHijo);
+        $userHijo->facturantesPermitidos()->sync($facturantesConPivot);
     }
-
-    // Validar facturante predeterminado
-    if ($facturantePredeterminado && !in_array($facturantePredeterminado, $facturantesValidos)) {
-        throw new \Exception('El facturante predeterminado no pertenece al usuario padre', 400);
-    }
-
-    // Asignar facturantes
-    $facturantesConPivot = [];
-    foreach ($facturantesValidos as $facturanteId) {
-        $facturantesConPivot[$facturanteId] = [
-            'predeterminado' => ($facturanteId == $facturantePredeterminado)
-        ];
-    }
-
-    $userHijo = User::find($idHijo);
-    $userHijo->facturantesPermitidos()->sync($facturantesConPivot);
-}
 
 
     public function completarHijo(array $data)
@@ -774,24 +822,24 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $user;
     }
     /**
- * Actualizar facturantes de un usuario hijo existente
- */
-public function actualizarFacturantesHijo($idHijo, array $data)
-{
-    $facturantes = $data['facturantes'] ?? [];
-    $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
-    
-    $userHijo = User::where('idRol', 3)->findOrFail($idHijo);
-    $idPadre = $userHijo->usuario_padre;
+     * Actualizar facturantes de un usuario hijo existente
+     */
+    public function actualizarFacturantesHijo($idHijo, array $data)
+    {
+        $facturantes = $data['facturantes'] ?? [];
+        $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
 
-    if (empty($facturantes)) {
-        // Si no se envían facturantes, eliminar todas las asignaciones
-        $userHijo->facturantesPermitidos()->detach();
-        return;
+        $userHijo = User::where('idRol', 3)->findOrFail($idHijo);
+        $idPadre = $userHijo->usuario_padre;
+
+        if (empty($facturantes)) {
+            // Si no se envían facturantes, eliminar todas las asignaciones
+            $userHijo->facturantesPermitidos()->detach();
+            return;
+        }
+
+        //$this->asignarFacturantesAHijo($idHijo, $facturantes, $facturantePredeterminado, $idPadre);
     }
-
-    //$this->asignarFacturantesAHijo($idHijo, $facturantes, $facturantePredeterminado, $idPadre);
-}
 
     function generarPasswordAvanzado($longitudMin = 8, $longitudMax = 10)
     {

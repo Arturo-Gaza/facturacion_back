@@ -232,6 +232,35 @@ class UsuarioController extends Controller
             return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
         }
     }
+    public function eliminarPorAdmin(Request $request)
+    {
+        $data = [
+            'email_padre' => $request->email_padre,
+            'email_hijo' => $request->email_hijo
+        ];
+
+        try {
+            $getById = $this->usuario->eliminarPorAdmin($data);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario eliminado con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+
+        public function desHabilitarPorAdmin(Request $request)
+    {
+        $data = [
+            'email_padre' => $request->email_padre,
+            'email_hijo' => $request->email_hijo
+        ];
+
+        try {
+            $getById = $this->usuario->desHabilitarPorAdmin($data);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+        }
+    }
     public function eliminar(Request $request)
     {
         $data = [

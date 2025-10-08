@@ -28,6 +28,8 @@ interface UsuarioRepositoryInterface
   public function recPass($data);
   public function desHabilitar($data);
   public function eliminar($data);
+  public function desHabilitarPorAdmin($data);
+  public function eliminarPorAdmin($data);
   public function findByEmailOrUser(string $email): ?User;
   public function responseUser(string $email);
   public function aumentarIntento(int $intentos, $id);

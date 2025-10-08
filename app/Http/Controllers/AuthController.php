@@ -90,6 +90,7 @@ class AuthController extends Controller
                 DB::rollBack();
                 return ApiResponseHelper::rollback($ex);
             }
+            $userProfile = UserProfileDTO::fromUserModel($user);
             return view('google-callback', [
                 'user' => $userresponse,
                 'token' => $token,
@@ -97,6 +98,7 @@ class AuthController extends Controller
                 'name' => $nameParts[0] ?? '',
                 'primer_apellido' => $nameParts[1] ?? null,
                 'segundo_apellido' => $nameParts[2] ?? null,
+                'user'=>$userProfile
             ]);
         } catch (\Exception $e) {
             Log::error('Error Google Auth: ' . $e->getMessage());
