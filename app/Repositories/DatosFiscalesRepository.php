@@ -4,6 +4,8 @@ namespace App\Repositories;
 
 use App\DTOs\UserProfileDTO;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
+use App\Models\Catalogos\CatEstatusesSat;
+use App\Models\Catalogos\CatRegimenesFiscales;
 use App\Models\DatosFiscal;
 use App\Models\DatosFiscalRegimenFiscal;
 use App\Models\DatosFiscalRegimenUsoCfdi;
@@ -355,15 +357,22 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($request->hasFile('archivo')) {
             $archivo = $request->file('archivo');
         }
-        $textoExtraido = $this->extraerTextoDePDF($archivo,"cfdi_extraction");
+        $textoExtraido = $this->extraerTextoDePDF($archivo, "cfdi_extraction");
         return $textoExtraido;
     }
     private function extraerTextoDePDF($archivo)
     {
         try {
+            $regimenesFiscales = CatRegimenesFiscales::all()->toArray();
+            $estatusSat = CatEstatusesSat::all()->toArray();
 
+            // Prepara los parámetros
+            $parameters = [
+                'regimenesFiscales' => json_encode($regimenesFiscales, JSON_PRETTY_PRINT),
+                'estatusSat' => json_encode($estatusSat, JSON_PRETTY_PRINT)
+            ];
 
-            $texto = $this->aiService->extractStructuredDataPDF($archivo, 'cfdi_extraction');
+            $texto = $this->aiService->extractStructuredDataPDF($archivo, 'cfdi_extraction', $parameters);
 
             return $texto ?: '';
         } catch (\Exception $e) {

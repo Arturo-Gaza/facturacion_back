@@ -133,8 +133,16 @@ Del siguiente texto extraído de una Constancia de Situación Fiscal (CFDI) del 
 TEXTO:
 {\$textoOCR}
 
+CATALGOGOS
+regimenesFiscales
+{\$regimenesFiscales}
+estatusSat
+{\$estatusSat}
+
 Estructura requerida:
 {
+    "id":"null",
+    "id_usuario":"null",
     "rfc": "RFC del contribuyente",
     "curp": "CURP del contribuyente",
     "idCIF": "ID o folio de la constancia CFDI",
@@ -144,11 +152,12 @@ Estructura requerida:
     "nombre_completo": "Nombre completo del contribuyente",
     "fecha_inicio_op": "Fecha de inicio de operaciones",
     "fecha_ult_cambio_op":"Fecha cuando cambio de operacion si es que lo hizo",
-    "estatus": "Estatus en el padrón (ACTIVO, BAJA, etc.)",
+    "id_estatus_sat": "Id del estatus en el padrón basandote en el catalogo 'estatusSat'",
     "fecha_ultimo_cambio": "Fecha del último cambio de estado",
     "es_persona_moral":"Si es persona moral true si es fisica false",
     "lugar_emision":"Lugar donde fue emitida la constancia",
-    "fecha_emision":"Fecha cuando fue emitida la constancia"
+    "fecha_emision":"Fecha cuando fue emitida la constancia",
+    "nombre_comercial":"Nombre de la empresa solo en caso de ser una persona moral"
     "domicilioFiscal": {
         "codigo_postal": "Código Postal",
         "colonia": "Colonia",
@@ -160,11 +169,16 @@ Estructura requerida:
         "num_interior": "Número interior",
         "pais": "País (default: México)"
     },
-    "regimenesFiscales": ["lista de regímenes fiscales"],
+    "regimenesFiscales": ["lista de las claves de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vacio"],
     "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
-    "lugar_emision": "Lugar de emisión de la constancia"
+    "lugar_emision": "Lugar de emisión de la constancia",
+    "datos_extra":"Solo si encuentras una seccion datos extra ponla",
+    "email_facturacion_id":"null",
+    "email_facturacion_id":"null",
+    "habilitado":"true",
+    "predeterminado":"false"
 
 }
 

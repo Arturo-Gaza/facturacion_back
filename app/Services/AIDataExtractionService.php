@@ -31,16 +31,24 @@ class AIDataExtractionService
 
         return $this->fallbackExtraction($textoOCR);
     }
-    public function extractStructuredDataPDF($file, string $promptType = 'receipt_extraction')
+    public function extractStructuredDataPDF($file, string $promptType = 'receipt_extraction', array $parameters = null)
     {
 
+
         $promptTem = PromptTemplate::where('type', $promptType)->first();
+
         $prompt = str_replace('{$textoOCR}', "", $promptTem->prompt);
+        if ($parameters) {
+            foreach ($parameters as $key => $value) {
+                $placeholder = '{$' . $key . '}';
+                $prompt = str_replace($placeholder, $value, $prompt);
+            }
+        }
         // Leer y codificar en base64
         $pdfData = base64_encode(file_get_contents($file->getRealPath()));
 
         // Llamar a la API de Gemini
-        $response = Http::withHeaders([
+        $response = Http::timeout(60)->withHeaders([
             'Content-Type' => 'application/json',
         ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey, [
             'contents' => [[
