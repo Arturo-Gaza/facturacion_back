@@ -15,8 +15,6 @@ use App\Services\OCRService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Smalot\PdfParser\Parser;
-use Spatie\PdfToText\Pdf;
 
 class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 {
