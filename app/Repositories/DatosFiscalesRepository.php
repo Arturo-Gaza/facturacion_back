@@ -357,21 +357,15 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($request->hasFile('archivo')) {
             $archivo = $request->file('archivo');
         }
-        $textoExtraido = $this->extraerTextoDePDF($archivo);
+        $textoExtraido = $this->extraerTextoDePDF($archivo,"cfdi_extraction");
         return $textoExtraido;
     }
     private function extraerTextoDePDF($archivo)
     {
         try {
-            $parser = new Parser();
 
-            // Parsear el PDF
-            $pdf = $parser->parseFile($archivo);
 
-            // Extraer todo el texto
-            $texto = $pdf->getText();
-
-            $texto = $this->aiService->extractStructuredData($texto, 'cfdi_extraction');
+            $texto = $this->aiService->extractStructuredDataPDF($archivo, 'cfdi_extraction');
 
             return $texto ?: '';
         } catch (\Exception $e) {

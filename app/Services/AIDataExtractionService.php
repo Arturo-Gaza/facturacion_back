@@ -16,7 +16,7 @@ class AIDataExtractionService
     {
         $this->provider = $provider ?: config('ocr.default_ai_provider');
         $config = config("ocr.providers.{$this->provider}");
-        
+
         $this->apiKey = $config['api_key'];
         $this->apiUrl = $config['api_url'];
     }
@@ -28,8 +28,71 @@ class AIDataExtractionService
         if ($this->provider === 'gemini') {
             return $this->extractWithGemini($prompt, $textoOCR);
         }
-        
+
         return $this->fallbackExtraction($textoOCR);
+    }
+    public function extractStructuredDataPDF($file, string $promptType = 'receipt_extraction')
+    {
+
+        $promptTem = PromptTemplate::where('type', $promptType)->first();
+        $prompt = str_replace('{$textoOCR}', "", $promptTem->prompt);
+        // Leer y codificar en base64
+        $pdfData = base64_encode(file_get_contents($file->getRealPath()));
+
+        // Llamar a la API de Gemini
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey, [
+            'contents' => [[
+                'parts' => [
+                    [
+                        'inline_data' => [
+                            'mime_type' => 'application/pdf',
+                            'data' => $pdfData,
+                        ]
+                    ],
+                    [
+                        'text' => $prompt
+                    ]
+                ]
+            ]]
+        ]);
+        $json = $response->json();
+
+        $summary = $json['candidates'][0]['content']['parts'][0]['text'] ?? 'No summary found';
+        $cleanedJson = $this->extractJsonFromString($summary);
+        return $cleanedJson;
+    }
+
+    private function extractJsonFromString(string $text)
+    {
+        // Intentar encontrar JSON dentro de bloques de código ```json ... ```
+        if (preg_match('/```json\s*(.*?)\s*```/s', $text, $matches)) {
+            $jsonString = $matches[1];
+        } else {
+            // Si no hay bloque de código, usar el texto completo
+            $jsonString = $text;
+        }
+
+        // Limpiar el string
+        $jsonString = trim($jsonString);
+
+        // Intentar parsear como JSON
+        $data = json_decode($jsonString, true);
+
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $data;
+        }
+
+        // Si falla, intentar encontrar cualquier objeto JSON en el texto
+        if (preg_match('/\{.*\}/s', $jsonString, $matches)) {
+            $data = json_decode($matches[0], true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $data;
+            }
+        }
+
+        return null;
     }
 
     private function extractWithGemini(string $prompt, string $textoOCR): array
@@ -65,7 +128,7 @@ class AIDataExtractionService
     {
         // Primero intenta obtener de la base de datos
         $template = PromptTemplate::where('type', $type)->first();
-        
+
         if ($template) {
             return str_replace('{$textoOCR}', $textoOCR, $template->prompt);
         }
@@ -94,7 +157,7 @@ Estructura requerida:
 
 Si algún dato no está presente, usa null. Devuelve ÚNICAMENTE el JSON.
 PROMPT,
-            
+
             'invoice_extraction' => <<<PROMPT
 // Otro prompt para facturas...
 PROMPT
