@@ -171,7 +171,7 @@ Estructura requerida:
     },
     "regimenesFiscales": ["
     lista de los id de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vaciode la siguiente manera;"
-    "id":"id del regiment,
+    "id":id del regimen en formato numerico,
     "predeterminado":"true en caso de haber un solo regimen"
     ],
     "email": "Correo electrónico",
