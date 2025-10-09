@@ -174,6 +174,7 @@ Estructura requerida:
     "id_regimen":id del regimen en formato numerico,
     "predeterminado":"true en caso de haber un solo regimen"
     ],
+    "usosCfdi":["un array vacio"]
     "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
