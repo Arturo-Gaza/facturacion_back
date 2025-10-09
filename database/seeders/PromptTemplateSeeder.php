@@ -169,7 +169,11 @@ Estructura requerida:
         "num_interior": "Número interior",
         "pais": "País (default: México)"
     },
-    "regimenesFiscales": ["lista de las claves de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vacio"],
+    "regimenesFiscales": ["
+    lista de los id de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vaciode la siguiente manera;"
+    "id":"id del regiment,
+    "predeterminado":"true en caso de haber un solo regimen"
+    ],
     "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
