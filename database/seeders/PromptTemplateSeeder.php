@@ -137,15 +137,19 @@ Estructura requerida:
 {
     "rfc": "RFC del contribuyente",
     "curp": "CURP del contribuyente",
-    "id_cfdi": "ID o folio de la constancia CFDI",
-    "nombre": "Nombre(s) del contribuyente",
+    "idCIF": "ID o folio de la constancia CFDI",
+    "nombre_razon": "Nombre(s) del contribuyente",
     "primer_apellido": "Primer apellido del contribuyente",
     "segundo_apellido": "Segundo apellido del contribuyente",
     "nombre_completo": "Nombre completo del contribuyente",
-    "fecha_inicio_operaciones": "Fecha de inicio de operaciones",
+    "fecha_inicio_op": "Fecha de inicio de operaciones",
+    "fecha_ult_cambio_op":"Fecha cuando cambio de operacion si es que lo hizo",
     "estatus": "Estatus en el padrón (ACTIVO, BAJA, etc.)",
     "fecha_ultimo_cambio": "Fecha del último cambio de estado",
-    "direccion": {
+    "es_persona_moral":"Si es persona moral true si es fisica false",
+    "lugar_emision":"Lugar donde fue emitida la constancia",
+    "fecha_emision":"Fecha cuando fue emitida la constancia"
+    "domicilioFiscal": {
         "codigo_postal": "Código Postal",
         "colonia": "Colonia",
         "estado": "Entidad federativa",
@@ -156,7 +160,7 @@ Estructura requerida:
         "num_interior": "Número interior",
         "pais": "País (default: México)"
     },
-    "regimenes": ["lista de regímenes fiscales"],
+    "regimenesFiscales": ["lista de regímenes fiscales"],
     "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
