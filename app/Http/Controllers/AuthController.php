@@ -205,7 +205,7 @@ class AuthController extends Controller
         }
 
         // Validar si el teléfono está verificado
-        if ($user->password ) {
+        if ($user->password =null ) {
             return ApiResponseHelper::rollback(null, 'La contraseña temporal es de un solo uso y ya fue utilizada, favor de ingresar a cambiar contraseña para crear una nueva', 401);
         }
                 if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
