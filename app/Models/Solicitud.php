@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\UploadedFile;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
-
+use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use Illuminate\Support\Facades\Storage;
 
 class Solicitud extends Model
@@ -154,6 +154,9 @@ class Solicitud extends Model
     {
         return $this->regimen?->clave; // Asumiendo que la columna se llama 'clave'
     }
-
+    public function bitacora(): HasMany
+    {
+        return $this->hasMany(TabBitacoraSolicitud::class, 'id_solicitud');
+    }
 
 }

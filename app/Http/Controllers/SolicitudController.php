@@ -28,6 +28,16 @@ class SolicitudController extends Controller
         }
     }
 
+
+    public function getConsola()
+    {
+        try {
+            $all = $this->solicitudRepository->getConsola();
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
     public function procesar(int $id)
     {
         try {

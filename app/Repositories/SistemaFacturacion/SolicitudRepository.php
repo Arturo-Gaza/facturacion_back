@@ -4,17 +4,20 @@ namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Models\DatosFiscal;
+use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\Solicitud;
 use App\Models\User;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
+use Carbon\Carbon;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class SolicitudRepository implements SolicitudRepositoryInterface
 {
@@ -190,6 +193,69 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
+    }
+
+    public function getConsola()
+    {
+        $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        $solicitudesFormateadas = $solicitudes->map(function ($solicitud) {
+            $estatusCatalogo = CatEstatusSolicitud::pluck('descripcion_estatus_solicitud', 'id')->toArray();
+
+            // --- PREPARACIÓN: Definir todas las posibles claves de fecha inicializadas a null ---
+            $clavesFechaNull = [];
+            foreach ($estatusCatalogo as $descripcion) {
+                $clave = 'fecha_hora_' . Str::snake($descripcion);
+                $clavesFechaNull[$clave] = null;
+            }
+            $formatUsr = null;
+            $nombreAsignado = $solicitud->empleado->nombre ?? null;
+            if (!empty($solicitud->empleado_id)) {
+                $formatUsr = sprintf('USR%03d', $solicitud->empleado_id);
+            }
+
+            $fechasDinamicas = $clavesFechaNull;
+
+            // Agrupar los registros de bitácora por id_estatus y obtener el registro más antiguo (primera vez que entró en ese estado)
+            $bitacoraPorEstado = $solicitud->bitacora
+                ->sortBy('created_at') // Ordenar por fecha para encontrar la primera ocurrencia
+                ->groupBy('id_estatus');
+
+            foreach ($bitacoraPorEstado as $id_estatus => $registros) {
+                // Obtener el nombre del estado del catálogo
+                $nombreEstado = $estatusCatalogo[$id_estatus];
+
+                if ($nombreEstado) {
+                    // Limpiar el nombre del estado para usarlo como clave (ej: "En Proceso" -> "en_proceso")
+                    $clave = 'fecha_hora_' . Str::snake($nombreEstado);
+
+                    // Obtener la fecha del primer registro para ese estado
+                    $fecha = $registros->first()->created_at;
+
+                    $fechasDinamicas[$clave] = $this->formatearFecha($fecha);
+                }
+            }
+
+            return array_merge([
+                'ticket' => $solicitud->num_ticket ?? $solicitud->id,
+                'establecimiento' => $solicitud->establecimiento,
+                'fecha_hora_upload' => $this->formatearFecha($solicitud->updated_at),
+                'usuario' =>   $formatUsr,
+                'asignado_a' => $nombreAsignado,
+                'estado_id' => $solicitud->estado_id,
+
+            ], $fechasDinamicas);
+        });
+        // helper para formatear id de usuario como USR### (con ceros)
+        return $solicitudesFormateadas;
+    }
+    public function formatearFecha($fecha)
+    {
+        return  Carbon::parse($fecha)
+            ->locale('es')
+            ->translatedFormat('j \\d\\e F \\d\\e\\l Y');
     }
 
     public function obtenerImagen(int $id)
