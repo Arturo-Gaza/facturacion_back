@@ -630,7 +630,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $existingEmail = UserEmail::where('email', $email)->first();
         if ($existingEmail) {
             if ($existingEmail->verificado) {
-                throw new \Exception('Usuario existente ', 409);
+                throw new \Exception('Correo existente ', 409);
             } else {
                 // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
                 $userToDelete = User::where('id_mail_principal', $existingEmail->id)
@@ -651,7 +651,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $existingPhone = UserPhone::where('telefono', $tel)->first();
         if ($existingPhone) {
             if ($existingPhone->verificado) {
-                throw new \Exception('Usuario existente ', 409);
+                throw new \Exception('Telefono existente ', 409);
             } else {
                 // Eliminar usuario completo
                 $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
