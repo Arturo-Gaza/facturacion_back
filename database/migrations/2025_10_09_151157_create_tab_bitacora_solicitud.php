@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tab_bitacora_solicitud', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_solicitud')->constrained('tab_solicitudes');
+            $table->foreignId('id_solicitud')->constrained('solicitudes');
             $table->foreignId('id_usuario')->constrained('users');
             $table->foreignId('id_estatus')->constrained('cat_estatus_solicitud');
             $table->timestamps();

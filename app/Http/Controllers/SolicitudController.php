@@ -7,6 +7,7 @@ use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class SolicitudController extends Controller
 {
@@ -39,14 +40,15 @@ class SolicitudController extends Controller
     public function enviar(int $id)
     {
         try {
-            $all = $this->solicitudRepository->enviar($id);
+            $id_user = auth('sanctum')->id();
+            $all = $this->solicitudRepository->enviar($id,$id_user);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
-        public function actualizarReceptor(Request $request)
+    public function actualizarReceptor(Request $request)
     {
         try {
             $all = $this->solicitudRepository->actualizarReceptor($request);
@@ -109,14 +111,14 @@ class SolicitudController extends Controller
     {
         DB::beginTransaction();
         try {
-
-            $solicitud = $this->solicitudRepository->store($request);
+            $id_user = auth('sanctum')->id();
+            $solicitud = $this->solicitudRepository->store($request,$id_user);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
-            return ApiResponseHelper::rollback($ex,$ex->getMessage());
+            return ApiResponseHelper::rollback($ex, $ex->getMessage());
         }
     }
 

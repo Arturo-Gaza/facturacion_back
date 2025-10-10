@@ -3,6 +3,7 @@
 namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
+use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\Solicitud;
 use App\Models\User;
 use App\Services\AIDataExtractionService;
@@ -59,7 +60,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $solicitud->fresh();
     }
-    public function enviar(int $id_sol)
+    public function enviar(int $id_sol, int $id_user)
     {
         $solicitud = Solicitud::find($id_sol);
         if (!$solicitud) {
@@ -67,6 +68,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         $solicitud->update([
             'estado_id' => 2
+        ]);
+        
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_sol,
+            'id_estatus' => 2, // Asumiendo que 2 es el ID del estatus "Enviado"
+            'id_usuario' => $id_user // O el ID del usuario que realiza la acción
         ]);
         return $solicitud->fresh();
     }
@@ -127,7 +134,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return $solicitud;
     }
 
-    public function store(Request $request): Solicitud
+    public function store(Request $request,  $id_user): Solicitud
     {
         $solicitud = new Solicitud();
         $usr = User::find($request['usuario_id']);
@@ -148,7 +155,11 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->save();
         $this->procesar($solicitud->id);
         $solicitud->save();
-
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $solicitud->id,
+            'id_estatus' => 1, 
+            'id_usuario' => $id_user  
+        ]);
 
         return $solicitud;
     }

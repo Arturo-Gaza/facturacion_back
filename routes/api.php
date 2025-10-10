@@ -256,7 +256,12 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('TabArchivosObservacionesSolicitudReqInfo/register', [TabArchivosObservacionesSolicitudReqInfoController::class, 'store']);
     Route::put('TabArchivosObservacionesSolicitudReqInfo/update/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'update']);
     Route::post('TabArchivosObservacionesSolicitudReqInfo/delete', [TabArchivosObservacionesSolicitudReqInfoController::class, 'delete']);
+
+Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
+
+
 });
+
 
 
 //Facturacion
@@ -352,7 +357,6 @@ Route::get('solicitud/getByUsuario/{usuario_id}', [SolicitudController::class, '
 Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::class, 'getGeneralByUsuario']);
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
-Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
 
 Route::get('solicitud/eliminar/{id}', [SolicitudController::class, 'eliminar']);
 Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtenerImagen']);

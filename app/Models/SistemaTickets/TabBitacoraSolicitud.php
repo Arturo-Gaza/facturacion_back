@@ -3,6 +3,7 @@
 namespace App\Models\SistemaTickets;
 
 use App\Models\Catalogos\CatEstatus;
+use App\Models\Solicitud;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,7 +30,7 @@ class TabBitacoraSolicitud extends Model
     }
     public function solicitud()
     {
-        return $this->belongsTo(TabSolicitud::class, 'id_solicitud');
+        return $this->belongsTo(Solicitud::class, 'id_solicitud');
     }
 
     protected $appends = ['descripcion_estatus_solicitud', 'user'];
