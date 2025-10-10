@@ -29,7 +29,8 @@ class Solicitud extends Model
         'empleado_id',
         'estado_id',
         'id_receptor',
-        'usoCFDI'
+        'usoCFDI',
+        'id_usuario_asignacion'
     ];
     protected $appends=[
         'clave'
