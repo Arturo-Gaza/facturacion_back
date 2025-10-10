@@ -172,9 +172,9 @@ Estructura requerida:
     "regimenesFiscales": ["
     lista de los id de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vaciode la siguiente manera;"
     "id_regimen":id del regimen en formato numerico,
-    "predeterminado":"true en caso de haber un solo regimen"
-    ],
+    "predeterminado":"true en caso de haber un solo regimen",
     "usosCfdi":["un array vacio"]
+    ]
     "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
