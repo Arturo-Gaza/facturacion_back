@@ -192,6 +192,10 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 $user->update([
                     'datos_fiscales_principal' => $datosFiscales->id
                 ]);
+            } elseif ($user->datos_fiscales_principal == $datosFiscales->id) {
+                $user->update([
+                    'datos_fiscales_principal' => null
+                ]);
             }
 
             DB::commit();
