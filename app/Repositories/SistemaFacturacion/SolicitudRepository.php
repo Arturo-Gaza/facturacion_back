@@ -3,6 +3,7 @@
 namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
+use App\Models\DatosFiscal;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\Solicitud;
 use App\Models\User;
@@ -123,12 +124,16 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function actualizarReceptor(Request $request)
     {
         $idSolicitud = $request->id_solicitud;
-        $idNuevoReceptor = $request->id_receptor;
         $solicitud = Solicitud::findOrFail($idSolicitud);
-        DB::transaction(function () use ($solicitud, $idNuevoReceptor) {
+        $idNuevoReceptor = $request->id_receptor;
+        $Receptor = DatosFiscal::findOrFail($idNuevoReceptor);
+
+        DB::transaction(function () use ($solicitud, $Receptor) {
             // Actualizar el receptor
             $solicitud->update([
-                'id_receptor' => $idNuevoReceptor
+                'id_receptor' => $Receptor->id,
+                'id_regimen' => $Receptor->regimenPredeterminado->id_regimen,
+                'usoCFDI' => $Receptor->uso_cfdi_predeterminado?->usoCFDI
             ]);
         });
         return $solicitud;
@@ -147,9 +152,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
         } else {
             $solicitud->id_receptor = null; // o algún valor por defecto
-             $solicitud->id_regimen = null;
+            $solicitud->id_regimen = null;
             $solicitud->usoCFDI = null;
-      
         }
 
 
