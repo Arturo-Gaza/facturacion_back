@@ -98,7 +98,7 @@ class AuthController extends Controller
                 'name' => $nameParts[0] ?? '',
                 'primer_apellido' => $nameParts[1] ?? null,
                 'segundo_apellido' => $nameParts[2] ?? null,
-                'user'=>$userProfile
+                'user' => $userProfile
             ]);
         } catch (\Exception $e) {
             Log::error('Error Google Auth: ' . $e->getMessage());
@@ -205,7 +205,10 @@ class AuthController extends Controller
         }
 
         // Validar si el teléfono está verificado
-        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
+        if ($user->password ) {
+            return ApiResponseHelper::rollback(null, 'La contraseña temporal es de un solo uso y ya fue utilizada, favor de ingresar a cambiar contraseña para crear una nueva', 401);
+        }
+                if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
             return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
         }
 
@@ -247,7 +250,7 @@ class AuthController extends Controller
             }
 
             $user->password = null;
-
+            $user->password_temporal;
             $user->save();
         }
 
