@@ -69,7 +69,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->update([
             'estado_id' => 2
         ]);
-        
+
         TabBitacoraSolicitud::create([
             'id_solicitud' => $id_sol,
             'id_estatus' => 2, // Asumiendo que 2 es el ID del estatus "Enviado"
@@ -141,7 +141,11 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->usuario_id = $request->usuario_id;
         $solicitud->estado_id = 1; // Estado por defecto
 
-        $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
+        if (isset($usr->datosFiscalesPrincipal) && isset($usr->datosFiscalesPrincipal->id)) {
+            $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
+        } else {
+            $solicitud->id_receptor = null; // o algún valor por defecto
+        }
         $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
 
         $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
@@ -157,8 +161,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->save();
         TabBitacoraSolicitud::create([
             'id_solicitud' => $solicitud->id,
-            'id_estatus' => 1, 
-            'id_usuario' => $id_user  
+            'id_estatus' => 1,
+            'id_usuario' => $id_user
         ]);
 
         return $solicitud;
