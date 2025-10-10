@@ -139,6 +139,9 @@ regimenesFiscales
 estatusSat
 {\$estatusSat}
 
+REGLAS
+-Todas las fechas damelas en formato "YYYY-MM-DD"
+
 Estructura requerida:
 {
     "id":"null",
