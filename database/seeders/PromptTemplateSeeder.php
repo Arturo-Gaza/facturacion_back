@@ -176,6 +176,7 @@ Estructura requerida:
     lista de los id de los regímenes fiscales basandote en el catalogo regimenesFiscales, si no encuentas coincidencia o no hay mandalo vaciode la siguiente manera;"
     "id_regimen":id del regimen en formato numerico,
     "predeterminado":"true en caso de haber un solo regimen",
+    "fecha_inicio_regimen","Fecha Inicio del regimen",
     "usosCfdi":["un array vacio"]
     ]
     "email": "Correo electrónico",
