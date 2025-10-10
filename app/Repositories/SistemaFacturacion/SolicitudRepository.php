@@ -143,12 +143,15 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         if (isset($usr->datosFiscalesPrincipal) && isset($usr->datosFiscalesPrincipal->id)) {
             $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
+            $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
+            $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
         } else {
             $solicitud->id_receptor = null; // o algún valor por defecto
+             $solicitud->id_regimen = null;
+            $solicitud->usoCFDI = null;
+      
         }
-        $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
 
-        $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
 
 
         // Guardar imagen
