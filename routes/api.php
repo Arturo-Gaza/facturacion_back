@@ -259,7 +259,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('TabArchivosObservacionesSolicitudReqInfo/delete', [TabArchivosObservacionesSolicitudReqInfoController::class, 'delete']);
 
 Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
-
+Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
 
 });
 
@@ -365,7 +365,7 @@ Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
 Route::post('solicitud/register', [SolicitudController::class, 'store']);
 Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);
 Route::post('solicitud/actualizarReceptor', [SolicitudController::class, 'actualizarReceptor']);
-Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
+
 
 
 Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
