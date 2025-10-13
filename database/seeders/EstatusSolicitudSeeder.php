@@ -14,29 +14,23 @@ class EstatusSolicitudSeeder extends Seeder
     public function run(): void
     {
 
-        $estatus1 = new CatEstatusSolicitud();
-        $estatus1->descripcion_estatus_solicitud = 'Cargado';
-        $estatus1->mandarCorreo = false;
-        $estatus1->save();
+        $estatusData = [
+            ['Cargado', false],
+            ['En Revisión', false],
+            ['Asignado', true],
+            ['Visualizado', false],
+            ['Procesando', false],
+            ['Recuperado', false],
+            ['Rechazado', false],
+            ['Descargado', false],
+            ['Concluido', false]
+        ];
 
-        $estatus1 = new CatEstatusSolicitud();
-        $estatus1->descripcion_estatus_solicitud = 'En Proceso';
-        $estatus1->mandarCorreo = false;
-        $estatus1->save();
-
-        $estatus2 = new CatEstatusSolicitud();
-        $estatus2->descripcion_estatus_solicitud = 'Recuperada';
-        $estatus1->mandarCorreo = true;
-        $estatus2->save();
-
-        $estatus3 = new CatEstatusSolicitud();
-        $estatus3->descripcion_estatus_solicitud = 'Rechazado';
-        $estatus1->mandarCorreo = false;
-        $estatus3->save();
-
-        $estatus3 = new CatEstatusSolicitud();
-        $estatus3->descripcion_estatus_solicitud = 'Eliminado';
-        $estatus1->mandarCorreo = false;
-        $estatus3->save();
+        foreach ($estatusData as $data) {
+            $estatus = new CatEstatusSolicitud();
+            $estatus->descripcion_estatus_solicitud = $data[0];
+            $estatus->mandarCorreo = $data[1];
+            $estatus->save();
+        }
     }
 }
