@@ -198,7 +198,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getConsola($idUsr)
     {
         $usr = User::find($idUsr);
-        if ($usr->idRol == 4) {
+        if ($usr->idRol == 4 || $usr->idRol == 1) {
             $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
                 ->orderBy('updated_at', 'desc')
                 ->get();
