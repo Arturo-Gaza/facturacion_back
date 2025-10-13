@@ -78,6 +78,7 @@ Route::get('/test', function () {
 });
 
 Route::post('auth/login', [AuthController::class, 'login']);
+Route::post('auth/loginEmpleados', [AuthController::class, 'loginEmpleados']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
 Route::post('auth/registerHijo', [AuthController::class, 'registerHijo']);

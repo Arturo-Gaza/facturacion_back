@@ -187,14 +187,108 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $rolesUsrsFinales=[2,3];
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
         ]);
 
         $user = $this->userRepo->findByEmailOrUser($request->email);
-        $userresponse = $this->userRepo->responseUser($request->email);
-        if ($user == null) {
+        if ($user == null || !in_array($user->idRol, $rolesUsrsFinales)) {
+            return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
+        }
+
+
+        // Validar si el correo está verificado
+        if ($user->mailPrincipal && !$user->mailPrincipal->verificado && !$user->password_temporal) {
+            return ApiResponseHelper::rollback(null, 'El correo electrónico no ha sido verificado', 401);
+        }
+
+        // Validar si el teléfono está verificado
+        if ($user->password ==null ) {
+            return ApiResponseHelper::rollback(null, 'La contraseña temporal es de un solo uso y ya fue utilizada, favor de ingresar a cambiar contraseña para crear una nueva', 401);
+        }
+                if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
+            return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
+        }
+
+        if ($user->intentos >= 3) {
+            return ApiResponseHelper::rollback(null, 'Ha excedido el número de intentos de inicio de sesión, favor de contactar con el administrador ', 401);
+        } else {
+
+            if ($user->id_estatus_usuario == 2) {
+
+                return ApiResponseHelper::rollback(null, 'Usuario bloqueado', 401);
+            }
+            if ($user->id_estatus_usuario == 3) {
+
+                return ApiResponseHelper::rollback(null, 'Usuario dado de baja', 401);
+            } else {
+                if (!$user || !Hash::check($request->password, $user->password)) {
+                    // $user->intentos=$user->intentos+1;
+                    // $user->update($user->toArray(),$user->id);
+
+                    //ESTE ME PERMITE EN AUMENTA EL NUMERO DE INTENTOS INTENTOS**
+                    DB::beginTransaction();
+                    try {
+                        $this->userRepo->aumentarIntento($user->intentos, $user->id);
+
+                        DB::commit();
+                    } catch (Exception $ex) {
+                        DB::rollBack();
+                        return ApiResponseHelper::rollback($ex);
+                    }
+
+                    return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
+                }
+            }
+        }
+        if ($user->password_temporal) {
+            if ($user->mailPrincipal) {
+                $user->mailPrincipal->verificado = true;
+                $user->mailPrincipal->save();
+            }
+
+            $user->password = null;
+            $user->password_temporal=false;
+            $user->save();
+        }
+
+
+
+        $token = $this->userRepo->generateToken($user);
+
+        DB::beginTransaction();
+        try {
+            $this->userRepo->loginActive($user->id);
+
+            DB::commit();
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+
+        $userProfile = UserProfileDTO::fromUserModel($user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Inicio de sesión correcto',
+            'data' =>  $userProfile->toArray(),
+            'token' => $token,
+
+        ], 200);
+    }
+
+    public function loginEmpleados(Request $request)
+    {
+        $rolesUsrsFinales=[1,4];
+        $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $user = $this->userRepo->findByEmailOrUser($request->email);
+        if ($user == null || !in_array($user->idRol, $rolesUsrsFinales)) {
             return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
         }
 
@@ -292,9 +386,7 @@ class AuthController extends Controller
             'token' => $token,
 
         ], 200);
-        return ApiResponseHelper::sendResponse($userresponse, 'Usuario logueado correctamente', 201, $token);
     }
-
     /**
      * @OA\Get(
      *     path="/api/auth/logout",
