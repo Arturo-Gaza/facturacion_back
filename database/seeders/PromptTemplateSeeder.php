@@ -16,6 +16,10 @@ class PromptTemplateSeeder extends Seeder
                 'prompt' => <<<PROMPT
 Del siguiente texto extraído de un ticket o factura, extrae la siguiente información en formato JSON:
 
+DATOS:
+{\$id}
+{\$fecha}
+
 TEXTO:
 {\$textoOCR}
 
@@ -32,6 +36,8 @@ Estructura requerida:
 }
 
 INSTRUCCIONES ESPECÍFICAS:
+- Para num_ticket: buscar códigos que empiecen con T, F, #, o que contengan "ticket", "folio", "número", "ID", "transacción", "transaccion" o en general un codigo que parezca unico, respeta todas las letras y numeros que esten en el codigo
+- Solo si no encuentras algun codigo que cumpla con la regla anterior genera uno con el formato T\$fecha\$id (con el formato de la fecha YYYYMMDD y con el id en 4 cifras rellenando los faltantes con ceros, pero solo si no encuentras uno, es importante que solo sea la ultima opción
 - Para el monto: buscar números con decimales, usualmente el más grande es el total
 - Para la fecha: buscar patrones de fecha (dd/mm/aaaa, mm/dd/aaaa, etc.)
 - Para establecimiento: buscar nombres comerciales en las primeras líneas

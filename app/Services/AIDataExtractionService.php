@@ -21,9 +21,15 @@ class AIDataExtractionService
         $this->apiUrl = $config['api_url'];
     }
 
-    public function extractStructuredData(string $textoOCR, string $promptType = 'receipt_extraction'): array
+    public function extractStructuredData(string $textoOCR, string $promptType = 'receipt_extraction',array $parameters=null): array
     {
         $prompt = $this->getPromptTemplate($promptType, $textoOCR);
+        if ($parameters) {
+            foreach ($parameters as $key => $value) {
+                $placeholder = '{$' . $key . '}';
+                $prompt = str_replace($placeholder, $value, $prompt);
+            }
+        }
 
         if ($this->provider === 'gemini') {
             return $this->extractWithGemini($prompt, $textoOCR);
