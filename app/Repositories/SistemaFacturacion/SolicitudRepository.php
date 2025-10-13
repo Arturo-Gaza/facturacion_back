@@ -212,7 +212,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         $solicitudesFormateadas = $solicitudes->map(function ($solicitud) {
             $estatusCatalogo = CatEstatusSolicitud::pluck('descripcion_estatus_solicitud', 'id')->toArray();
-
+$nombreEstatus = $estatusCatalogo[$solicitud->estado_id] ?? 'Desconocido';
             // --- PREPARACIÓN: Definir todas las posibles claves de fecha inicializadas a null ---
             $clavesFechaNull = [];
             foreach ($estatusCatalogo as $descripcion) {
@@ -254,6 +254,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'usuario' =>   $formatUsr,
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
+                'nombre_estado'=>$nombreEstatus
 
             ], $fechasDinamicas);
         });
