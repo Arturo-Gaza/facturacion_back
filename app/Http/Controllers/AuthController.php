@@ -250,7 +250,7 @@ class AuthController extends Controller
             }
 
             $user->password = null;
-            $user->password_temporal;
+            $user->password_temporal=false;
             $user->save();
         }
 
