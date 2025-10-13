@@ -14,7 +14,7 @@ class RolSeeder extends Seeder
     public function run(): void
     {
         $Rol1 = new CatRoles();
-        $Rol1->nombre = "Administrador";
+        $Rol1->nombre = "Administrador General";
         $Rol1->habilitado = true;
         $Rol1->save();
 
@@ -25,6 +25,11 @@ class RolSeeder extends Seeder
 
         $Rol3 = new CatRoles();
         $Rol3->nombre = "Usuario Colaborador";
+        $Rol3->habilitado = true;
+        $Rol3->save();
+
+        $Rol3 = new CatRoles();
+        $Rol3->nombre = "Administrador de mesa de ayuda";
         $Rol3->habilitado = true;
         $Rol3->save();
 

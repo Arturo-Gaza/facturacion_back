@@ -281,7 +281,7 @@ class AuthController extends Controller
 
     public function loginEmpleados(Request $request)
     {
-        $rolesUsrsFinales=[1,4];
+        $rolesUsrsFinales=[1,4,5];
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
