@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\UploadedFile;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
+use Exception;
 use Illuminate\Support\Facades\Storage;
 
 class Solicitud extends Model
@@ -32,7 +33,7 @@ class Solicitud extends Model
         'usoCFDI',
         'id_usuario_asignacion'
     ];
-    protected $appends=[
+    protected $appends = [
         'clave'
     ];
 
@@ -62,14 +63,18 @@ class Solicitud extends Model
     /**
      * Manejo de la carga de archivos
      */
-    public function guardarImagen(UploadedFile $archivo, string $carpeta = 'solicitudes'): string
+    public function guardarImagen(UploadedFile $archivo,$usuarioId, string $carpeta = 'solicitudes'): string
     {
-
+        
+        if (!$usuarioId) {
+            throw new Exception('Usuario no autenticado');
+        }
+         $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId;
         // Generar hash del contenido del archivo
         $hash = md5_file($archivo->getPathname());
 
         // Verificar si ya existe un archivo con el mismo hash
-        $archivosExistentes = Storage::disk('public')->files($carpeta);
+          $archivosExistentes = Storage::disk('public')->files($carpetaUsuario);
         // Eliminar imagen anterior si existe
         if ($this->imagen_url && Storage::exists($this->imagen_url)) {
             Storage::delete($this->imagen_url);
@@ -83,7 +88,7 @@ class Solicitud extends Model
 
 
         // Guardar nueva imagen
-        $ruta = $archivo->store($carpeta, 'public');
+        $ruta = $archivo->store($carpetaUsuario, 'public');
 
         return $ruta;
     }
@@ -146,7 +151,7 @@ class Solicitud extends Model
         return $this->belongsTo(CatUsoCfdi::class, 'uso_cfdi_id');
     }
 
-        public function regimen()
+    public function regimen()
     {
         return $this->belongsTo(CatRegimenesFiscales::class, 'id_regimen', 'id_regimen');
     }
@@ -158,5 +163,4 @@ class Solicitud extends Model
     {
         return $this->hasMany(TabBitacoraSolicitud::class, 'id_solicitud');
     }
-
 }

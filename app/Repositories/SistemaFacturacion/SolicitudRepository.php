@@ -163,7 +163,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         // Guardar imagen
         if ($request->hasFile('imagen')) {
-            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'));
+            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'),$id_user);
             $solicitud->imagen_url = $rutaImagen;
         }
         $solicitud->save();
