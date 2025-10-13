@@ -32,7 +32,8 @@ class SolicitudController extends Controller
     public function getConsola()
     {
         try {
-            $all = $this->solicitudRepository->getConsola();
+            $idUsr= auth()->user()->id;
+            $all = $this->solicitudRepository->getConsola($idUsr);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);

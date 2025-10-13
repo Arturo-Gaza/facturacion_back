@@ -195,11 +195,20 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->get();
     }
 
-    public function getConsola()
+    public function getConsola($idUsr)
     {
-        $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
-            ->orderBy('updated_at', 'desc')
-            ->get();
+        $usr = User::find($idUsr);
+        if ($usr->idRol == 4) {
+            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
+                ->orderBy('updated_at', 'desc')
+                ->get();
+        }
+        if ($usr->idRol == 5) {
+            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
+                ->orderBy('updated_at', 'desc')
+                ->where('empleado_id',$idUsr)
+                ->get();
+        }
 
         $solicitudesFormateadas = $solicitudes->map(function ($solicitud) {
             $estatusCatalogo = CatEstatusSolicitud::pluck('descripcion_estatus_solicitud', 'id')->toArray();

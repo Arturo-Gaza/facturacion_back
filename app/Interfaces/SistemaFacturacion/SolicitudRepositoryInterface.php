@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 interface SolicitudRepositoryInterface
 {
     public function getAll();
-    public function getConsola();
+    public function getConsola($idUsr);
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
       public function enviar(int $id, int $id_user);
