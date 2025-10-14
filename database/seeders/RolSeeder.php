@@ -13,30 +13,40 @@ class RolSeeder extends Seeder
      */
     public function run(): void
     {
-        $Rol1 = new CatRoles();
-        $Rol1->nombre = "Administrador General";
-        $Rol1->habilitado = true;
-        $Rol1->save();
-
-        $Rol2 = new CatRoles();
-        $Rol2->nombre = "Usuario Cliente";
-        $Rol2->habilitado = true;
-        $Rol2->save();
-
-        $Rol3 = new CatRoles();
-        $Rol3->nombre = "Usuario Colaborador";
-        $Rol3->habilitado = true;
-        $Rol3->save();
-
-        $Rol3 = new CatRoles();
-        $Rol3->nombre = "Administrador de mesa de ayuda";
-        $Rol3->habilitado = true;
-        $Rol3->save();
-
-                $Rol3 = new CatRoles();
-        $Rol3->nombre = "Mesa de ayuda";
-        $Rol3->habilitado = true;
-        $Rol3->save();
-
+        $roles = [
+            [
+                'nombre' => 'Administrador General',
+                'recupera_gastos' => true,
+                'consola' => true
+            ],
+            [
+                'nombre' => 'Usuario Cliente',
+                'recupera_gastos' => true,
+                'consola' => false
+            ],
+            [
+                'nombre' => 'Usuario Colaborador',
+                'recupera_gastos' => true,
+                'consola' => false
+            ],
+            [
+                'nombre' => 'Administrador de mesa de ayuda',
+                'recupera_gastos' => false,
+                'consola' => true
+            ],
+            [
+                'nombre' => 'Mesa de ayuda',
+                'recupera_gastos' => false,
+                'consola' => true
+            ]
+        ];
+        foreach ($roles as $rolData) {
+            $rol = new CatRoles();
+            $rol->nombre = $rolData['nombre'];
+            $rol->habilitado = true;
+            $rol->recupera_gastos = $rolData['recupera_gastos'];
+            $rol->consola = $rolData['consola'];
+            $rol->save();
+        }
     }
 }

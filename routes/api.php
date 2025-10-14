@@ -258,10 +258,10 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::put('TabArchivosObservacionesSolicitudReqInfo/update/{id}', [TabArchivosObservacionesSolicitudReqInfoController::class, 'update']);
     Route::post('TabArchivosObservacionesSolicitudReqInfo/delete', [TabArchivosObservacionesSolicitudReqInfoController::class, 'delete']);
 
-Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
-Route::post('solicitud/asignar', [SolicitudController::class, 'asignar']);
-Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
-
+    Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
+    Route::post('solicitud/asignar', [SolicitudController::class, 'asignar']);
+    Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
+    Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
 });
 
 

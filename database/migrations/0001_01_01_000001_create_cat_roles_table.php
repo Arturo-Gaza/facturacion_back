@@ -16,6 +16,8 @@ return new class extends Migration
             $table->text('nombre');
             $table->timestamps();
             $table->boolean('habilitado');
+            $table->boolean('recupera_gastos');
+            $table->boolean('consola');
         });
     }
 

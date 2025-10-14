@@ -8,6 +8,7 @@ interface SolicitudRepositoryInterface
 {
     public function getAll();
     public function getConsola($idUsr);
+     public function getMesaAyuda();
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
       public function enviar(int $id, int $id_user);

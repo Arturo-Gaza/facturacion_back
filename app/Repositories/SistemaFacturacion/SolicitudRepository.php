@@ -88,7 +88,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if (!$solicitud) {
             throw new \Exception('La solicitud no existe');
         }
-        $id_estatus=$solicitud->estatestado_idus;
+        $id_estatus = $solicitud->estatestado_idus;
         // Verificar que el estatus sea 2
         if (!in_array($solicitud->estado_id, [2, 3])) {
             throw new \Exception('No se puede asignar la solicitud. El estatus no lo permite');
@@ -141,6 +141,10 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getAll()
     {
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->get();
+    }
+    public function getMesaAyuda()
+    {
+        return User::where('idRol', 4)->get();
     }
 
     public function getByID($id): ?Solicitud

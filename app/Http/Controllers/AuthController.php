@@ -6,6 +6,7 @@ use App\Classes\ApiResponseHelper;
 use App\DTOs\UserProfileDTO;
 use App\Http\Requests\StoreUsuarioRequest;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
+use App\Models\Catalogos\CatRoles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -191,7 +192,9 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $rolesUsrsFinales = [1, 2, 3];
+        $rolesUsrsFinales = CatRoles::where('recupera_gastos', true)
+            ->pluck('id')
+            ->toArray();
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
@@ -285,7 +288,9 @@ class AuthController extends Controller
 
     public function loginEmpleados(Request $request)
     {
-        $rolesUsrsFinales = [1, 4, 5];
+        $rolesUsrsFinales = CatRoles::where('consola', true)
+            ->pluck('id')
+            ->toArray();
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
@@ -431,22 +436,22 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
-    
+
         $google2fa = new Google2FA();
         $secret = $google2fa->generateSecretKey();
-        
+
         $user->two_factor_secret = $secret;
         $user->save();
-    
+
         $qrCodeUrl = $google2fa->getQRCodeUrl(
             'Recupera Gastos',
             $user->email,
             $secret
         );
-    
+
         // QuickChart - funciona perfectamente
         $qrImage = 'https://quickchart.io/qr?text=' . urlencode($qrCodeUrl) . '&size=200&margin=1';
-    
+
         return response()->json([
             'success' => true,
             'secret' => $secret,

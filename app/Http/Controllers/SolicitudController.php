@@ -39,6 +39,17 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+
+    public function getMesaAyuda()
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $all = $this->solicitudRepository->getMesaAyuda();
+            return ApiResponseHelper::sendResponse($all, 'Usuarios obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
     public function procesar(int $id)
     {
         try {
@@ -69,7 +80,7 @@ class SolicitudController extends Controller
 
             $id_solicitud = $request->input('id_solicitud');
             $id_empleado = $request->input('id_empleado');
-            $all = $this->solicitudRepository->asignar( $id_user,$id_solicitud,$id_empleado);
+            $all = $this->solicitudRepository->asignar($id_user, $id_solicitud, $id_empleado);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
