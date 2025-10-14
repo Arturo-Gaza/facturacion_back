@@ -428,7 +428,7 @@ class AuthController extends Controller
     }
 
 
-    //Controller para la doble Autenticacion
+//Controller para la doble Autenticacion
     public function enable2FA(Request $request)
     {
         $user = User::find($request->id);
@@ -437,23 +437,34 @@ class AuthController extends Controller
             return response()->json(['message' => 'Usuario no encontrado'], 404);
         }
 
-        $google2fa = new Google2FA();
+        // Si el usuario ya tiene activado el 2FA, solo devuelve un mensaje
+        if (!is_null($user->two_factor_secret)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario ya tiene habilitada la autenticación de dos factores.'
+            ], 200);
+        }
+
+        // Crear nueva clave secreta
+        $google2fa = new \PragmaRX\Google2FA\Google2FA();
         $secret = $google2fa->generateSecretKey();
 
         $user->two_factor_secret = $secret;
         $user->save();
 
+        // Generar URL y QR
         $qrCodeUrl = $google2fa->getQRCodeUrl(
             'Recupera Gastos',
             $user->email,
             $secret
         );
 
-        // QuickChart - funciona perfectamente
+        // Usamos QuickChart para generar la imagen QR
         $qrImage = 'https://quickchart.io/qr?text=' . urlencode($qrCodeUrl) . '&size=200&margin=1';
 
         return response()->json([
             'success' => true,
+            'message' => 'Se ha generado el código QR para la autenticación de dos factores.',
             'secret' => $secret,
             'qr_image' => $qrImage,
             'qr_url' => $qrCodeUrl
@@ -468,9 +479,13 @@ class AuthController extends Controller
         $valid = $google2fa->verifyKey($user->two_factor_secret, $request->code);
 
         if ($valid) {
-            return response()->json(['success' => true, 'message' => 'Código válido']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Código válido'
+            ]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Código incorrecto']);
+            return ApiResponseHelper::rollback(null, 'Código incorrecto ', 401);
         }
     }
 
