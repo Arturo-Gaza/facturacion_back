@@ -32,7 +32,7 @@ class SolicitudController extends Controller
     public function getConsola()
     {
         try {
-            $idUsr= auth()->user()->id;
+            $idUsr = auth()->user()->id;
             $all = $this->solicitudRepository->getConsola($idUsr);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
@@ -52,7 +52,24 @@ class SolicitudController extends Controller
     {
         try {
             $id_user = auth('sanctum')->id();
-            $all = $this->solicitudRepository->enviar($id,$id_user);
+            $all = $this->solicitudRepository->enviar($id, $id_user);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+    public function asignar(Request $request)
+    {
+        try {
+            $id_user = auth('sanctum')->id();
+            $request->validate([
+                'id_solicitud' => 'required|integer',
+                'id_empleado' => 'required|integer'
+            ]);
+
+            $id_solicitud = $request->input('id_solicitud');
+            $id_empleado = $request->input('id_empleado');
+            $all = $this->solicitudRepository->asignar( $id_user,$id_solicitud,$id_empleado);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
@@ -123,7 +140,7 @@ class SolicitudController extends Controller
         DB::beginTransaction();
         try {
             $id_user = auth('sanctum')->id();
-            $solicitud = $this->solicitudRepository->store($request,$id_user);
+            $solicitud = $this->solicitudRepository->store($request, $id_user);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);

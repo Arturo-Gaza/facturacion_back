@@ -11,6 +11,7 @@ interface SolicitudRepositoryInterface
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
       public function enviar(int $id, int $id_user);
+      public function asignar($id_user,$id_solicitud,$id_empleado);
       public function actualizarReceptor(Request $data);
       public function eliminar(int $id);
      public function obtenerImagen(int $id);

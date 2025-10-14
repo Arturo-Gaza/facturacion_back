@@ -81,6 +81,30 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         ]);
         return $solicitud->fresh();
     }
+    public function asignar($id_user, $id_solicitud, $id_empleado)
+    {
+        $solicitud = Solicitud::find($id_solicitud);
+
+        if (!$solicitud) {
+            throw new \Exception('La solicitud no existe');
+        }
+        $id_estatus=$solicitud->estatestado_idus;
+        // Verificar que el estatus sea 2
+        if (!in_array($solicitud->estado_id, [2, 3])) {
+            throw new \Exception('No se puede asignar la solicitud. El estatus no lo permite');
+        }
+        $solicitud->update([
+            'estado_id' => 3,
+            'id_empleado' => $id_empleado
+        ]);
+
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_solicitud,
+            'id_estatus' => 3, // Asumiendo que 2 es el ID del estatus "Enviado"
+            'id_usuario' => $id_user // O el ID del usuario que realiza la acción
+        ]);
+        return $solicitud->fresh();
+    }
     public function eliminar(int $id_sol)
     {
         $solicitud = Solicitud::find($id_sol);
@@ -163,7 +187,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         // Guardar imagen
         if ($request->hasFile('imagen')) {
-            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'),$id_user);
+            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'), $id_user);
             $solicitud->imagen_url = $rutaImagen;
         }
         $solicitud->save();
@@ -206,13 +230,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if ($usr->idRol == 5) {
             $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
                 ->orderBy('updated_at', 'desc')
-                ->where('empleado_id',$idUsr)
+                ->where('empleado_id', $idUsr)
                 ->get();
         }
 
         $solicitudesFormateadas = $solicitudes->map(function ($solicitud) {
             $estatusCatalogo = CatEstatusSolicitud::pluck('descripcion_estatus_solicitud', 'id')->toArray();
-$nombreEstatus = $estatusCatalogo[$solicitud->estado_id] ?? 'Desconocido';
+            $nombreEstatus = $estatusCatalogo[$solicitud->estado_id] ?? 'Desconocido';
             // --- PREPARACIÓN: Definir todas las posibles claves de fecha inicializadas a null ---
             $clavesFechaNull = [];
             foreach ($estatusCatalogo as $descripcion) {
@@ -254,7 +278,7 @@ $nombreEstatus = $estatusCatalogo[$solicitud->estado_id] ?? 'Desconocido';
                 'usuario' =>   $formatUsr,
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
-                'nombre_estado'=>$nombreEstatus
+                'nombre_estado' => $nombreEstatus
 
             ], $fechasDinamicas);
         });
