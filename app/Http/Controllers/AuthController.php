@@ -13,8 +13,12 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
 use App\Models\UserEmail;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use PragmaRX\Google2FA\Google2FA;
 
 /**
  * @OA\Info(
@@ -187,7 +191,7 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $rolesUsrsFinales=[1,2,3];
+        $rolesUsrsFinales = [1, 2, 3];
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
@@ -205,10 +209,10 @@ class AuthController extends Controller
         }
 
         // Validar si el teléfono está verificado
-        if ($user->password ==null ) {
+        if ($user->password == null) {
             return ApiResponseHelper::rollback(null, 'La contraseña temporal es de un solo uso y ya fue utilizada, favor de ingresar a cambiar contraseña para crear una nueva', 401);
         }
-                if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
+        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
             return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
         }
 
@@ -250,7 +254,7 @@ class AuthController extends Controller
             }
 
             $user->password = null;
-            $user->password_temporal=false;
+            $user->password_temporal = false;
             $user->save();
         }
 
@@ -281,7 +285,7 @@ class AuthController extends Controller
 
     public function loginEmpleados(Request $request)
     {
-        $rolesUsrsFinales=[1,4,5];
+        $rolesUsrsFinales = [1, 4, 5];
         $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
@@ -299,10 +303,10 @@ class AuthController extends Controller
         }
 
         // Validar si el teléfono está verificado
-        if ($user->password ==null ) {
+        if ($user->password == null) {
             return ApiResponseHelper::rollback(null, 'La contraseña temporal es de un solo uso y ya fue utilizada, favor de ingresar a cambiar contraseña para crear una nueva', 401);
         }
-                if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
+        if ($user->telefonoPrincipal && !$user->telefonoPrincipal->verificado && !$user->password_temporal) {
             return ApiResponseHelper::rollback(null, 'El número de teléfono no ha sido verificado', 401);
         }
 
@@ -344,7 +348,7 @@ class AuthController extends Controller
             }
 
             $user->password = null;
-            $user->password_temporal=false;
+            $user->password_temporal = false;
             $user->save();
         }
 
@@ -417,4 +421,54 @@ class AuthController extends Controller
         }
         return response()->json(['message' => 'Logged out'], 200);
     }
+
+
+    //Controller para la doble Autenticacion
+    public function enable2FA(Request $request)
+    {
+        $user = User::find($request->id);
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no encontrado'], 404);
+        }
+    
+        $google2fa = new Google2FA();
+        $secret = $google2fa->generateSecretKey();
+        
+        $user->two_factor_secret = $secret;
+        $user->save();
+    
+        $qrCodeUrl = $google2fa->getQRCodeUrl(
+            'Recupera Gastos',
+            $user->email,
+            $secret
+        );
+    
+        // QuickChart - funciona perfectamente
+        $qrImage = 'https://quickchart.io/qr?text=' . urlencode($qrCodeUrl) . '&size=200&margin=1';
+    
+        return response()->json([
+            'success' => true,
+            'secret' => $secret,
+            'qr_image' => $qrImage,
+            'qr_url' => $qrCodeUrl
+        ]);
+    }
+
+    public function verify2FA(Request $request)
+    {
+        $user = User::find($request->id);
+        $google2fa = new Google2FA();
+
+        $valid = $google2fa->verifyKey($user->two_factor_secret, $request->code);
+
+        if ($valid) {
+            return response()->json(['success' => true, 'message' => 'Código válido']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Código incorrecto']);
+        }
+    }
+
+    // Genera QR de Google Authenticator
+
 }

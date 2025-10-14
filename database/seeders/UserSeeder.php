@@ -22,7 +22,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // Primero crear el usuario
+
+            // ============================
+            // USUARIO ADMINISTRADOR (ROL 1)
+            // ============================
+
             $user = User::create([
                 'idRol' => 1,
                 'password' => '$2y$12$bHqfPcMYy3GLmbxM5iF54eOTGofmXHHyzuSYgP4MCS1EWUF2wNQX6',
@@ -31,52 +35,45 @@ class UserSeeder extends Seeder
                 'id_mail_principal' => null,
             ]);
 
-            // Luego crear el email con el user_id correcto
             $emailAdmin = UserEmail::create([
                 'user_id' => $user->id,
                 'email' => 'admin@hopewellsystem.com',
                 'verificado' => true,
             ]);
+
             $phoneAdmin = UserPhone::create([
                 'user_id' => $user->id,
                 'telefono' => '5551234567',
                 'verificado' => true,
             ]);
 
-            // Finalmente actualizar el usuario con el id_mail_principal
             $user->update([
                 'id_mail_principal' => $emailAdmin->id,
                 'id_telefono_principal' => $phoneAdmin->id,
             ]);
+
             $datosFiscalesPersonal = DatosFiscal::create([
                 'id_usuario' => $user->id,
                 'nombre_razon' => 'Administrador',
                 'primer_apellido' => 'Pérez',
                 'segundo_apellido' => 'Gómez',
-                'nombre_comercial' => null,
-                'es_persona_moral' => false, // Persona física
-                'rfc' => 'PEGJ800101ABC', // RFC de persona física
+                'es_persona_moral' => false,
+                'rfc' => 'PEGJ800101ABC',
                 'curp' => 'PEGJ800101HDFRMN09',
-                'idCIF' => null,
                 'lugar_emision' => 'Ciudad de México',
                 'fecha_emision' => '2020-01-01',
                 'fecha_inicio_op' => '2020-01-01',
-                'id_estatus_sat' => 1, // Asumiendo que 1 es estatus activo en SAT
-                'datos_extra' => null,
+                'id_estatus_sat' => 1,
                 'email_facturacion_id' => $emailAdmin->id,
                 'habilitado' => true,
             ]);
 
-            // 6. Crear Datos Fiscales PRINCIPALES (para facturación)
             $datosFiscalesPrincipal = DatosFiscal::create([
                 'id_usuario' => $user->id,
                 'nombre_razon' => 'HopeWell Systems S.A. de C.V.',
-                'primer_apellido' => null,
-                'segundo_apellido' => null,
                 'nombre_comercial' => 'HopeWell Systems',
-                'es_persona_moral' => true, // Persona moral
-                'rfc' => 'HWS120101ABC', // RFC de empresa
-                'curp' => null,
+                'es_persona_moral' => true,
+                'rfc' => 'HWS120101ABC',
                 'idCIF' => 'CIF123456789',
                 'lugar_emision' => 'Ciudad de México',
                 'fecha_emision' => '2012-01-01',
@@ -90,23 +87,22 @@ class UserSeeder extends Seeder
                 'habilitado' => true,
             ]);
 
-            // 7. Agregar regímenes fiscales a los datos fiscales principales
             $regimenPrincipal = DatosFiscalRegimenFiscal::create([
                 'id_dato_fiscal' => $datosFiscalesPrincipal->id,
-                'id_regimen' => 1, // General de Ley Personas Morales
+                'id_regimen' => 1,
                 'fecha_inicio_regimen' => '2012-01-01',
                 'predeterminado' => true,
             ]);
 
-            // 8. Agregar usos CFDI al régimen principal
             DatosFiscalRegimenUsoCfdi::create([
                 'id_dato_fiscal_regimen' => $regimenPrincipal->id,
-                'uso_cfdi' => 'G03', // Gastos en general
+                'uso_cfdi' => 'G03',
                 'predeterminado' => true,
             ]);
+
             Direccion::create([
                 'id_fiscal' => $datosFiscalesPrincipal->id,
-                'id_tipo_direccion' => 1, // Domicilio fiscal
+                'id_tipo_direccion' => 1,
                 'calle' => 'Av. Reforma',
                 'num_exterior' => '123',
                 'num_interior' => 'Piso 4',
@@ -117,10 +113,9 @@ class UserSeeder extends Seeder
                 'pais' => 'México'
             ]);
 
-            // Dirección personal para datos fiscales personales
             Direccion::create([
                 'id_fiscal' => $datosFiscalesPersonal->id,
-                'id_tipo_direccion' => 2, // Domicilio personal
+                'id_tipo_direccion' => 2,
                 'calle' => 'Calle Roma',
                 'num_exterior' => '456',
                 'colonia' => 'Condesa',
@@ -130,12 +125,76 @@ class UserSeeder extends Seeder
                 'pais' => 'México'
             ]);
 
-            // 12. Finalmente actualizar el usuario con las referencias a datos fiscales
             $user->update([
                 'datos_fiscales_principal' => $datosFiscalesPrincipal->id,
                 'datos_fiscales_personal' => $datosFiscalesPersonal->id,
             ]);
-            $user->save();
+
+            // ============================
+            // USUARIO EMPLEADO (ROL 4)
+            // ============================
+
+            $userEmpleado = User::create([
+                'idRol' => 4,
+                'password' => bcrypt('P@ssword1'),
+                'intentos' => 0,
+                'login_activo' => false,
+                'id_mail_principal' => null,
+            ]);
+
+            $emailEmpleado = UserEmail::create([
+                'user_id' => $userEmpleado->id,
+                'email' => 'empleado@hopewellsystem.com',
+                'verificado' => true,
+            ]);
+
+            $phoneEmpleado = UserPhone::create([
+                'user_id' => $userEmpleado->id,
+                'telefono' => '5512345678',
+                'verificado' => true,
+            ]);
+
+            $userEmpleado->update([
+                'id_mail_principal' => $emailEmpleado->id,
+                'id_telefono_principal' => $phoneEmpleado->id,
+            ]);
+
+            $datosFiscalesEmpleado = DatosFiscal::create([
+                'id_usuario' => $userEmpleado->id,
+                'nombre_razon' => 'Carlos Hernández',
+                'primer_apellido' => 'Hernández',
+                'segundo_apellido' => 'López',
+                'es_persona_moral' => false,
+                'rfc' => 'HELC900101XYZ',
+                'curp' => 'HELC900101HDFRPR08',
+                'lugar_emision' => 'Guadalajara',
+                'fecha_emision' => '2022-01-01',
+                'fecha_inicio_op' => '2022-01-01',
+                'id_estatus_sat' => 1,
+                'email_facturacion_id' => $emailEmpleado->id,
+                'habilitado' => true,
+            ]);
+
+            Direccion::create([
+                'id_fiscal' => $datosFiscalesEmpleado->id,
+                'id_tipo_direccion' => 2,
+                'calle' => 'Av. Vallarta',
+                'num_exterior' => '200',
+                'colonia' => 'Arcos Vallarta',
+                'codigo_postal' => '44130',
+                'municipio' => 'Guadalajara',
+                'estado' => 'Jalisco',
+                'pais' => 'México'
+            ]);
+
+            $userEmpleado->update([
+                'datos_fiscales_principal' => $datosFiscalesEmpleado->id,
+                'datos_fiscales_personal' => $datosFiscalesEmpleado->id,
+            ]);
+
+            $userEmpleado->save();
         });
+
+        
     }
 }

@@ -382,3 +382,8 @@ Route::post('datosFiscales/registerCompleto', [DatosFiscalesController::class, '
 Route::put('datosFiscales/updateCompleto', [DatosFiscalesController::class, 'updateCompleto']);
 Route::post('datosFiscales/registerConDomicilio', [DatosFiscalesController::class, 'storeConDomicilio']);
 Route::put('datosFiscales/update/{id}', [DatosFiscalesController::class, 'update']);
+
+//Apis para autenticacion 2Fa
+
+Route::post('autenticacion2fa/generarqr', [AuthController::class, 'enable2FA']);
+Route::post('autenticacion2fa/verifyqr', [AuthController::class, 'verify2FA']);
