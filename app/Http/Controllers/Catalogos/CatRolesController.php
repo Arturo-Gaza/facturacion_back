@@ -20,14 +20,22 @@ class CatRolesController extends Controller
         $this->_catRoles = $catRoles;
     }
 
+    public function getMesa()
+    {
+        try {
+            $getAll = $this->_catRoles->getMesa();
+            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
     public function getAll()
     {
         try {
             $getAll = $this->_catRoles->getAll();
-            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido',200);
-        }
-        catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista',500);
+            return ApiResponseHelper::sendResponse($getAll, 'Catálogo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
 
@@ -41,38 +49,40 @@ class CatRolesController extends Controller
         }
     }
 
-    public function store(StoreCatRolesRequest $cat){
+    public function store(StoreCatRolesRequest $cat)
+    {
         DB::beginTransaction();
         try {
             $data = [
-                'nombre'=> $cat->nombre,
-                'habilitado'=> $cat->habilitado
+                'nombre' => $cat->nombre,
+                'habilitado' => $cat->habilitado
             ];
             $student = $this->_catRoles->store($data);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Rol creado correctamente',201);
+            return ApiResponseHelper::sendResponse(null, 'Rol creado correctamente', 201);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
         }
     }
 
-    public function update(UpdateCatRolesRequest $cat,$id){
+    public function update(UpdateCatRolesRequest $cat, $id)
+    {
         DB::beginTransaction();
         try {
             $data = [
-                'nombre'=> $cat->nombre,
-                'habilitado'=> $cat->habilitado
+                'nombre' => $cat->nombre,
+                'habilitado' => $cat->habilitado
             ];
-            $this->_catRoles->update($data,$id);
+            $this->_catRoles->update($data, $id);
             DB::commit();
-            return ApiResponseHelper::sendResponse(null, 'Rol actualizado correctamente',200);
+            return ApiResponseHelper::sendResponse(null, 'Rol actualizado correctamente', 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex);
         }
     }
-        public function exportar(Request $data)
+    public function exportar(Request $data)
     {
         DB::beginTransaction();
         try {

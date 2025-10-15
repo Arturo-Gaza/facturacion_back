@@ -9,7 +9,7 @@ class CatRoles extends Model
 {
     use HasFactory;
     protected $table = 'cat_roles';
-    protected $fillable = ['nombre','habilitado'];
+    protected $fillable = ['nombre','habilitado','recupera_gastos'.'consola'];
 }
 
 

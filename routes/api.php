@@ -142,6 +142,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     //CATALOGOS
     //Rutas de catalogo Roles
     Route::get('catRoles/getAll', [CatRolesController::class, 'getAll']);
+     Route::get('catRoles/getMesa', [CatRolesController::class, 'getMesa']);
     Route::get('catRoles/getById/{id}', [CatRolesController::class, 'getById']);
     Route::post('catRoles/register', [CatRolesController::class, 'store']);
     Route::put('catRoles/update/{id}', [CatRolesController::class, 'update']);

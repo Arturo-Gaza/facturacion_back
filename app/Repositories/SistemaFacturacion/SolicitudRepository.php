@@ -281,6 +281,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
 
             return array_merge([
+                'id'=>$solicitud->id,
                 'ticket' => $solicitud->num_ticket ?? $solicitud->id,
                 'establecimiento' => $solicitud->establecimiento,
                 'fecha_hora_upload' => $this->formatearFecha($solicitud->updated_at),

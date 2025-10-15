@@ -13,6 +13,10 @@ class CatRolesRepository implements CatRolesRepositoryInterface
     {
         return CatRoles::all();
     }
+        public function getMesa()
+    {
+        return CatRoles::where('consola',true)->get();
+    }
 
     public function getByID($id): ?CatRoles
     {
