@@ -30,7 +30,7 @@ class StoreUsuarioRequest extends FormRequest
             'name' => ['required', 'string' ],
             'apellidoP' => ['required', 'string' ],
             'apellidoM' => ['required', 'string' ],
-            'email' => ['nullable', 'string', 'lowercase', 'email' , 'unique:' . User::class],
+            'email' => ['nullable', 'string', 'lowercase', 'email' ],
             'password' => ['required', Rules\Password::defaults()],
             'user' => ['required', 'string', 'min:6', 'max:20', Rule::unique('users', 'user')
                 ->where(function ($query) {

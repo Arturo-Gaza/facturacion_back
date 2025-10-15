@@ -6,6 +6,7 @@ use App\Mail\MandarCorreo;
 use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
 use App\Mail\MandarCorreoEliminar;
+use App\Mail\MandarCorreoEmpleado;
 use App\Mail\MandarCorreoHijo;
 use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
@@ -230,7 +231,28 @@ class EmailService
             return $usr;
         
     }
+    public function enviarCorreoEmpleado($email, $password)
+    {
+       
+            $datosMail = [
+                'email' => $email,
+                'password_temporal' => $password,
+                'url_login' => 'https://tudominio.com/login'
+            ];
 
+
+
+            try {
+                Mail::to($datosMail["email"])->send(new MandarCorreoEmpleado($datosMail));
+                return "Exito";
+            } catch (\Exception $e) {
+                // Guardar el error en log, base de datos, o notificar al admin
+                Log::error('Error al enviar correo: ' . $e->getMessage());
+                return $e->getMessage();
+            }
+            return $usr;
+        
+    }
 
     // Puedes agregar más métodos según el tipo de correo
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('nombre_razon', 250);
             $table->string('nombre_comercial', 250)->nullable();
             $table->boolean('es_persona_moral')->default(false);
-            $table->string('rfc', 13);
+            $table->string('rfc', 13)->nullable();
             $table->string('curp', 18)->nullable();
             $table->date('fecha_inicio_op')->nullable();
              $table->date('fecha_ult_cambio_op')->nullable();

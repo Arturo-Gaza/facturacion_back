@@ -165,7 +165,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal'])
             ->where('usuario_padre', $id)
-            ->whereNot('id_estatus_usuario',3)
+            ->whereNot('id_estatus_usuario', 3)
             ->get();
         // Crear array de DTOs
         $dtos = $users->map(function ($user) use ($id) {
@@ -438,7 +438,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     }
     public function eliminarPorAdmin($data)
     {
-                $email_padre = $data['email_padre'];
+        $email_padre = $data['email_padre'];
         $email_hijo = $data['email_hijo'];
         $usrPadre = $this->findByEmailOrUser($email_padre);
         $usrHijo = $this->findByEmailOrUser($email_hijo);
@@ -617,14 +617,14 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function store(array $data)
     {
-$email = $data['email'];
-        $tel   = $data['tel'];
-
+        $email = $data['email'];
+        $idRol   = $data['idRol'];
+        $datos_fiscales_personal = $data["datos_personal"];
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
         if ($existingEmail) {
             if ($existingEmail->verificado) {
-                throw new \Exception('Correo existente ', 409);
+                throw new \Exception('Usuario existente ', 409);
             } else {
                 // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
                 $userToDelete = User::where('id_mail_principal', $existingEmail->id)
@@ -641,49 +641,35 @@ $email = $data['email'];
             }
         }
 
-        // 2. Buscar teléfono existente
-        $existingPhone = UserPhone::where('telefono', $tel)->first();
-        if ($existingPhone) {
-            if ($existingPhone->verificado) {
-                throw new \Exception('Telefono existente ', 409);
-            } else {
-                // Eliminar usuario completo
-                $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
-                    ->orWhereHas('phones', function ($query) use ($tel) {
-                        $query->where('telefono', $tel);
-                    })
-                    ->first();
-
-                if ($userToDelete) {
-                    $userToDelete->delete(); // Esto eliminará todo en cascada
-                } else {
-                    $existingPhone->delete();
-                }
-            }
-        }
+        $password = $this->generarPasswordAvanzado();
+        $usr = $this->emailService->enviarCorreoEmpleado($email, $password);
 
         // 3. Crear nuevo usuario
-        $data['password'] = Hash::make($data['password']);
+        $passwordHash = Hash::make($password);
         $user = User::create([
-            'password'  => $data['password'],
-            'idRol'     => $data['idRol'] ?? 4,
+            'password'  => $passwordHash,
+            'idRol'     =>  $idRol,
+            'password_temporal' => true
         ]);
 
         // 4. Guardar correo y teléfono
         $correo = $user->emails()->create([
             'email' => $email,
         ]);
+        $datos = DatosFiscal::create([
+            'nombre_razon' => $datos_fiscales_personal['nombre_razon'],
+            'primer_apellido' => $datos_fiscales_personal['primer_apellido'],
+            'segundo_apellido' => $datos_fiscales_personal['segundo_apellido'],
+            'id_usuario'=>$user->id
 
-        $telefono = $user->phones()->create([
-            'telefono' => $tel,
         ]);
 
         $user->update([
             'id_mail_principal' => $correo->id,
-            'id_telefono_principal' => $telefono->id
+            'datos_fiscales_personal' => $datos->id
         ]);
 
-        return   $user;
+        return $user;
     }
 
     public function storeCliente(array $data)

@@ -134,10 +134,14 @@ class AuthController extends Controller
      *     )
      * )
      */
-    public function register(StoreUsuarioRequest $request)
+    public function register(Request $request)
     {
-        $user = $this->userRepo->store($request->all());
-        return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+        try {
+            $user = $this->userRepo->store($request->all());
+            return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+        } catch (Exception $e) {
+            return ApiResponseHelper::throw(null, $e->getMessage(), $e->getCode());
+        }
     }
     public function registerCliente(Request $request)
     {
@@ -428,7 +432,7 @@ class AuthController extends Controller
     }
 
 
-//Controller para la doble Autenticacion
+    //Controller para la doble Autenticacion
     public function enable2FA(Request $request)
     {
         $user = User::find($request->id);
