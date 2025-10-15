@@ -666,7 +666,7 @@ $email = $data['email'];
         $data['password'] = Hash::make($data['password']);
         $user = User::create([
             'password'  => $data['password'],
-            'idRol'     => $data['idRol'] ?? 2,
+            'idRol'     => $data['idRol'] ?? 4,
         ]);
 
         // 4. Guardar correo y teléfono

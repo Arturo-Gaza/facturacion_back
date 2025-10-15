@@ -57,6 +57,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'num_ticket' => $datosExtraidos['num_ticket'],
                 'texto_ocr' => $textoOCR,
                 'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
+                'url_facturacion' => $datosExtraidos['url_facturacion'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,
                 'texto_json' => json_encode($datosExtraidos),
             ]);

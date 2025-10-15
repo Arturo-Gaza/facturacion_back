@@ -33,6 +33,7 @@ Estructura requerida:
     "moneda": "tipo de moneda (MXN, USD, etc.)",
     "direccion": "dirección del establecimiento si está disponible",
     "telefono": "teléfono del establecimiento si está disponible"
+    "url_facturacion": "URL para facturación electrónica si está disponible, si no encuentras ninguna url regresa null, no inventes nada"
 }
 
 INSTRUCCIONES ESPECÍFICAS:
@@ -43,6 +44,7 @@ INSTRUCCIONES ESPECÍFICAS:
 - Para establecimiento: buscar nombres comerciales en las primeras líneas
 - Para productos: identificar líneas que contengan cantidades, descripciones y precios
 - Si algún dato no está presente, usar null
+- Para url_facturacion: buscar URLs que comiencen con http://, https://, www., o que estén precedidas por frases como "factura en", "obtener factura", "facturar en", "descargar factura", "validar factura", "cfdi", "sat", incluso si están mezcladas con texto y omite los que tengan texto como "encuesta"
 
 Devuelve ÚNICAMENTE el JSON válido, sin texto adicional.
 PROMPT,
