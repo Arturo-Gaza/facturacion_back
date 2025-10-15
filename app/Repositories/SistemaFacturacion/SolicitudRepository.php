@@ -245,7 +245,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $clavesFechaNull = [];
             foreach ($estatusCatalogo as $descripcion) {
                 $clave = 'fecha_hora_' . Str::snake($descripcion);
+                $claveCorta = 'fecha_hora_corta_' . Str::snake($descripcion);
                 $clavesFechaNull[$clave] = null;
+                $clavesFechaNull[$claveCorta] = null;
             }
             $formatUsr = null;
             $nombreAsignado = $solicitud->empleado->nombre ?? null;
@@ -267,11 +269,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 if ($nombreEstado) {
                     // Limpiar el nombre del estado para usarlo como clave (ej: "En Proceso" -> "en_proceso")
                     $clave = 'fecha_hora_' . Str::snake($nombreEstado);
+                    $claveCorta = 'fecha_hora_corta_' . Str::snake($nombreEstado);
 
                     // Obtener la fecha del primer registro para ese estado
                     $fecha = $registros->first()->created_at;
 
                     $fechasDinamicas[$clave] = $this->formatearFecha($fecha);
+                    $fechasDinamicas[$claveCorta] = $this->formatearFechaCorta($fecha);
                 }
             }
 
@@ -294,6 +298,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return  Carbon::parse($fecha)
             ->locale('es')
             ->translatedFormat('j \\d\\e F \\d\\e\\l Y');
+    }
+
+    public function formatearFechaCorta($fecha)
+    {
+        return Carbon::parse($fecha)->toISOString();
+        // Ejemplo: "2024-01-15T10:30:00.000000Z"
     }
 
     public function obtenerImagen(int $id)

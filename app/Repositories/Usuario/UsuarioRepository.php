@@ -617,8 +617,73 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function store(array $data)
     {
+$email = $data['email'];
+        $tel   = $data['tel'];
+
+        // 1. Buscar email existente
+        $existingEmail = UserEmail::where('email', $email)->first();
+        if ($existingEmail) {
+            if ($existingEmail->verificado) {
+                throw new \Exception('Correo existente ', 409);
+            } else {
+                // Eliminar usuario completo (esto eliminará en cascada emails y teléfonos)
+                $userToDelete = User::where('id_mail_principal', $existingEmail->id)
+                    ->orWhereHas('emails', function ($query) use ($email) {
+                        $query->where('email', $email);
+                    })
+                    ->first();
+
+                if ($userToDelete) {
+                    $userToDelete->delete(); // Esto eliminará todo en cascada
+                } else {
+                    $existingEmail->delete();
+                }
+            }
+        }
+
+        // 2. Buscar teléfono existente
+        $existingPhone = UserPhone::where('telefono', $tel)->first();
+        if ($existingPhone) {
+            if ($existingPhone->verificado) {
+                throw new \Exception('Telefono existente ', 409);
+            } else {
+                // Eliminar usuario completo
+                $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
+                    ->orWhereHas('phones', function ($query) use ($tel) {
+                        $query->where('telefono', $tel);
+                    })
+                    ->first();
+
+                if ($userToDelete) {
+                    $userToDelete->delete(); // Esto eliminará todo en cascada
+                } else {
+                    $existingPhone->delete();
+                }
+            }
+        }
+
+        // 3. Crear nuevo usuario
         $data['password'] = Hash::make($data['password']);
-        return User::create($data);
+        $user = User::create([
+            'password'  => $data['password'],
+            'idRol'     => $data['idRol'] ?? 2,
+        ]);
+
+        // 4. Guardar correo y teléfono
+        $correo = $user->emails()->create([
+            'email' => $email,
+        ]);
+
+        $telefono = $user->phones()->create([
+            'telefono' => $tel,
+        ]);
+
+        $user->update([
+            'id_mail_principal' => $correo->id,
+            'id_telefono_principal' => $telefono->id
+        ]);
+
+        return   $user;
     }
 
     public function storeCliente(array $data)
