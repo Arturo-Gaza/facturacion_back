@@ -83,7 +83,7 @@ class SolicitudController extends Controller
             $all = $this->solicitudRepository->asignar($id_user, $id_solicitud, $id_empleado);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
 

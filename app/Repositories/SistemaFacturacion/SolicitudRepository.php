@@ -96,7 +96,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         $solicitud->update([
             'estado_id' => 3,
-            'id_empleado' => $id_empleado
+            'empleado_id' => $id_empleado
         ]);
 
         TabBitacoraSolicitud::create([
