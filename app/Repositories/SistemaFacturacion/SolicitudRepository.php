@@ -288,7 +288,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
                 'nombre_estado' => $nombreEstatus,
-                'url_facturacion'=> $solicitud->url_facturacion
+                'url_facturacion'=> $solicitud->url_facturacion,
+                'monto'=> $solicitud->monto
 
             ], $fechasDinamicas);
         });
