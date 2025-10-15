@@ -131,7 +131,8 @@ class User extends Authenticatable
     // Accessors para los datos personales desde datos fiscales principales
     public function getNombreAttribute()
     {
-        return optional($this->datosFiscalesPrincipal)->nombre;
+        $nombre= optional($this->datosFiscalesPrincipal)->nombre_razon . optional($this->datosFiscalesPrincipal)->primer_apellido;
+        return $nombre;
     }
 
     public function getApellidoPaternoAttribute()
