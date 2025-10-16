@@ -45,9 +45,12 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $usuario;
     }
 
-    public function getCompras()
+    public function getMesaAyuda()
     {
-        return User::where('idRol', 3)->get();
+           return User::join('cat_roles', 'users.idRol', '=', 'cat_roles.id')
+               ->where('cat_roles.consola', true)
+               ->select('users.*')
+               ->get();
     }
 
     public function getAllUserAlmacen($idCarga)

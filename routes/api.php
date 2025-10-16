@@ -88,7 +88,7 @@ Route::post('auth/completarHijo', [AuthController::class, 'completarHijo']);
 
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
 Route::put('usuario/editarDatos/{id}', [UsuarioController::class, 'editarDatos']);
-
+Route::get('usuario/getMesaAyuda', [UsuarioController::class, 'getMesaAyuda']);
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
@@ -97,7 +97,6 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('auth/logout/{id}', [AuthController::class, 'logout']);
 
     Route::get('usuario/getAll', [UsuarioController::class, 'getAll']);
-    Route::get('usuario/getCompras', [UsuarioController::class, 'getCompras']);
     Route::put('usuario/update/{id}', [UsuarioController::class, 'update']);
     Route::put('usuario/deleteUser/{id}', [UsuarioController::class, 'deleteUser']);
     Route::get('usuario/getById/{id}', [UsuarioController::class, 'getById']);

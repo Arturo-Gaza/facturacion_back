@@ -7,7 +7,7 @@ use App\Models\User;
 interface UsuarioRepositoryInterface
 {
   public function getAll();
-  public function getCompras();
+  public function getMesaAyuda();
   public function getAllUser();
   public function getColaboradores($id);
   public function getAllUserAlmacen($idCarga);

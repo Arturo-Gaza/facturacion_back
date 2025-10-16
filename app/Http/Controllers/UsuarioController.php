@@ -23,9 +23,9 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
 
-    public function getCompras()
+    public function getMesaAyuda()
     {
-        $usuario = $this->usuario->getCompras();
+        $usuario = $this->usuario->getMesaAyuda();
         return ApiResponseHelper::sendResponse($usuario, 'Sucess', 201);
     }
 
