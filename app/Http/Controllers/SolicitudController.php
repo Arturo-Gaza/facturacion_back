@@ -182,4 +182,23 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
+        public function editarTicket(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $data = $request->only([
+                'num_ticket',
+                'establecimiento',
+                'monto',
+                'url_facturacion',
+            ]);
+            $updated = $this->solicitudRepository->editarTicket($data, $id);
+
+            DB::commit();
+            return ApiResponseHelper::sendResponse($updated, 'Solicitud actualizada correctamente', 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex);
+        }
+    }
 }

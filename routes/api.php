@@ -262,6 +262,8 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('solicitud/asignar', [SolicitudController::class, 'asignar']);
     Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
     Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
+
+    Route::put('solicitud/editarTicket/{id}', [SolicitudController::class, 'editarTicket']);
 });
 
 

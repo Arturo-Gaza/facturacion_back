@@ -20,4 +20,5 @@ interface SolicitudRepositoryInterface
     public function getByID($id): ?Solicitud;
     public function store(Request $data, $id_user): Solicitud;
     public function update(array $data, $id): ?Solicitud;
+    public function editarTicket(array $data, $id): ?Solicitud;
 }

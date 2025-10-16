@@ -215,6 +215,14 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         return $solicitud;
     }
+    public function editarTicket(array $data, $id): ?Solicitud
+    {
+        $solicitud = Solicitud::find($id);
+        if ($solicitud) {
+            $solicitud->update($data);
+        }
+        return $solicitud;
+    }
 
     public function getByUsuario(int $usuario_id)
     {
@@ -281,7 +289,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
 
             return array_merge([
-                'id'=>$solicitud->id,
+                'id' => $solicitud->id,
                 'ticket' => $solicitud->num_ticket ?? $solicitud->id,
                 'establecimiento' => $solicitud->establecimiento,
                 'fecha_hora_upload' => $this->formatearFecha($solicitud->updated_at),
@@ -289,8 +297,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
                 'nombre_estado' => $nombreEstatus,
-                'url_facturacion'=> $solicitud->url_facturacion,
-                'monto'=> $solicitud->monto
+                'url_facturacion' => $solicitud->url_facturacion,
+                'monto' => $solicitud->monto
 
             ], $fechasDinamicas);
         });
