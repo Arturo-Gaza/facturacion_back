@@ -32,7 +32,8 @@ class Solicitud extends Model
         'id_receptor',
         'usoCFDI',
         'id_usuario_asignacion',
-        'url_facturacion'
+        'url_facturacion',
+        'fecha_ticket'
     ];
     protected $appends = [
         'clave'

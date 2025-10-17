@@ -44,6 +44,7 @@ INSTRUCCIONES ESPECÍFICAS:
 - Para establecimiento: buscar nombres comerciales en las primeras líneas
 - Para productos: identificar líneas que contengan cantidades, descripciones y precios
 - Si algún dato no está presente, usar null
+- Las fechas utiliza el formato 'Y-m-d'
 - Para url_facturacion: buscar URLs que comiencen con http://, https://, www., o que estén precedidas por frases como "factura en", "obtener factura", "facturar en", "descargar factura", "validar factura", "cfdi", "sat", incluso si están mezcladas con texto y omite los que tengan texto como "encuesta"
 
 Devuelve ÚNICAMENTE el JSON válido, sin texto adicional.

@@ -60,6 +60,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'url_facturacion' => $datosExtraidos['url_facturacion'] ?? null,
                 'monto' => $datosExtraidos['monto'] ?? null,
                 'texto_json' => json_encode($datosExtraidos),
+                'fecha_ticket' => Carbon::parse($datosExtraidos['fecha'])
             ]);
         }
 
@@ -307,9 +308,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function formatearFecha($fecha)
     {
-        return  Carbon::parse($fecha)
+        return Carbon::parse($fecha)
             ->locale('es')
-            ->translatedFormat('j \\d\\e F \\d\\e\\l Y');
+            ->translatedFormat('j-M-Y H:i');
     }
 
     public function formatearFechaCorta($fecha)
