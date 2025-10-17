@@ -131,11 +131,75 @@ class UserSeeder extends Seeder
             ]);
 
             // ============================
-            // USUARIO EMPLEADO (ROL 4)
+            // ADMIN MESA DE AYUDA (ROL 4)
+            // ============================
+
+            $userMesaAyuda = User::create([
+                'idRol' => 4, // Asumiendo que el rol 5 es para mesa de ayuda
+                'password' => bcrypt('P@ssword1'),
+                'intentos' => 0,
+                'login_activo' => false, // Activo para que pueda iniciar sesión
+                'id_mail_principal' => null,
+            ]);
+
+            $emailMesaAyuda = UserEmail::create([
+                'user_id' => $userMesaAyuda->id,
+                'email' => 'mesa.ayuda@hopewellsystem.com',
+                'verificado' => true,
+            ]);
+
+            $phoneMesaAyuda = UserPhone::create([
+                'user_id' => $userMesaAyuda->id,
+                'telefono' => '5512345000',
+                'verificado' => true,
+            ]);
+
+            $userMesaAyuda->update([
+                'id_mail_principal' => $emailMesaAyuda->id,
+                'id_telefono_principal' => $phoneMesaAyuda->id,
+            ]);
+
+            $datosFiscalesMesaAyuda = DatosFiscal::create([
+                'id_usuario' => $userMesaAyuda->id,
+                'nombre_razon' => 'Ana García',
+                'primer_apellido' => 'García',
+                'segundo_apellido' => 'Martínez',
+                'es_persona_moral' => false,
+                'rfc' => 'GAMA800515XYZ',
+                'curp' => 'GAMA800515MDFRRN04',
+                'lugar_emision' => 'Ciudad de México',
+                'fecha_emision' => '2023-01-01',
+                'fecha_inicio_op' => '2023-01-01',
+                'id_estatus_sat' => 1,
+                'email_facturacion_id' => $emailMesaAyuda->id,
+                'habilitado' => true,
+            ]);
+
+            Direccion::create([
+                'id_fiscal' => $datosFiscalesMesaAyuda->id,
+                'id_tipo_direccion' => 2,
+                'calle' => 'Av. Reforma',
+                'num_exterior' => '500',
+                'colonia' => 'Juárez',
+                'codigo_postal' => '06600',
+                'municipio' => 'Cuauhtémoc',
+                'estado' => 'Ciudad de México',
+                'pais' => 'México'
+            ]);
+
+            $userMesaAyuda->update([
+                'datos_fiscales_principal' => $datosFiscalesMesaAyuda->id,
+                'datos_fiscales_personal' => $datosFiscalesMesaAyuda->id,
+            ]);
+
+            $userMesaAyuda->save();
+
+            // ============================
+            // USUARIO EMPLEADO (ROL 5)
             // ============================
 
             $userEmpleado = User::create([
-                'idRol' => 4,
+                'idRol' => 5,
                 'password' => bcrypt('P@ssword1'),
                 'intentos' => 0,
                 'login_activo' => false,
@@ -194,7 +258,5 @@ class UserSeeder extends Seeder
 
             $userEmpleado->save();
         });
-
-        
     }
 }
