@@ -145,7 +145,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function getMesaAyuda()
     {
-        return User::where('idRol', 4)->get();
+        return User::where('idRol', 5)->get();
     }
 
     public function getByID($id): ?Solicitud
