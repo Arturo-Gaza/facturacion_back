@@ -397,6 +397,7 @@ class AuthController extends Controller
             'message' => 'Inicio de sesión correcto',
             'data' =>  $userProfile->toArray(),
             'token' => $token,
+            'two_factor_required' => false,
 
         ], 200);
     }
