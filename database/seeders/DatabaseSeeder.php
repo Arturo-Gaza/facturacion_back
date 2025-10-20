@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
              PromptTemplateSeeder::class,
              UserSeeder::class,
               CatPlanesSeeder::class,
-            MontosPermitidosSeeder::class,
+            PlanesPrepagoSeeder::class,
             //CatTiposContactoSeeder::class,
             // Agrega aquí otros seeders que crees en el futuro
         ]);

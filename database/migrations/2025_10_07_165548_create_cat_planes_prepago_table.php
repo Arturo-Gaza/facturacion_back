@@ -8,9 +8,13 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('cat_montos_permitidos', function (Blueprint $table) {
+        Schema::create('cat_planes_prepago', function (Blueprint $table) {
             $table->id();
-            $table->decimal('monto', 10, 2)->unique();
+            $table->string('nombre')->unique();
+            $table->string('descripcion')->unique();
+             $table->integer('creditos');
+             
+            $table->decimal('monto', 10, 2);
             $table->boolean('activo')->default(true);
             $table->timestamps();
         });

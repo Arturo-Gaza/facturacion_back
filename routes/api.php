@@ -14,6 +14,7 @@ use App\Http\Controllers\Catalogos\CatTipoContactoController;
 use App\Http\Controllers\Catalogos\CatTipoDireccionController;
 use App\Http\Controllers\Catalogos\CatUbicaionesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
+use App\Http\Controllers\CatPlanesPrepagoController;
 use App\Http\Controllers\SistemaFacturacion\TabClientesController;
 use App\Http\Controllers\SistemaFacturacion\TabClientesFiscalesController;
 use App\Http\Controllers\SistemaFacturacion\TabContactoController;
@@ -389,3 +390,10 @@ Route::put('datosFiscales/update/{id}', [DatosFiscalesController::class, 'update
 
 Route::post('autenticacion2fa/generarqr', [AuthController::class, 'enable2FA']);
 Route::post('autenticacion2fa/verifyqr', [AuthController::class, 'verify2FA']);
+
+Route::get('catPlanesPrepago/getAll', [CatPlanesPrepagoController::class, 'getAll']);
+Route::get('catPlanesPrepago/getById/{id}', [CatPlanesPrepagoController::class, 'getById']);
+Route::post('catPlanesPrepago/register', [CatPlanesPrepagoController::class, 'store']);
+Route::put('catPlanesPrepago/update/{id}', [CatPlanesPrepagoController::class, 'update']);
+Route::put('catPlanesPrepago/activate/{id}', [CatPlanesPrepagoController::class, 'activate']);
+Route::put('catPlanesPrepago/deactivate/{id}', [CatPlanesPrepagoController::class, 'deactivate']);
