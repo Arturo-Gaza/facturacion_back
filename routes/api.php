@@ -26,7 +26,6 @@ use App\Http\Controllers\SistemaTickets\CatMonedaController;
 use App\Http\Controllers\SistemaTickets\CatTiposController;
 use App\Http\Controllers\SistemaTickets\TabArchivosObservacionesDetalleController;
 use App\Http\Controllers\SistemaTickets\TabArchivosObservacionesSolicitudReqInfoController;
-use App\Http\Controllers\SistemaTickets\TabcotizacionesDetalleController;
 use App\Http\Controllers\SistemaTickets\TabCotizacionesSolicitudesController;
 use App\Http\Controllers\SistemaTickets\TabObesrvacionesDetalleController;
 use App\Http\Controllers\SistemaTickets\TabObservacionesSolicitudController;
@@ -44,6 +43,7 @@ use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DatosFiscalesController;
+use App\Http\Controllers\StripeController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -222,14 +222,6 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('tabobservacionesSolicitudDetalle/register', [TabObesrvacionesDetalleController::class, 'store']);
     Route::put('tabobservacionesSolicitudDetalle/update/{id}', [TabObesrvacionesDetalleController::class, 'update']);
 
-    //Ruta para tab cotizaciones  solicitud detalle
-    Route::get('tabCotizacionesSolicitudDetalle/getAll', [TabcotizacionesDetalleController::class, 'getAll']);
-    Route::get('tabCotizacionesSolicitudDetalle/getById/{id}', [TabcotizacionesDetalleController::class, 'getById']);
-    Route::get('tabCotizacionesSolicitudDetalle/getByIdDetalle/{id}', [TabcotizacionesDetalleController::class, 'getByIdDetalle']);
-    Route::post('tabCotizacionesSolicitudDetalle/register', [TabcotizacionesDetalleController::class, 'store']);
-    Route::put('tabCotizacionesSolicitudDetalle/update', [TabcotizacionesDetalleController::class, 'update']);
-    Route::post('tabCotizacionesSolicitudDetalle/delete', [TabcotizacionesDetalleController::class, 'delete']);
-
     //Ruta para tab cotizaciones  solicitud
     Route::get('tabCotizacionesSolicitudes/getAll', [TabCotizacionesSolicitudesController::class, 'getAll']);
     Route::get('tabCotizacionesSolicitudes/getById/{id}', [TabCotizacionesSolicitudesController::class, 'getById']);
@@ -397,3 +389,9 @@ Route::post('catPlanesPrepago/register', [CatPlanesPrepagoController::class, 'st
 Route::put('catPlanesPrepago/update/{id}', [CatPlanesPrepagoController::class, 'update']);
 Route::put('catPlanesPrepago/activate/{id}', [CatPlanesPrepagoController::class, 'activate']);
 Route::put('catPlanesPrepago/deactivate/{id}', [CatPlanesPrepagoController::class, 'deactivate']);
+
+
+Route::post('/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+
+
+
