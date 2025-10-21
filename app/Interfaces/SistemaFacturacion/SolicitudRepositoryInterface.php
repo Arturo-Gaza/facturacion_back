@@ -11,6 +11,7 @@ interface SolicitudRepositoryInterface
      public function getMesaAyuda();
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
+      public function actualizarEstatus($id_solicitud,$id_estatus,$id_usuario);
       public function enviar(int $id, int $id_user);
       public function asignar($id_user,$id_solicitud,$id_empleado);
       public function actualizarReceptor(Request $data);

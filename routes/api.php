@@ -253,6 +253,8 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::get('solicitud/enviar/{id}', [SolicitudController::class, 'enviar']);
     Route::post('solicitud/asignar', [SolicitudController::class, 'asignar']);
+
+    Route::post('solicitud/actualizarEstatus', [SolicitudController::class, 'actualizarEstatus']);
     Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
     Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
 

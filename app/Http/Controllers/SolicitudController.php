@@ -59,6 +59,24 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
+
+    public function actualizarEstatus(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_solicitud' => 'required|integer',
+                'id_estatus' => 'required|integer'
+            ]);
+
+            $id_solicitud = $request->input('id_solicitud');
+            $id_estatus = $request->input('id_estatus');
+             $id_usuario = auth()->user()->id;
+            $all = $this->solicitudRepository->actualizarEstatus($id_solicitud,$id_estatus,$id_usuario);
+            return ApiResponseHelper::sendResponse($all, 'Estatus actualizado correctamente', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Error al actualizar estatus: ' . $ex->getMessage(), 500);
+        }
+    }
     public function enviar(int $id)
     {
         try {
@@ -182,7 +200,7 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
-        public function editarTicket(Request $request, $id)
+    public function editarTicket(Request $request, $id)
     {
         DB::beginTransaction();
         try {

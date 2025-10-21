@@ -208,6 +208,19 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return $solicitud;
     }
 
+    public function actualizarEstatus($id_solicitud, $id_estatus, $id_usuario)
+    {
+
+        $solicitud = new Solicitud();
+        $solicitud = Solicitud::find($id_solicitud);
+        $solicitud->estado_id = $id_estatus; // Estado por defecto
+          $solicitud->save();
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_solicitud,
+            'id_estatus' => $id_estatus,
+            'id_usuario' => $id_usuario
+        ]);
+    }
     public function update(array $data, $id): ?Solicitud
     {
         $solicitud = Solicitud::find($id);
@@ -293,14 +306,15 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'id' => $solicitud->id,
                 'ticket' => $solicitud->num_ticket ?? $solicitud->id,
                 'establecimiento' => $solicitud->establecimiento,
-                'fecha_hora_upload' => $this->formatearFecha($solicitud->updated_at),
+                'fecha_ticket' => $solicitud->fecha_ticket,
                 'usuario' =>   $formatUsr,
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
                 'nombre_estado' => $nombreEstatus,
                 'url_facturacion' => $solicitud->url_facturacion,
                 'monto' => $solicitud->monto,
-                'idreceptor' => $solicitud->id_receptor
+                'idreceptor' => $solicitud->id_receptor,
+
 
             ], $fechasDinamicas);
         });
