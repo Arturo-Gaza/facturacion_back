@@ -18,7 +18,6 @@ class ApiResponseHelper
 
     public static function throw($e, $message = 'Ocurrio un error durante el proceso',$status=500)
     {
-        Log::info($e);
         throw new HttpResponseException(response()->json([
             'message' => $message,
             'errors' => [$message],

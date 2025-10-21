@@ -391,7 +391,9 @@ Route::put('catPlanesPrepago/activate/{id}', [CatPlanesPrepagoController::class,
 Route::put('catPlanesPrepago/deactivate/{id}', [CatPlanesPrepagoController::class, 'deactivate']);
 
 
-Route::post('/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+Route::post('stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+
+Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
 
 
 
