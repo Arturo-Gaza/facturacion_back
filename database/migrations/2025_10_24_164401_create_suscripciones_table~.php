@@ -13,11 +13,12 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('id_plan')->constrained('cat_planes')->onDelete('cascade');
             $table->date('fecha_inicio');
-            $table->date('fecha_vencimiento');
-            $table->enum('estado', ['activa', 'vencida', 'cancelada'])->default('activa');
+            $table->date('fecha_vencimiento')->nullable();
+            $table->enum('estado', ['pendiente','activa', 'vencida', 'cancelada'])->default('pendiente');
             $table->integer('perfiles_utilizados')->default(0);
             $table->integer('facturas_realizadas')->default(0);
-
+$table->string('stripe_session_id')->nullable()->unique();
+            $table->string('stripe_payment_intent_id')->nullable()->unique();
             $table->timestamps();
         });
     }

@@ -45,7 +45,9 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DatosFiscalesController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\SuscripcionController;
 use App\Http\Middleware\AcceptJsonMiddleware;
+use App\Models\Suscripciones;
 use Illuminate\Support\Facades\Route;
 
 // Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
@@ -260,6 +262,10 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
     Route::get('solicitud/getDashboard', [SolicitudController::class, 'getDashboard']);
     Route::put('solicitud/editarTicket/{id}', [SolicitudController::class, 'editarTicket']);
+
+    Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
+        Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
+
 });
 
 

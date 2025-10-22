@@ -14,6 +14,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Básico Personal',
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
+            'precio'=>0.00,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Sin fecha de fin (vigente indefinidamente)
         ]);
@@ -23,6 +24,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Prepago',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'prepago',
+            'precio'=>0.00,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Vigencia de 1 año
         ]);
@@ -32,6 +34,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Básico Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
+            'precio'=>99.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 1 año de vigencia
         ]);
@@ -40,6 +43,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Avanzado Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
+            'precio'=>149.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
@@ -48,6 +52,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Premium Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
+            'precio'=>199.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 2 años de vigencia
         ]);

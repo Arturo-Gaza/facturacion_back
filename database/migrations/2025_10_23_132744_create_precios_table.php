@@ -19,8 +19,8 @@ return new class extends Migration
                   ->constrained('cat_planes') // Explícitamente apuntando a planes
                   ->onDelete('cascade');
             $table->decimal('precio', 10, 2);
-            $table->integer('desde_factura');
-            $table->integer('hasta_factura');
+            $table->integer('desde_factura')->nullable();
+            $table->integer('hasta_factura')->nullable();
             $table->date('vigencia_desde');
             $table->date('vigencia_hasta')->nullable()->comment('NULL indica precio actual');
             $table->timestamps();

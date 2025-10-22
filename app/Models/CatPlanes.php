@@ -16,7 +16,8 @@ class CatPlanes extends Model
         'tipo_plan',
         'tipo_pago',
         'vigencia_inicio',
-        'vigencia_fin'
+        'vigencia_fin',
+        'precio'
     ];
 
     protected $casts = [

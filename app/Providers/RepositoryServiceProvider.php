@@ -92,9 +92,11 @@ use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Repositories\SistemaFacturacion\SolicitudRepository;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\CatPlanesRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\SuscripcionesRepositoryInterface;
 use App\Repositories\CatMontosPrepagoRepository;
 use App\Repositories\SistemaFacturacion\CatPlanesRepository;
 use App\Repositories\DatosFiscalesRepository;
+use App\Repositories\SistemaFacturacion\SuscripcionesRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -145,7 +147,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(FacturaRepositoryInterface::class, FacturaRepository::class);
         $this->app->bind(MovimientoSaldoRepositoryInterface::class, MovimientoSaldoRepository::class);
         $this->app->bind(PrecioRepositoryInterface::class, PrecioRepository::class);
-        $this->app->bind(ServicioRepositoryInterface::class, ServicioRepository::class);
+        $this->app->bind(SuscripcionesRepositoryInterface::class, SuscripcionesRepository::class);
 
         $this->app->bind(DatosFiscalesRepositoryInterface::class, DatosFiscalesRepository::class);
         $this->app->bind(SolicitudRepositoryInterface::class, SolicitudRepository::class);
