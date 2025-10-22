@@ -148,50 +148,53 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         return User::whereIn('idRol', [4, 5])->get();
     }
-    public function getDashboard($id)
-    {
-        $fechaInicio = now()->subDays(30);
+    public function getDashboard($idUsr)
+{
+    $usr = User::find($idUsr);
+    $fechaInicio = now()->subDays(30);
 
-        // Obtener todos los estatus del catálogo con sus nombres
-        $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
+    // Obtener todos los estatus del catálogo
+    $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
 
-        // Construir la consulta dinámica
-        $selects = ['COUNT(*) as total_tickets'];
-
-        foreach ($estatus as $estatusItem) {
-            $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
-        }
-
-        $estadisticas = \App\Models\Solicitud::where('created_at', '>=', $fechaInicio)
-            ->selectRaw(implode(', ', $selects))
-            ->first();
-
-        $totalTickets = $estadisticas->total_tickets ?? 0;
-
-        // Calcular métricas para cada estatus
-        $estadisticasPorEstatus = [];
-        foreach ($estatus as $estatusItem) {
-            $campo = "tickets_estatus_{$estatusItem->id}";
-            $cantidad = $estadisticas->$campo ?? 0;
-
-            $estadisticasPorEstatus[] = [
-                'estatus_id' => $estatusItem->id,
-                'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
-                'total_tickets' => (int)$cantidad,
-                'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
-            ];
-        }
-
-        $metricas_30dias = [
-            'total_tickets' => $totalTickets,
-            'estadisticas_por_estatus' => $estadisticasPorEstatus,
-            'periodo' => 'ultimos_30_dias',
-            'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
-            'fecha_fin' => now()->format('Y-m-d H:i:s')
-        ];
-
-        return $metricas_30dias;
+    // Construir consulta base con filtros por rol
+    $query = Solicitud::where('created_at', '>=', $fechaInicio);
+    
+    // Aplicar filtro por rol
+    if ($usr->idRol != 1 && $usr->idRol != 4) {
+        $query->where('empleado_id', $idUsr);
     }
+
+    // Construir selects dinámicos
+    $selects = ['COUNT(*) as total_tickets'];
+    foreach ($estatus as $estatusItem) {
+        $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
+    }
+
+    $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
+    $totalTickets = $estadisticas->total_tickets ?? 0;
+
+    // Calcular métricas
+    $estadisticasPorEstatus = [];
+    foreach ($estatus as $estatusItem) {
+        $campo = "tickets_estatus_{$estatusItem->id}";
+        $cantidad = $estadisticas->$campo ?? 0;
+
+        $estadisticasPorEstatus[] = [
+            'estatus_id' => $estatusItem->id,
+            'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
+            'total_tickets' => (int)$cantidad,
+            'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+        ];
+    }
+
+    return [
+        'total_tickets' => $totalTickets,
+        'estadisticas_por_estatus' => $estadisticasPorEstatus,
+        'periodo' => 'ultimos_30_dias',
+        'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
+        'fecha_fin' => now()->format('Y-m-d H:i:s')
+    ];
+}
 
     public function getByID($id): ?Solicitud
     {
