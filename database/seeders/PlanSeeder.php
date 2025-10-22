@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Plan;
+use App\Models\CatPlanes;
 use Illuminate\Database\Seeder;
 
 class PlanSeeder extends Seeder
@@ -10,7 +10,7 @@ class PlanSeeder extends Seeder
     public function run(): void
     {
         // Plan Básico Personal Prepago
-        Plan::create([
+        CatPlanes::create([
             'nombre_plan' => 'Plan Básico Personal',
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
@@ -19,7 +19,7 @@ class PlanSeeder extends Seeder
         ]);
 
         // Plan Empresarial Prepago
-        Plan::create([
+        CatPlanes::create([
             'nombre_plan' => 'Plan Empresarial Prepago',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'prepago',
@@ -28,7 +28,7 @@ class PlanSeeder extends Seeder
         ]);
 
         // 3 Planes Empresariales Mensuales (Postpago)
-        Plan::create([
+        CatPlanes::create([
             'nombre_plan' => 'Plan Empresarial Básico Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
@@ -36,7 +36,7 @@ class PlanSeeder extends Seeder
             'vigencia_fin' => null, // 1 año de vigencia
         ]);
 
-        Plan::create([
+        CatPlanes::create([
             'nombre_plan' => 'Plan Empresarial Avanzado Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
@@ -44,7 +44,7 @@ class PlanSeeder extends Seeder
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
 
-        Plan::create([
+        CatPlanes::create([
             'nombre_plan' => 'Plan Empresarial Premium Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
