@@ -50,6 +50,18 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+
+        public function getDashboard()
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $all = $this->solicitudRepository->getDashboard($idUsr);
+            return ApiResponseHelper::sendResponse($all, 'Usuarios obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+
     public function procesar(int $id)
     {
         try {

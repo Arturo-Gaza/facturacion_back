@@ -9,6 +9,7 @@ interface SolicitudRepositoryInterface
     public function getAll();
     public function getConsola($idUsr);
      public function getMesaAyuda();
+     public function getDashboard($id);
      public function getByUsuario(int $usuario_id);
      public function procesar(int $id);
       public function actualizarEstatus($id_solicitud,$id_estatus,$id_usuario);

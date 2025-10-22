@@ -142,7 +142,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     //CATALOGOS
     //Rutas de catalogo Roles
     Route::get('catRoles/getAll', [CatRolesController::class, 'getAll']);
-     Route::get('catRoles/getMesa', [CatRolesController::class, 'getMesa']);
+    Route::get('catRoles/getMesa', [CatRolesController::class, 'getMesa']);
     Route::get('catRoles/getById/{id}', [CatRolesController::class, 'getById']);
     Route::post('catRoles/register', [CatRolesController::class, 'store']);
     Route::put('catRoles/update/{id}', [CatRolesController::class, 'update']);
@@ -257,7 +257,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('solicitud/actualizarEstatus', [SolicitudController::class, 'actualizarEstatus']);
     Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
     Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
-
+    Route::get('solicitud/getDashboard', [SolicitudController::class, 'getDashboard']);
     Route::put('solicitud/editarTicket/{id}', [SolicitudController::class, 'editarTicket']);
 });
 
@@ -396,6 +396,3 @@ Route::put('catPlanesPrepago/deactivate/{id}', [CatPlanesPrepagoController::clas
 Route::post('stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
 
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
-
-
-
