@@ -9,12 +9,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
     public function up(): void
     {
         Schema::create('precios', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('servicio_id')->constrained()->onDelete('cascade');
+            $table->string('nombre_precio');
+            $table->foreignId('id_plan')
+                  ->constrained('cat_planes') // Explícitamente apuntando a planes
+                  ->onDelete('cascade');
             $table->decimal('precio', 10, 2);
+            $table->integer('desde_factura');
+            $table->integer('hasta_factura');
             $table->date('vigencia_desde');
             $table->date('vigencia_hasta')->nullable()->comment('NULL indica precio actual');
             $table->timestamps();

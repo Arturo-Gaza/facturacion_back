@@ -22,7 +22,7 @@ use App\Interfaces\Catalogos\CatRegimenesFiscaslesRepositoryInterface;
 use App\Interfaces\Catalogos\CatTipoDireccionRepositoryInterface;
 use App\Interfaces\Catalogos\CatTiposContactosRepositoryInterface;
 use App\Interfaces\Catalogos\CatUbicacionesRepositoryInterface;
-use App\Interfaces\CatPlanesPrepagoRepositoryInterface;
+use App\Interfaces\CatMontosPrepagoRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\TabClientesFiscalesRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\TabClientesRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\TabContactosRepositoryInterface;
@@ -91,7 +91,9 @@ use App\Repositories\SistemaFacturacion\ServicioRepository;
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Repositories\SistemaFacturacion\SolicitudRepository;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
-use App\Repositories\CatPlanesPrepagoRepository;
+use App\Interfaces\SistemaFacturacion\CatPlanesRepositoryInterface;
+use App\Repositories\CatMontosPrepagoRepository;
+use App\Repositories\SistemaFacturacion\CatPlanesRepository;
 use App\Repositories\DatosFiscalesRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -147,7 +149,8 @@ class RepositoryServiceProvider extends ServiceProvider
 
         $this->app->bind(DatosFiscalesRepositoryInterface::class, DatosFiscalesRepository::class);
         $this->app->bind(SolicitudRepositoryInterface::class, SolicitudRepository::class);
-        $this->app->bind( CatPlanesPrepagoRepositoryInterface::class, CatPlanesPrepagoRepository::class);
+        $this->app->bind( CatMontosPrepagoRepositoryInterface::class, CatMontosPrepagoRepository::class);
+    $this->app->bind(CatPlanesRepositoryInterface::class, CatPlanesRepository::class);
     }
 
     /**

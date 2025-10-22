@@ -15,9 +15,8 @@ class MovimientoSaldo extends Model
     protected $fillable = [
         'usuario_id',
         'monto',
-        'tipo_movimiento_id',
+        'id_estatus_movimiento',
         'nuevo_monto',
-        'factura_id',
         'descripcion'
     ];
 
@@ -36,8 +35,5 @@ class MovimientoSaldo extends Model
         return $this->belongsTo(EstatusMovimiento::class, 'tipo_movimiento_id');
     }
 
-    public function factura(): BelongsTo
-    {
-        return $this->belongsTo(Factura::class);
-    }
+   
 }

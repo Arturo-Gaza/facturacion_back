@@ -14,7 +14,7 @@ class Precio extends Model
     protected $table = 'precios';
 
     protected $fillable = [
-        'servicio_id',
+        'id_plan',
         'precio',
         'vigencia_desde',
         'vigencia_hasta'
@@ -26,8 +26,8 @@ class Precio extends Model
         'vigencia_hasta' => 'date',
     ];
 
-    public function servicio(): BelongsTo
+    public function plan(): BelongsTo
     {
-        return $this->belongsTo(Servicio::class);
+        return $this->belongsTo(Plan::class);
     }
 }

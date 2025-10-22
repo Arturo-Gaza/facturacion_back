@@ -14,7 +14,8 @@ use App\Http\Controllers\Catalogos\CatTipoContactoController;
 use App\Http\Controllers\Catalogos\CatTipoDireccionController;
 use App\Http\Controllers\Catalogos\CatUbicaionesController;
 use App\Http\Controllers\Catalogos\CatUnidadMedidasController;
-use App\Http\Controllers\CatPlanesPrepagoController;
+use App\Http\Controllers\CatMontosPrepagoController;
+use App\Http\Controllers\CatPlanesController;
 use App\Http\Controllers\SistemaFacturacion\TabClientesController;
 use App\Http\Controllers\SistemaFacturacion\TabClientesFiscalesController;
 use App\Http\Controllers\SistemaFacturacion\TabContactoController;
@@ -385,12 +386,18 @@ Route::put('datosFiscales/update/{id}', [DatosFiscalesController::class, 'update
 Route::post('autenticacion2fa/generarqr', [AuthController::class, 'enable2FA']);
 Route::post('autenticacion2fa/verifyqr', [AuthController::class, 'verify2FA']);
 
-Route::get('catPlanesPrepago/getAll', [CatPlanesPrepagoController::class, 'getAll']);
-Route::get('catPlanesPrepago/getById/{id}', [CatPlanesPrepagoController::class, 'getById']);
-Route::post('catPlanesPrepago/register', [CatPlanesPrepagoController::class, 'store']);
-Route::put('catPlanesPrepago/update/{id}', [CatPlanesPrepagoController::class, 'update']);
-Route::put('catPlanesPrepago/activate/{id}', [CatPlanesPrepagoController::class, 'activate']);
-Route::put('catPlanesPrepago/deactivate/{id}', [CatPlanesPrepagoController::class, 'deactivate']);
+Route::get('catMontosPrepago/getAll', [CatMontosPrepagoController::class, 'getAll']);
+Route::get('catMontosPrepago/getById/{id}', [CatMontosPrepagoController::class, 'getById']);
+Route::post('catMontosPrepago/register', [CatMontosPrepagoController::class, 'store']);
+Route::put('catMontosPrepago/update/{id}', [CatMontosPrepagoController::class, 'update']);
+Route::put('catMontosPrepago/activate/{id}', [CatMontosPrepagoController::class, 'activate']);
+Route::put('catMontosPrepago/deactivate/{id}', [CatMontosPrepagoController::class, 'deactivate']);
+
+Route::get('catPlanes/getAll', [CatPlanesController::class, 'getAll']);
+Route::get('catPlanes/getAllVigentes', [CatPlanesController::class, 'getAllVigentes']);
+Route::get('catPlanes/getById/{id}', [CatPlanesController::class, 'getById']);
+Route::post('catPlanes/register', [CatPlanesController::class, 'store']);
+Route::put('catPlanes/update/{id}', [CatPlanesController::class, 'update']);
 
 
 Route::post('stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);

@@ -42,7 +42,6 @@ class PrecioController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->only([
-                'servicio_id',
                 'precio',
                 'vigencia_desde',
                 'vigencia_hasta'
@@ -62,7 +61,6 @@ class PrecioController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->only([
-                'servicio_id',
                 'precio',
                 'vigencia_desde',
                 'vigencia_hasta'

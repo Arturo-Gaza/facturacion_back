@@ -8,11 +8,6 @@ return new class extends Migration
 {
     public function up()
     {
-        // Primero eliminar la foreign key existente
-        Schema::table('movimientos_saldo', function (Blueprint $table) {
-            $table->dropForeign(['tipo_movimiento_id']);
-            $table->dropColumn('tipo_movimiento_id');
-        });
 
         // Agregar el nuevo campo ENUM
         Schema::table('movimientos_saldo', function (Blueprint $table) {
@@ -32,9 +27,6 @@ return new class extends Migration
             $table->renameColumn('saldo_resultante', 'nuevo_monto');
         });
 
-        // Restaurar la relación anterior (necesitarías recrear la tabla estatus_movimiento)
-        Schema::table('movimientos_saldo', function (Blueprint $table) {
-            $table->foreignId('tipo_movimiento_id')->constrained('estatus_movimiento');
-        });
+
     }
 };

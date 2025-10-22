@@ -2,30 +2,30 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\CatPlanesPrepagoRepositoryInterface;
-use App\Models\CatPlanesPrepago;
+use App\Interfaces\CatMontosPrepagoRepositoryInterface;
+use App\Models\CatMontosPrepago;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
-class CatPlanesPrepagoRepository implements CatPlanesPrepagoRepositoryInterface
+class CatMontosPrepagoRepository implements CatMontosPrepagoRepositoryInterface
 {
     public function getAll()
     {
-        return CatPlanesPrepago::activos()
+        return CatMontosPrepago::activos()
             ->ordenarPorCreditos()
             ->get();
     }
 
-    public function getById($id): ?CatPlanesPrepago
+    public function getById($id): ?CatMontosPrepago
     {
-        return CatPlanesPrepago::find($id);
+        return CatMontosPrepago::find($id);
     }
 
-    public function store(array $data): CatPlanesPrepago
+    public function store(array $data): CatMontosPrepago
     {
         DB::beginTransaction();
         try {
-            $plan = CatPlanesPrepago::create($data);
+            $plan = CatMontosPrepago::create($data);
             DB::commit();
             return $plan;
         } catch (Exception $e) {
@@ -34,11 +34,11 @@ class CatPlanesPrepagoRepository implements CatPlanesPrepagoRepositoryInterface
         }
     }
 
-    public function update(array $data, $id): ?CatPlanesPrepago
+    public function update(array $data, $id): ?CatMontosPrepago
     {
         DB::beginTransaction();
         try {
-            $plan = CatPlanesPrepago::find($id);
+            $plan = CatMontosPrepago::find($id);
             
             if ($plan) {
                 $plan->update($data);
@@ -52,11 +52,11 @@ class CatPlanesPrepagoRepository implements CatPlanesPrepagoRepositoryInterface
         }
     }
 
-    public function activate($id): ?CatPlanesPrepago
+    public function activate($id): ?CatMontosPrepago
     {
         DB::beginTransaction();
         try {
-            $plan = CatPlanesPrepago::find($id);
+            $plan = CatMontosPrepago::find($id);
             
             if ($plan) {
                 $plan->activar();
@@ -70,11 +70,11 @@ class CatPlanesPrepagoRepository implements CatPlanesPrepagoRepositoryInterface
         }
     }
 
-    public function deactivate($id): ?CatPlanesPrepago
+    public function deactivate($id): ?CatMontosPrepago
     {
         DB::beginTransaction();
         try {
-            $plan = CatPlanesPrepago::find($id);
+            $plan = CatMontosPrepago::find($id);
             
             if ($plan) {
                 $plan->desactivar();

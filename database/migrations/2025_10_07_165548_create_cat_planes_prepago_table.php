@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('cat_planes_prepago', function (Blueprint $table) {
+        Schema::create('cat_montos_prepago', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
             $table->string('descripcion')->unique();
@@ -22,6 +22,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('montos_permitidos');
+        Schema::dropIfExists('cat_montos_prepago');
     }
 };

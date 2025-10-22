@@ -34,7 +34,10 @@ class User extends Authenticatable
         'datos_fiscales_principal',
         'datos_fiscales_personal',
         'usuario_padre',
-        'password_temporal'
+        'password_temporal',
+        'id_plan',
+        'vigencia_plan_inicio',
+        'vigencia_plan_fin'
     ];
 
     protected $hidden = [
@@ -131,8 +134,8 @@ class User extends Authenticatable
     // Accessors para los datos personales desde datos fiscales principales
     public function getNombreAttribute()
     {
-        $nombre= optional($this->datosFiscalesPersonal)->nombre_razon ;
-        
+        $nombre = optional($this->datosFiscalesPersonal)->nombre_razon;
+
         return $nombre;
     }
 
@@ -212,5 +215,9 @@ class User extends Authenticatable
         return $this->belongsToMany(DatosFiscal::class, 'usuario_hijo_facturantes', 'id_usuario_hijo', 'id_dato_fiscal')
             ->withPivot('predeterminado')
             ->withTimestamps();
+    }
+    public function planVencido()
+    {
+        return $this->vigencia_plan_fin && $this->vigencia_plan_fin < now();
     }
 }

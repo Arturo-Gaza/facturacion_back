@@ -10,7 +10,7 @@ class EstatusMovimiento extends Model
 {
     use HasFactory;
 
-    protected $table = 'estatus_movimiento';
+    protected $table = 'cat_estatus_movimiento';
 
         protected $fillable = [
         'nombre',

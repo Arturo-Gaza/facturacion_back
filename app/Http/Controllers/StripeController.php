@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseHelper;
-use App\Models\CatPlanesPrepago;
+use App\Models\CatMontosPrepago;
 use Exception;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
@@ -32,7 +32,7 @@ class StripeController extends Controller
         try {
             $idPrepago = $req->input('idPrepago'); // en centavos: $10 USD => 1000
             Stripe::setApiKey(env('STRIPE_SECRET'));
-            $prepago = CatPlanesPrepago::find($idPrepago);
+            $prepago = CatMontosPrepago::find($idPrepago);
             $amount = $prepago->monto * 100;
             $paymentIntent = PaymentIntent::create([
                 'amount' => $amount,

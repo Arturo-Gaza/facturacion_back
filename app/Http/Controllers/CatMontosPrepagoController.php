@@ -3,24 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseHelper;
-use App\Interfaces\CatPlanesPrepagoRepositoryInterface;
+use App\Interfaces\CatMontosPrepagoRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class CatPlanesPrepagoController extends Controller
+class CatMontosPrepagoController extends Controller
 {
-    protected $catPlanesPrepagoRepository;
+    protected $catMontosPrepagoRepository;
 
-    public function __construct(CatPlanesPrepagoRepositoryInterface $catPlanesPrepagoRepository)
+    public function __construct(CatMontosPrepagoRepositoryInterface $catMontosPrepagoRepository)
     {
-        $this->catPlanesPrepagoRepository = $catPlanesPrepagoRepository;
+        $this->catMontosPrepagoRepository = $catMontosPrepagoRepository;
     }
 
     public function getAll()
     {
         try {
-            $planes = $this->catPlanesPrepagoRepository->getAll();
+            $planes = $this->catMontosPrepagoRepository->getAll();
             return ApiResponseHelper::sendResponse($planes, 'Planes prepago obtenidos correctamente', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista de planes prepago', 500);
@@ -30,7 +30,7 @@ class CatPlanesPrepagoController extends Controller
     public function getById($id)
     {
         try {
-            $plan = $this->catPlanesPrepagoRepository->getById($id);
+            $plan = $this->catMontosPrepagoRepository->getById($id);
             
             if (!$plan) {
                 return ApiResponseHelper::sendResponse(null, 'Plan no encontrado', 404);
@@ -54,7 +54,7 @@ class CatPlanesPrepagoController extends Controller
                 'activo'
             ]);
 
-            $plan = $this->catPlanesPrepagoRepository->store($data);
+            $plan = $this->catMontosPrepagoRepository->store($data);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($plan, 'Plan creado correctamente', 201);
@@ -76,7 +76,7 @@ class CatPlanesPrepagoController extends Controller
                 'activo'
             ]);
 
-            $plan = $this->catPlanesPrepagoRepository->update($data, $id);
+            $plan = $this->catMontosPrepagoRepository->update($data, $id);
 
             if (!$plan) {
                 return ApiResponseHelper::sendResponse(null, 'Plan no encontrado', 404);
@@ -94,7 +94,7 @@ class CatPlanesPrepagoController extends Controller
     {
         DB::beginTransaction();
         try {
-            $plan = $this->catPlanesPrepagoRepository->activate($id);
+            $plan = $this->catMontosPrepagoRepository->activate($id);
 
             if (!$plan) {
                 return ApiResponseHelper::sendResponse(null, 'Plan no encontrado', 404);
@@ -112,7 +112,7 @@ class CatPlanesPrepagoController extends Controller
     {
         DB::beginTransaction();
         try {
-            $plan = $this->catPlanesPrepagoRepository->deactivate($id);
+            $plan = $this->catMontosPrepagoRepository->deactivate($id);
 
             if (!$plan) {
                 return ApiResponseHelper::sendResponse(null, 'Plan no encontrado', 404);

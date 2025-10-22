@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class PlanesPrepagoSeeder extends Seeder
+class MontosPrepagoSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -44,6 +44,6 @@ class PlanesPrepagoSeeder extends Seeder
             ],
         ];
 
-        DB::table('cat_planes_prepago')->insert($planes);
+        DB::table('cat_montos_prepago')->insert($planes);
     }
 }

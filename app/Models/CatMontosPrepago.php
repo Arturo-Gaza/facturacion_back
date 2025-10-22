@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CatPlanesPrepago extends Model
+class CatMontosPrepago extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class CatPlanesPrepago extends Model
      *
      * @var string
      */
-    protected $table = 'cat_planes_prepago';
+    protected $table = 'cat_montos_prepago';
 
     /**
      * The primary key associated with the table.

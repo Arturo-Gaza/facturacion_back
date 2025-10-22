@@ -11,11 +11,13 @@ return new class extends Migration
         Schema::create('suscripciones', function (Blueprint $table) {
             $table->id();
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('plan_id')->constrained('cat_planes')->onDelete('cascade');
+            $table->foreignId('id_plan')->constrained('cat_planes')->onDelete('cascade');
             $table->date('fecha_inicio');
             $table->date('fecha_vencimiento');
             $table->enum('estado', ['activa', 'vencida', 'cancelada'])->default('activa');
             $table->integer('perfiles_utilizados')->default(0);
+            $table->integer('facturas_realizadas')->default(0);
+
             $table->timestamps();
         });
     }
