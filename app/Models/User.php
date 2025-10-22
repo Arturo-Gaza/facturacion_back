@@ -15,6 +15,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\TwoFactorAuthenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -219,5 +220,21 @@ class User extends Authenticatable
     public function planVencido()
     {
         return $this->vigencia_plan_fin && $this->vigencia_plan_fin < now();
+    }
+
+    public function suscripcionActiva(): HasOne
+    {
+        return $this->hasOne(Suscripciones::class, 'usuario_id')
+            ->where('estado', 'activa')
+            ->where('fecha_vencimiento', '>=', now())
+            ->latest();
+    }
+
+    /**
+     * Verificar si el usuario tiene suscripción activa
+     */
+    public function tieneSuscripcionActiva(): bool
+    {
+        return $this->suscripcionActiva !== null;
     }
 }

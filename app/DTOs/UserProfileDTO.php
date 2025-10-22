@@ -20,7 +20,9 @@ class UserProfileDTO
         public ?bool $tienDatoFiscal,
         public ?array $direccionPersonal,
         public ?bool $password_temporal,
-        public ?int $id_estatus_usuario
+        public ?int $id_estatus_usuario,
+        public ?array $suscripcionActiva,
+        public ?bool $tieneSuscripcionActiva,
     ) {}
 
     public static function fromUserModel($user): self
@@ -28,12 +30,36 @@ class UserProfileDTO
         // Obtener datos fiscales principales
 
         $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
-         $tieneDatosFiscalesPredeterminado = $user->datosFiscalesPrincipal !== null;
-          // Manejar dirección personal (puede ser null)
-    $direccionPersonalArray = null;
-    if ($user->direccionPersonal) {
-        $direccionPersonalArray = $user->direccionPersonal->toArray();
-    }
+        $tieneDatosFiscalesPredeterminado = $user->datosFiscalesPrincipal !== null;
+        $tieneSuscripcionActiva = $user->suscripcionActiva !== null;
+        // Manejar dirección personal (puede ser null)
+        $direccionPersonalArray = null;
+        if ($user->direccionPersonal) {
+            $direccionPersonalArray = $user->direccionPersonal->toArray();
+        }
+        if ($user->suscripcionActiva) {
+            
+            $suscripcionArray = [
+                'id' => $user->suscripcionActiva->id,
+                'id_plan' => $user->suscripcionActiva->id_plan,
+                'fecha_inicio' => $user->suscripcionActiva->fecha_inicio->format('Y-m-d'),
+                'fecha_vencimiento' => $user->suscripcionActiva->fecha_vencimiento->format('Y-m-d'),
+                'estado' => $user->suscripcionActiva->estado,
+                'perfiles_utilizados' => $user->suscripcionActiva->perfiles_utilizados,
+                'facturas_realizadas' => $user->suscripcionActiva->facturas_realizadas,
+                'plan' => $user->suscripcionActiva->plan ? [
+                    'id' => $user->suscripcionActiva->plan->id,
+                    'nombre_plan' => $user->suscripcionActiva->plan->nombre_plan,
+                    'tipo_plan' => $user->suscripcionActiva->plan->tipo_plan,
+                    'tipo_pago' => $user->suscripcionActiva->plan->tipo_pago,
+                    'vigencia_inicio' => $user->suscripcionActiva->plan->vigencia_inicio?->format('Y-m-d'),
+                    'vigencia_fin' => $user->suscripcionActiva->plan->vigencia_fin?->format('Y-m-d'),
+                ] : null
+            ];
+        }else{
+            $suscripcionArray=[];
+        }
+
         return new self(
             id: $user->id,
             nombre: $user->datosFiscalesPersonal?->nombre_razon, // Nullsafe operator
@@ -47,10 +73,12 @@ class UserProfileDTO
             departamento: $user->descripcio_depatamento,
             saldo: (float) $user->saldo,
             datosCompletos: $tieneDatosFiscalesPersonal,
-            direccionPersonal:$direccionPersonalArray,
-            tienDatoFiscal:$tieneDatosFiscalesPredeterminado,
-            password_temporal:$user->password_temporal,
-            id_estatus_usuario:$user->id_estatus_usuario
+            direccionPersonal: $direccionPersonalArray,
+            tienDatoFiscal: $tieneDatosFiscalesPredeterminado,
+            password_temporal: $user->password_temporal,
+            id_estatus_usuario: $user->id_estatus_usuario,
+            suscripcionActiva: $suscripcionArray,
+            tieneSuscripcionActiva:$tieneSuscripcionActiva
         );
     }
 
@@ -70,9 +98,11 @@ class UserProfileDTO
             'saldo' => $this->saldo,
             'datosCompletos' => $this->datosCompletos,
             'direccionPersonal' => $this->direccionPersonal,
-            'tienDatoFiscal'=>$this->tienDatoFiscal,
-            'password_temporal'=>$this->password_temporal,
-            'id_estatus_usuario'=>$this->id_estatus_usuario
+            'tienDatoFiscal' => $this->tienDatoFiscal,
+            'password_temporal' => $this->password_temporal,
+            'id_estatus_usuario' => $this->id_estatus_usuario,
+            'suscripcionActiva' => $this->suscripcionActiva,
+            'tieneSuscripcionActiva' => $this->tieneSuscripcionActiva
         ];
     }
 }
