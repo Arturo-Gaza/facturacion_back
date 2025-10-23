@@ -61,7 +61,6 @@ class CatPlanesController extends Controller
                 'descripcion',
                 'precio',
                 'duracion_dias',
-                'creditos_incluidos',
                 'activo'
             ]);
 
@@ -84,7 +83,6 @@ class CatPlanesController extends Controller
                 'descripcion',
                 'precio',
                 'duracion_dias',
-                'creditos_incluidos',
                 'activo'
             ]);
 

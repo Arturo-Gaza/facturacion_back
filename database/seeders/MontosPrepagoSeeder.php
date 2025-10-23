@@ -16,28 +16,31 @@ class MontosPrepagoSeeder extends Seeder
     {
         $planes = [
             [
+                'id_plan'=>1,
                 'nombre' => 'Básico',
-                'descripcion' => 'Plan Básico con 40 créditos',
-                'creditos' => 40,
-                'monto' => 1680.00, // 40 créditos * $42.00 MXN
+                'descripcion' => 'Plan Básico con',
+            
+                'monto' => 1680.00,  
                 'activo' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
+                 'id_plan'=>1,
                 'nombre' => 'Intermedio',
-                'descripcion' => 'Plan Intermedio con 80 créditos',
-                'creditos' => 80,
-                'monto' => 3000.00, // 80 créditos * $37.50 MXN
+                'descripcion' => 'Plan Intermedio',
+           
+                'monto' => 3000.00,  
                 'activo' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
+                 'id_plan'=>1,
                 'nombre' => 'Profesional',
-                'descripcion' => 'Plan Profesional con 120 créditos',
-                'creditos' => 120,
-                'monto' => 4200.00, // 120 créditos * $35.00 MXN
+                'descripcion' => 'Plan Profesional',
+                
+                'monto' => 4200.00, 
                 'activo' => true,
                 'created_at' => now(),
                 'updated_at' => now(),

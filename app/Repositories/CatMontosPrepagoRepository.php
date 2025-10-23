@@ -12,13 +12,21 @@ class CatMontosPrepagoRepository implements CatMontosPrepagoRepositoryInterface
     public function getAll()
     {
         return CatMontosPrepago::activos()
-            ->ordenarPorCreditos()
+            ->ordenarPorMonto()
             ->get();
     }
 
     public function getById($id): ?CatMontosPrepago
     {
         return CatMontosPrepago::find($id);
+    }
+
+    public function getByPlan($id)
+    {
+         return CatMontosPrepago::activos()
+            ->where('id_plan',$id)
+            ->ordenarPorMonto()
+            ->get();
     }
 
     public function store(array $data): CatMontosPrepago
@@ -39,11 +47,11 @@ class CatMontosPrepagoRepository implements CatMontosPrepagoRepositoryInterface
         DB::beginTransaction();
         try {
             $plan = CatMontosPrepago::find($id);
-            
+
             if ($plan) {
                 $plan->update($data);
             }
-            
+
             DB::commit();
             return $plan;
         } catch (Exception $e) {
@@ -57,11 +65,11 @@ class CatMontosPrepagoRepository implements CatMontosPrepagoRepositoryInterface
         DB::beginTransaction();
         try {
             $plan = CatMontosPrepago::find($id);
-            
+
             if ($plan) {
                 $plan->activar();
             }
-            
+
             DB::commit();
             return $plan;
         } catch (Exception $e) {
@@ -75,11 +83,11 @@ class CatMontosPrepagoRepository implements CatMontosPrepagoRepositoryInterface
         DB::beginTransaction();
         try {
             $plan = CatMontosPrepago::find($id);
-            
+
             if ($plan) {
                 $plan->desactivar();
             }
-            
+
             DB::commit();
             return $plan;
         } catch (Exception $e) {

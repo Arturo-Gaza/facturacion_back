@@ -31,8 +31,8 @@ class CatMontosPrepago extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
-        'creditos',
         'monto',
+        'id_plan',
         'activo',
     ];
 
@@ -42,7 +42,6 @@ class CatMontosPrepago extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'creditos' => 'integer',
         'monto' => 'decimal:2',
         'activo' => 'boolean',
         'created_at' => 'datetime',
@@ -71,16 +70,7 @@ class CatMontosPrepago extends Model
         return $query->where('activo', false);
     }
 
-    /**
-     * Scope para ordenar por créditos de forma ascendente.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeOrdenarPorCreditos($query)
-    {
-        return $query->orderBy('creditos', 'asc');
-    }
+ 
 
     /**
      * Scope para ordenar por monto de forma ascendente.
@@ -93,19 +83,7 @@ class CatMontosPrepago extends Model
         return $query->orderBy('monto', 'asc');
     }
 
-    /**
-     * Calcular el costo por crédito del plan.
-     *
-     * @return float
-     */
-    public function getCostoPorCreditoAttribute()
-    {
-        if ($this->creditos > 0) {
-            return $this->monto / $this->creditos;
-        }
-        
-        return 0;
-    }
+
 
     /**
      * Formatear el monto como moneda.
@@ -127,15 +105,6 @@ class CatMontosPrepago extends Model
         return '$ ' . number_format($this->costo_por_credito, 2) . ' MXN';
     }
 
-    /**
-     * Verificar si el plan es profesional (más de 100 créditos).
-     *
-     * @return bool
-     */
-    public function getEsProfesionalAttribute()
-    {
-        return $this->creditos >= 100;
-    }
 
     /**
      * Activar el plan.

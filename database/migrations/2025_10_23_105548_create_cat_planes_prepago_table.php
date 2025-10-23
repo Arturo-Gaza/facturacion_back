@@ -12,8 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('nombre')->unique();
             $table->string('descripcion')->unique();
-             $table->integer('creditos');
-             
+ 
+            $table->foreignId('id_plan')->constrained('cat_planes')->onDelete('cascade');
+
             $table->decimal('monto', 10, 2);
             $table->boolean('activo')->default(true);
             $table->timestamps();

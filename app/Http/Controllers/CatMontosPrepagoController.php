@@ -41,6 +41,20 @@ class CatMontosPrepagoController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener el plan', 500);
         }
     }
+        public function getByPlan($id)
+    {
+        try {
+            $plan = $this->catMontosPrepagoRepository->getByPlan($id);
+            
+            if (!$plan) {
+                return ApiResponseHelper::sendResponse(null, 'Plan no encontrado', 404);
+            }
+            
+            return ApiResponseHelper::sendResponse($plan, 'Plan obtenido correctamente', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el plan', 500);
+        }
+    }
 
     public function store(Request $request)
     {
@@ -49,7 +63,6 @@ class CatMontosPrepagoController extends Controller
             $data = $request->only([
                 'nombre',
                 'descripcion',
-                'creditos',
                 'monto',
                 'activo'
             ]);
@@ -71,7 +84,6 @@ class CatMontosPrepagoController extends Controller
             $data = $request->only([
                 'nombre',
                 'descripcion',
-                'creditos',
                 'monto',
                 'activo'
             ]);

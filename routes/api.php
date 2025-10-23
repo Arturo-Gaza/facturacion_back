@@ -396,6 +396,8 @@ Route::post('autenticacion2fa/verifyqr', [AuthController::class, 'verify2FA']);
 
 Route::get('catMontosPrepago/getAll', [CatMontosPrepagoController::class, 'getAll']);
 Route::get('catMontosPrepago/getById/{id}', [CatMontosPrepagoController::class, 'getById']);
+
+Route::get('catMontosPrepago/getByPlan/{id}', [CatMontosPrepagoController::class, 'getByPlan']);
 Route::post('catMontosPrepago/register', [CatMontosPrepagoController::class, 'store']);
 Route::put('catMontosPrepago/update/{id}', [CatMontosPrepagoController::class, 'update']);
 Route::put('catMontosPrepago/activate/{id}', [CatMontosPrepagoController::class, 'activate']);

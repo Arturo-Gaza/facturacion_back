@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DepartamentosSeeder::class);
         $this->call(TiposSeeder::class);
         $this->call(CategoriaSeeder::class);
-        
+
         # $this->call(UbicacionSeeder::class);
         $this->call(EstatusSolicitudSeeder::class);
         #$this->call(MonedaSeeder::class);
@@ -30,23 +30,21 @@ class DatabaseSeeder extends Seeder
         #$this->call(GpoFamiliaSeeder::class);
         #$this->call(ProductosSeeder::class);
         $this->call(TabDepartamentosCategoriasSeeder::class);
-#$this->call(UsuariosSoliSeeder::class);
+        #$this->call(UsuariosSoliSeeder::class);
 
 
-     $this->call([
+        $this->call([
             CatRegimenUsoCfdiSeeder::class,
             CatEstatusesSatSeeder::class,
-            
             CatTiposDireccionSeeder::class,
-             PromptTemplateSeeder::class,
-             UserSeeder::class,
-              
-            MontosPrepagoSeeder::class,
+            PromptTemplateSeeder::class,
+            UserSeeder::class,
             PlanSeeder::class,
+            MontosPrepagoSeeder::class,
             CatGirosSeeder::class,
             DatosPorGiroSeeder::class
-           // CatEmpresasSeeder::class
-          
+            // CatEmpresasSeeder::class
+
         ]);
 
         //Department::factory(6)->create();
