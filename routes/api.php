@@ -266,9 +266,9 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
         Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
-        Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 
 });
+        Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 
 
 
