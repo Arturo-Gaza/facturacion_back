@@ -148,53 +148,206 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         return User::whereIn('idRol', [4, 5])->get();
     }
+
     public function getDashboard($idUsr)
-{
-    $usr = User::find($idUsr);
-    $fechaInicio = now()->subDays(30);
+    {
+        $usr = User::find($idUsr);
+        $fechaInicio = now()->subDays(30);
 
-    // Obtener todos los estatus del catálogo
-    $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
+        // Obtener todos los estatus
+        $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
 
-    // Construir consulta base con filtros por rol
-    $query = Solicitud::where('created_at', '>=', $fechaInicio);
-    
-    // Aplicar filtro por rol
-    if ($usr->idRol != 1 && $usr->idRol != 4) {
-        $query->where('empleado_id', $idUsr);
-    }
+        // Consulta base últimos 30 días
+        $query = Solicitud::where('created_at', '>=', $fechaInicio);
 
-    // Construir selects dinámicos
-    $selects = ['COUNT(*) as total_tickets'];
-    foreach ($estatus as $estatusItem) {
-        $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
-    }
+        if ($usr->idRol != 1 && $usr->idRol != 4) {
+            $query->where('empleado_id', $idUsr);
+        }
 
-    $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
-    $totalTickets = $estadisticas->total_tickets ?? 0;
+        // Select dinámico para estatus
+        $selects = ['COUNT(*) as total_tickets'];
+        foreach ($estatus as $estatusItem) {
+            $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
+        }
 
-    // Calcular métricas
-    $estadisticasPorEstatus = [];
-    foreach ($estatus as $estatusItem) {
-        $campo = "tickets_estatus_{$estatusItem->id}";
-        $cantidad = $estadisticas->$campo ?? 0;
+        $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
+        $totalTickets = $estadisticas->total_tickets ?? 0;
 
-        $estadisticasPorEstatus[] = [
-            'estatus_id' => $estatusItem->id,
-            'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
-            'total_tickets' => (int)$cantidad,
-            'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+        // Estadísticas por estatus
+        $estadisticasPorEstatus = [];
+        foreach ($estatus as $estatusItem) {
+            $campo = "tickets_estatus_{$estatusItem->id}";
+            $cantidad = $estadisticas->$campo ?? 0;
+
+            $estadisticasPorEstatus[] = [
+                'estatus_id' => $estatusItem->id,
+                'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
+                'total_tickets' => (int)$cantidad,
+                'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+            ];
+        }
+
+        // --------------------------2da parte estadistica por año-------------------------------------
+
+        $queryMensual = Solicitud::selectRaw("
+        EXTRACT(YEAR FROM solicitudes.created_at)::int as anio,
+        EXTRACT(MONTH FROM solicitudes.created_at)::int as mes,
+        solicitudes.estado_id,
+        cat_estatus_solicitud.descripcion_estatus_solicitud as nombre_estatus,
+        COUNT(*) as total
+    ")
+            ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
+            ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_estatus_solicitud')
+            ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
+
+        if ($usr->idRol != 1 && $usr->idRol != 4) {
+            $queryMensual->where('solicitudes.empleado_id', $idUsr);
+        }
+
+        $resultadosMensuales = $queryMensual->get();
+
+        $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        $dataAnual = [];
+
+        foreach ($resultadosMensuales as $r) {
+            $nombreMes = $meses[$r->mes - 1];
+            $anio = $r->anio;
+
+            if (!isset($dataAnual[$anio])) {
+                $dataAnual[$anio] = [
+                    'anio' => $anio,
+                    'meses' => []
+                ];
+            }
+
+            if (!isset($dataAnual[$anio]['meses'][$nombreMes])) {
+                $dataAnual[$anio]['meses'][$nombreMes] = [
+                    'mes' => $nombreMes,
+                    'estatus' => []
+                ];
+            }
+
+            $dataAnual[$anio]['meses'][$nombreMes]['estatus'][] = [
+                'estado_id' => $r->estado_id,
+                'nombre_estatus' => $r->nombre_estatus,
+                'total' => $r->total
+            ];
+        }
+
+        // Formatear estructura final
+        $dataAgrupada = array_values(array_map(function ($anioData) {
+            $anioData['meses'] = array_values($anioData['meses']);
+            return $anioData;
+        }, $dataAnual));
+
+        /////// como se envia la informacion
+        return [
+            'total_tickets' => $totalTickets,
+            'estadisticas_por_estatus' => $estadisticasPorEstatus,
+            'periodo' => 'ultimos_30_dias',
+            'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
+            'fecha_fin' => now()->format('Y-m-d H:i:s'),
+            'data_mensual' => $dataAgrupada // esta contiene los datos por año y mes
         ];
     }
 
-    return [
-        'total_tickets' => $totalTickets,
-        'estadisticas_por_estatus' => $estadisticasPorEstatus,
-        'periodo' => 'ultimos_30_dias',
-        'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
-        'fecha_fin' => now()->format('Y-m-d H:i:s')
-    ];
-}
+
+    //     public function getDashboard($idUsr)
+    //     {
+    //         $usr = User::find($idUsr);
+    //         $fechaInicio = now()->subDays(30);
+
+    //         // Obtener todos los estatus del catálogo
+    //         $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
+
+    //         // Consulta base para los últimos 30 días
+    //         $query = Solicitud::where('created_at', '>=', $fechaInicio);
+
+    //         // Filtro por rol
+    //         if ($usr->idRol != 1 && $usr->idRol != 4) {
+    //             $query->where('empleado_id', $idUsr);
+    //         }
+
+    //         // Selects dinámicos
+    //         $selects = ['COUNT(*) as total_tickets'];
+    //         foreach ($estatus as $estatusItem) {
+    //             $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
+    //         }
+
+    //         $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
+    //         $totalTickets = $estadisticas->total_tickets ?? 0;
+
+    //         // Calcular métricas por estatus
+    //         $estadisticasPorEstatus = [];
+    //         foreach ($estatus as $estatusItem) {
+    //             $campo = "tickets_estatus_{$estatusItem->id}";
+    //             $cantidad = $estadisticas->$campo ?? 0;
+
+    //             $estadisticasPorEstatus[] = [
+    //                 'estatus_id' => $estatusItem->id,
+    //                 'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
+    //                 'total_tickets' => (int)$cantidad,
+    //                 'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+    //             ];
+    //         }
+
+    //         // ---------------------------------------------------------------
+    //         // SEGUNDA PARTE: Estadísticas mensuales (últimos 6 meses)
+    //         // ---------------------------------------------------------------
+    //         $fechaInicioMensual = now()->subMonths(6);
+
+    //         $queryMensual = Solicitud::selectRaw("
+    //     EXTRACT(MONTH FROM solicitudes.created_at)::int as mes,
+    //     solicitudes.estado_id,
+    //     cat_estatus_solicitud.descripcion_estatus_solicitud as nombre_estatus,
+    //     COUNT(*) as total
+    // ")
+    //             ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
+    //             ->where('solicitudes.created_at', '>=', $fechaInicioMensual)
+    //             ->groupByRaw('EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_estatus_solicitud')
+    //             ->orderByRaw('EXTRACT(MONTH FROM solicitudes.created_at)');
+
+    //         if ($usr->idRol != 1 && $usr->idRol != 4) {
+    //             $queryMensual->where('solicitudes.empleado_id', $idUsr);
+    //         }
+
+    //         $resultadosMensuales = $queryMensual->get();
+
+    //         $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    //         $dataMensual = [];
+
+    //         foreach ($meses as $i => $nombreMes) {
+    //             $dataMensual[$nombreMes] = [
+    //                 'mes' => $nombreMes,
+    //                 'estatus' => []
+    //             ];
+    //         }
+
+    //         foreach ($resultadosMensuales as $r) {
+    //             $nombreMes = $meses[$r->mes - 1];
+    //             $dataMensual[$nombreMes]['estatus'][] = [
+    //                 'estado_id' => $r->estado_id,
+    //                 'nombre_estatus' => $r->nombre_estatus,
+    //                 'total' => $r->total
+    //             ];
+    //         }
+
+
+    //         // ---------------------------------------------------------------
+    //         // Retorno completo
+    //         // ---------------------------------------------------------------
+    //         return [
+    //             'total_tickets' => $totalTickets,
+    //             'estadisticas_por_estatus' => $estadisticasPorEstatus,
+    //             'periodo' => 'ultimos_30_dias',
+    //             'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
+    //             'fecha_fin' => now()->format('Y-m-d H:i:s'),
+    //             'data2' => array_values($dataMensual)
+    //         ];
+    //     }
+
+
+
 
     public function getByID($id): ?Solicitud
     {
