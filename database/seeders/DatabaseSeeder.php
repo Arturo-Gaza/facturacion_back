@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\CatEmpresa;
+use App\Models\CatGiro;
+use App\Models\DatosPorGiro;
 use App\Models\SistemaTickets\EstatusSolicitud;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -39,9 +42,11 @@ class DatabaseSeeder extends Seeder
              UserSeeder::class,
               
             MontosPrepagoSeeder::class,
-            PlanSeeder::class
-            //CatTiposContactoSeeder::class,
-            // Agrega aquí otros seeders que crees en el futuro
+            PlanSeeder::class,
+            CatGirosSeeder::class,
+            DatosPorGiroSeeder::class
+           // CatEmpresasSeeder::class
+          
         ]);
 
         //Department::factory(6)->create();

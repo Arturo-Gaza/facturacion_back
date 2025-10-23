@@ -11,10 +11,49 @@ class PromptTemplateSeeder extends Seeder
     {
         $prompts = [
             [
+    'name' => 'Extracción de datos específicos por giro',
+    'type' => 'datos_por_giro_extraction',
+    'prompt' => <<<PROMPT
+Del siguiente texto extraído (OCR) extrae únicamente los valores solicitados para el giro comercial.  
+
+CATALOGOS / DEFINICIONES:
+datos_por_giro
+{\$datos_por_giro}
+
+INFORMACIÓN ADICIONAL:
+id solicitud: {\$id}
+texto OCR:
+{\$textoOCR}
+
+INSTRUCCIONES:
+- Devuelve un único bloque JSON válido (sin texto adicional).  
+- Las claves del JSON **deben ser exactamente** los campos "nombre_dato_giro" provistos en \$datos_por_giro.  
+- Si no encuentras un valor, devuelve null para esa clave.  
+- Normaliza espacios (trim) y devuelve números como valores numéricos cuando correspondan.  
+- No inventes datos; si dudas, usa null.  
+- No añadas propiedades extra al JSON.
+
+EJEMPLO ESTRUCTURA SALIDA:
+{
+    "numero_caseta": "1234",
+    "sentido": "CDMX - Puebla",
+    "peaje": 55.00
+}
+
+DEVUELVE SOLO JSON.
+PROMPT,
+    'description' => 'Prompt para extraer campos específicos según el giro (usa datos_por_giro).',
+],
+            [
                 'name' => 'Extracción de datos de tickets y facturas',
                 'type' => 'receipt_extraction',
                 'prompt' => <<<PROMPT
 Del siguiente texto extraído de un ticket o factura, extrae la siguiente información en formato JSON:
+
+CATALGOGOS
+cat_giro
+{\$cat_giro}
+
 
 DATOS:
 {\$id}
@@ -23,9 +62,11 @@ DATOS:
 TEXTO:
 {\$textoOCR}
 
+
 Estructura requerida:
 {
     "num_ticket":numero o id del ticket,
+    "rfc": "RFC de la empresa si está disponible en el texto",
     "establecimiento": "nombre del establecimiento o empresa",
     "monto": "monto total numérico (sin símbolos de moneda)",
     "fecha": "fecha de la transacción si está disponible",
@@ -34,6 +75,8 @@ Estructura requerida:
     "direccion": "dirección del establecimiento si está disponible",
     "telefono": "teléfono del establecimiento si está disponible"
     "url_facturacion": "URL para facturación electrónica si está disponible, si no encuentras ninguna url regresa null, no inventes nada"
+    "giro": "giro comercial identificado",
+    "id_giro": "id del giro comercial identificado",
 }
 
 INSTRUCCIONES ESPECÍFICAS:
@@ -46,7 +89,12 @@ INSTRUCCIONES ESPECÍFICAS:
 - Si algún dato no está presente, usar null
 - Las fechas utiliza el formato 'Y-m-d'
 - Para url_facturacion: buscar URLs que comiencen con http://, https://, www., o que estén precedidas por frases como "factura en", "obtener factura", "facturar en", "descargar factura", "validar factura", "cfdi", "sat", incluso si están mezcladas con texto y omite los que tengan texto como "encuesta"
-
+- Para el giro busca en el cat_giro el giro que sea correspondiente de la empresa que emitio el ticket,utiliza solo la informacion de cat_giro, no inventes nada   
+PARA IDENTIFICACIÓN DE RFC:
+   - Buscar patrones de 12-13 caracteres alfanuméricos
+   - Formato: 3 letras (persona moral) + 6 números + 3 letras/dígitos
+   - Ejemplos: ABC123456XYZ, XYZ780124ABC
+   - Buscar después de "RFC:", "R.F.C.:", "Registro Federal"
 Devuelve ÚNICAMENTE el JSON válido, sin texto adicional.
 PROMPT,
                 'description' => 'Prompt para extraer datos estructurados de tickets y facturas mediante OCR',
@@ -315,7 +363,7 @@ Devuelve ÚNICAMENTE el JSON de validación.
 PROMPT,
                 'description' => 'Prompt para validar integridad de Constancia de Situación Fiscal',
             ]
-        
+
         ];
 
         foreach ($prompts as $promptData) {

@@ -50,7 +50,7 @@ class Solicitud extends Model
 
     public function empleado(): BelongsTo
     {
-        $empleado= $this->belongsTo(User::class, 'empleado_id');
+        $empleado = $this->belongsTo(User::class, 'empleado_id');
         return $empleado;
     }
 
@@ -58,26 +58,27 @@ class Solicitud extends Model
     {
         return $this->belongsTo(CatEstatusSolicitud::class, 'estado_id');
     }
-
-    public function facturas(): HasMany
-    {
-        return $this->hasMany(Factura::class);
-    }
+public function datosGiro()
+{
+    // Se carga también la relación 'dato' y solo los campos que necesitas
+    return $this->hasMany(SolicitudDatoGiro::class, 'id_solicitud')
+                ->with('dato:id,nombre_dato_giro');
+}
     /**
      * Manejo de la carga de archivos
      */
-    public function guardarImagen(UploadedFile $archivo,$usuarioId, string $carpeta = 'solicitudes'): string
+    public function guardarImagen(UploadedFile $archivo, $usuarioId, string $carpeta = 'solicitudes'): string
     {
-        
+
         if (!$usuarioId) {
             throw new Exception('Usuario no autenticado');
         }
-         $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId;
+        $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId;
         // Generar hash del contenido del archivo
         $hash = md5_file($archivo->getPathname());
 
         // Verificar si ya existe un archivo con el mismo hash
-          $archivosExistentes = Storage::disk('public')->files($carpetaUsuario);
+        $archivosExistentes = Storage::disk('public')->files($carpetaUsuario);
         // Eliminar imagen anterior si existe
         if ($this->imagen_url && Storage::exists($this->imagen_url)) {
             Storage::delete($this->imagen_url);

@@ -3,10 +3,14 @@
 namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
+use App\Models\CatDatosPorGiro;
+use App\Models\CatEmpresa;
+use App\Models\CatGiro;
 use App\Models\DatosFiscal;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\Solicitud;
+use App\Models\SolicitudDatoGiro;
 use App\Models\User;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
@@ -50,18 +54,147 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $textoOCR = $this->procesarImagenConOCR($solicitud);
 
         if ($textoOCR) {
-            // Extraer datos estructurados con IA
-            $datosExtraidos = $this->aiService->extractStructuredData($textoOCR);
+            $cat_giros = CatGiro::all()->toArray();
 
-            $solicitud->update([
-                'num_ticket' => $datosExtraidos['num_ticket'],
-                'texto_ocr' => $textoOCR,
-                'establecimiento' => $datosExtraidos['establecimiento'] ?? null,
-                'url_facturacion' => $datosExtraidos['url_facturacion'] ?? null,
-                'monto' => $datosExtraidos['monto'] ?? null,
-                'texto_json' => json_encode($datosExtraidos),
-                'fecha_ticket' => Carbon::parse($datosExtraidos['fecha'])
-            ]);
+
+            // Prepara los parámetros
+            $parameters = [
+                'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
+            ];
+      
+            // Extraer datos estructurados con IA
+            $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters, "receipt_extraction", $parameters, "receipt_extraction", $parameters);
+
+
+            $rfcExtraido = $datosExtraidos['rfc'] ?? null;
+            $rfc = $rfcExtraido ? strtoupper(preg_replace('/\s+/', '', $rfcExtraido)) : null;
+
+            $nombreExtraido = $datosExtraidos['nombre_empresa'] ?? $datosExtraidos['establecimiento'] ?? null;
+            $urlExtraida = $datosExtraidos['url_facturacion'] ?? null;
+
+            DB::beginTransaction();
+            try {
+                $empresa = null;
+
+                // 1) Buscar por RFC (preferible)
+                if ($rfc) {
+                    $empresa = CatEmpresa::where('rfc', $rfc)->first();
+                }
+
+                // 2) Si no encontró por RFC y hay nombre, intentar buscar por nombre parecido
+                if (!$empresa && $nombreExtraido) {
+                    $empresa = CatEmpresa::where('nombre_empresa', 'LIKE', '%' . mb_strtolower($nombreExtraido) . '%')->first();
+                }
+
+                // 3) Si no existe, crear una entrada en catálogo
+                if (!$empresa) {
+                    // intentar obtener id_giro si IA devolvió algo
+                    $idGiro = $datosExtraidos['id_giro'];
+
+
+                    $empresa = CatEmpresa::create([
+                        'rfc' => $rfc ?? null,
+                        'nombre_empresa' => $nombreExtraido ? mb_convert_case($nombreExtraido, MB_CASE_TITLE) : null,
+                        'pagina_web' => $urlExtraida ?? null,
+                        'id_giro' => $idGiro,
+                        'activo' => true,
+                    ]);
+                }
+
+                // Definir los valores finales a guardar en la solicitud
+                $urlFacturacionFinal = $empresa->pagina_web ?? $urlExtraida ?? null;
+                $establecimientoFinal = $empresa->nombre_empresa ?? $nombreExtraido ?? null;
+
+                // Actualizar solicitud con lo extraído / resuelto
+                $solicitud->update([
+                    'num_ticket' => $datosExtraidos['num_ticket'] ?? null,
+                    'texto_ocr' => $textoOCR,
+                    'establecimiento' => $establecimientoFinal,
+                    'url_facturacion' => $urlFacturacionFinal,
+                    'monto' => $datosExtraidos['monto'] ?? null,
+                    'texto_json' => json_encode($datosExtraidos),
+                    'fecha_ticket' => $datosExtraidos['fecha'],
+                ]);
+
+                if (!empty($empresa->id_giro)) {
+                    $datosGiroGuardados = $this->extractDatosPorGiroAndSave($solicitud->id, $empresa->id_giro, $textoOCR);
+                    // opcional: guardar un JSON resumen en solicitud
+                    $solicitud->update([
+                        'texto_json' => json_encode(array_merge(json_decode($solicitud->texto_json ?? '{}', true) ?? [], ['datos_giro' => $datosGiroGuardados]))
+                    ]);
+                }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // opcional: loguear $e->getMessage()
+                // no abortamos; devolvemos la solicitud sin los cambios extra si quieres
+            }
+
+            $rfcExtraido = $datosExtraidos['rfc'] ?? null;
+            $rfc = $rfcExtraido ? strtoupper(preg_replace('/\s+/', '', $rfcExtraido)) : null;
+
+            $nombreExtraido = $datosExtraidos['nombre_empresa'] ?? $datosExtraidos['establecimiento'] ?? null;
+            $urlExtraida = $datosExtraidos['url_facturacion'] ?? null;
+
+            DB::beginTransaction();
+            try {
+                $empresa = null;
+
+                // 1) Buscar por RFC (preferible)
+                if ($rfc) {
+                    $empresa = CatEmpresa::where('rfc', $rfc)->first();
+                }
+
+                // 2) Si no encontró por RFC y hay nombre, intentar buscar por nombre parecido
+                if (!$empresa && $nombreExtraido) {
+                    $empresa = CatEmpresa::where('nombre_empresa', 'LIKE', '%' . mb_strtolower($nombreExtraido) . '%')->first();
+                }
+
+                // 3) Si no existe, crear una entrada en catálogo
+                if (!$empresa) {
+                    // intentar obtener id_giro si IA devolvió algo
+                    $idGiro = $datosExtraidos['id_giro'];
+
+
+                    $empresa = CatEmpresa::create([
+                        'rfc' => $rfc ?? null,
+                        'nombre_empresa' => $nombreExtraido ? mb_convert_case($nombreExtraido, MB_CASE_TITLE) : null,
+                        'pagina_web' => $urlExtraida ?? null,
+                        'id_giro' => $idGiro,
+                        'activo' => true,
+                    ]);
+                }
+
+                // Definir los valores finales a guardar en la solicitud
+                $urlFacturacionFinal = $empresa->pagina_web ?? $urlExtraida ?? null;
+                $establecimientoFinal = $empresa->nombre_empresa ?? $nombreExtraido ?? null;
+
+                // Actualizar solicitud con lo extraído / resuelto
+                $solicitud->update([
+                    'num_ticket' => $datosExtraidos['num_ticket'] ?? null,
+                    'texto_ocr' => $textoOCR,
+                    'establecimiento' => $establecimientoFinal,
+                    'url_facturacion' => $urlFacturacionFinal,
+                    'monto' => $datosExtraidos['monto'] ?? null,
+                    'texto_json' => json_encode($datosExtraidos),
+                    'fecha_ticket' => $datosExtraidos['fecha'],
+                ]);
+
+                if (!empty($empresa->id_giro)) {
+                    $datosGiroGuardados = $this->extractDatosPorGiroAndSave($solicitud->id, $empresa->id_giro, $textoOCR);
+                    // opcional: guardar un JSON resumen en solicitud
+                    $solicitud->update([
+                        'texto_json' => json_encode(array_merge(json_decode($solicitud->texto_json ?? '{}', true) ?? [], ['datos_giro' => $datosGiroGuardados]))
+                    ]);
+                }
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                // opcional: loguear $e->getMessage()
+                // no abortamos; devolvemos la solicitud sin los cambios extra si quieres
+            }
         }
 
         return $solicitud->fresh();
@@ -154,38 +287,39 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $usr = User::find($idUsr);
         $fechaInicio = now()->subDays(30);
 
-        // Obtener todos los estatus
+        // Obtener todos los estatus del catálogo
         $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
 
-        // Consulta base últimos 30 días
+        // Construir consulta base con filtros por rol
         $query = Solicitud::where('created_at', '>=', $fechaInicio);
 
+        // Aplicar filtro por rol
         if ($usr->idRol != 1 && $usr->idRol != 4) {
             $query->where('empleado_id', $idUsr);
         }
 
-        // Select dinámico para estatus
-        $selects = ['COUNT(*) as total_tickets'];
-        foreach ($estatus as $estatusItem) {
-            $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
-        }
+                    // Select dinámico para estatus
+                    $selects = ['COUNT(*) as total_tickets'];
+                    foreach ($estatus as $estatusItem) {
+                        $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
+                    }
 
-        $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
-        $totalTickets = $estadisticas->total_tickets ?? 0;
+                    $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
+                    $totalTickets = $estadisticas->total_tickets ?? 0;
 
-        // Estadísticas por estatus
-        $estadisticasPorEstatus = [];
-        foreach ($estatus as $estatusItem) {
-            $campo = "tickets_estatus_{$estatusItem->id}";
-            $cantidad = $estadisticas->$campo ?? 0;
+                    // Estadísticas por estatus
+                    $estadisticasPorEstatus = [];
+                    foreach ($estatus as $estatusItem) {
+                        $campo = "tickets_estatus_{$estatusItem->id}";
+                        $cantidad = $estadisticas->$campo ?? 0;
 
-            $estadisticasPorEstatus[] = [
-                'estatus_id' => $estatusItem->id,
-                'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
-                'total_tickets' => (int)$cantidad,
-                'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
-            ];
-        }
+                        $estadisticasPorEstatus[] = [
+                            'estatus_id' => $estatusItem->id,
+                            'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
+                            'total_tickets' => (int)$cantidad,
+                            'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+                        ];
+                    }
 
         // --------------------------2da parte estadistica por año-------------------------------------
 
@@ -450,12 +584,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         $usr = User::find($idUsr);
         if ($usr->idRol == 4 || $usr->idRol == 1) {
-            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
+            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora', 'datosGiro'])
                 ->orderBy('updated_at', 'desc')
                 ->get();
         }
         if ($usr->idRol == 5) {
-            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora'])
+            $solicitudes = Solicitud::with(['empleado', 'estadoSolicitud', 'bitacora', 'datosGiro'])
                 ->orderBy('updated_at', 'desc')
                 ->where('empleado_id', $idUsr)
                 ->get();
@@ -501,7 +635,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     $fechasDinamicas[$claveCorta] = $this->formatearFechaCorta($fecha);
                 }
             }
-
+            $datosGiro = $solicitud->datosGiro->map(function ($item) {
+                return [
+                    'nombre' => $item->dato->nombre_dato_giro ?? null,
+                    'valor'  => $item->valor,
+                ];
+            });
             return array_merge([
                 'id' => $solicitud->id,
                 'ticket' => $solicitud->num_ticket ?? $solicitud->id,
@@ -514,7 +653,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'url_facturacion' => $solicitud->url_facturacion,
                 'monto' => $solicitud->monto,
                 'idreceptor' => $solicitud->id_receptor,
-
+                'datos_por_giro' => $datosGiro
 
             ], $fechasDinamicas);
         });
@@ -601,4 +740,100 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $resultados;
     }
+
+
+
+    public function extractDatosPorGiroAndSave(int $id_solicitud, int $id_giro, string $textoOCR)
+    {
+        // Obtener definiciones de datos para el giro
+        $campos = CatDatosPorGiro::where('id_giro', $id_giro)->get();
+        if ($campos->isEmpty()) {
+            return [];
+        }
+
+        // Preparar array que se inyectará en el prompt (la plantilla espera {$datos_por_giro})
+        $camposParaPrompt = $campos->map(function ($c) {
+            return [
+                'name' => $c->nombre_dato_giro,
+                'label' => $c->label ?? $c->nombre_dato_giro,
+                'type' => $c->tipo ?? 'string',
+                'required' => (bool)$c->requerido
+            ];
+        })->values()->toArray();
+
+        // parámetros que tu extractStructuredData ya sabe sustituir en la plantilla
+        $parameters = [
+            'datos_por_giro' => json_encode($camposParaPrompt, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            'id' => $id_solicitud,
+            'textoOCR' => $textoOCR,
+        ];
+
+        // Llamada a tu servicio (usa el type que registraste en la BDD)
+        try {
+            $datos = $this->aiService->extractStructuredData($textoOCR, "datos_por_giro_extraction", $parameters);
+        } catch (\Exception $e) {
+            Log::error("Error IA datos por giro: " . $e->getMessage(), ['id_solicitud' => $id_solicitud, 'id_giro' => $id_giro]);
+            return [];
+        }
+
+
+
+        // Guardar/actualizar cada campo en la tabla relacional
+        $guardados = [];
+        foreach ($campos as $campo) {
+            $clave = $campo->nombre_dato_giro;
+            $valor = array_key_exists($clave, $datos) ? $datos[$clave] : null;
+
+            // Normalizaciones básicas según tipo
+            if ($valor !== null) {
+                if ($campo->tipo === 'numeric') {
+                    // limpiar símbolos y comas, convertir a numero
+                    $valor = preg_replace('/[^\d\.\-]/', '', (string)$valor);
+                    $valor = $valor === '' ? null : (is_numeric($valor) ? (float)$valor : $valor);
+                } else {
+                    // trim strings
+                    if (is_string($valor)) $valor = trim($valor);
+                }
+            }
+
+            $registro = SolicitudDatoGiro::updateOrCreate(
+                [
+                    'id_solicitud' => $id_solicitud,
+                    'id_dato_por_giro' => $campo->id
+                ],
+                [
+                    'valor' => $valor
+                ]
+            );
+
+            $guardados[$clave] = $registro->valor;
+        }
+
+        return $guardados;
+    }
+
+    /**
+     * helper: extrae el primer bloque JSON en un texto (si viene con explicación)
+     */
+    private function extractJsonFromText(string $text): ?string
+    {
+        $start = strpos($text, '{');
+        if ($start === false) return null;
+
+        $braces = 0;
+        $len = strlen($text);
+        for ($i = $start; $i < $len; $i++) {
+            if ($text[$i] === '{') $braces++;
+            if ($text[$i] === '}') $braces--;
+            if ($braces === 0) {
+                return substr($text, $start, $i - $start + 1);
+            }
+        }
+        return null;
+    }
+
+
+
+
+    
 }

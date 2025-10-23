@@ -45,6 +45,7 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DatosFiscalesController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SuscripcionController;
 use App\Http\Middleware\AcceptJsonMiddleware;
 use App\Models\Suscripciones;
@@ -265,6 +266,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
         Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
+        Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 
 });
 
