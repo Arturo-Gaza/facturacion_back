@@ -98,11 +98,14 @@ class StripeController extends Controller
                 'refunded_amount' => 0,
                 'reverted' => false,
             ]);
+            if(env('APP_ENV')==='local'){
+
+            }
 
             DB::commit();
 
 
-            return ApiResponseHelper::sendResponse($paymentIntent->id, 'Pago creado correctamente para el plan de prepago.', 200);
+            return ApiResponseHelper::sendResponse($paymentIntent->client_secret, 'Pago creado correctamente para el plan de prepago.', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
