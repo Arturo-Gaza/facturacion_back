@@ -33,7 +33,7 @@ class StripeController extends Controller
     public function crearPagoByPrepago(Request $req)
     {
         try {
-            $id_user = auth('sanctum')->id();
+            $id_user = $req->input('id_user');;
             $idPrepago = $req->input('idPrepago'); // en centavos: $10 USD => 1000
             Stripe::setApiKey(env('STRIPE_SECRET'));
             $prepago = CatMontosPrepago::find($idPrepago);
