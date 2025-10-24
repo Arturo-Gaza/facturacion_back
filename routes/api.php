@@ -266,6 +266,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
         Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
+Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
 
 });
         Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
@@ -412,4 +413,3 @@ Route::put('catPlanes/update/{id}', [CatPlanesController::class, 'update']);
 
 Route::post('stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
 
-Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);

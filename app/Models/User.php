@@ -226,7 +226,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(Suscripciones::class, 'usuario_id')
             ->where('estado', 'activa')
-            ->where('fecha_vencimiento', '>=', now())
+            ->where(function ($q) {
+                $q->where('fecha_vencimiento', '>=', now())
+                    ->orWhereNull('fecha_vencimiento');
+            })
             ->latest();
     }
 

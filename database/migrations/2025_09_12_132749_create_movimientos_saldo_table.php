@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
             $table->decimal('monto', 10, 2)->comment('Monto negativo para cobro, positivo para pago');
             $table->foreignId('estatus_movimiento_id')->constrained('cat_estatus_movimiento')->onDelete('cascade');
-
             $table->decimal('nuevo_monto', 10, 2);
             $table->string('descripcion', 255)->nullable();
             $table->timestamps();
