@@ -53,6 +53,9 @@ class StripeWebhookController extends Controller
                     Log::warning("Movimiento no encontrado para payment_intent_id: {$paymentIntentId}");
                     return response('Movimiento no encontrado', 200); // responder 200 para no reintentar webhook infinitamente
                 }
+                if (!$mov) {
+                    return response( 'Movimiento no encontrado en DB', 200);
+                }
 
                 // Ids de estatus — ajusta según tu catálogo
                 $estatusCompletado = 3; // <-- AJUSTA si tu id es distinto
@@ -152,8 +155,8 @@ class StripeWebhookController extends Controller
 
                 // intentar buscar por stripe_charge_id primero; si no hay, intentar por payment_intent
                 $mov = MovimientoSaldo::where('stripe_charge_id', $chargeId)
-                        ->orWhere('payment_intent_id', $charge->payment_intent ?? null)
-                        ->first();
+                    ->orWhere('payment_intent_id', $charge->payment_intent ?? null)
+                    ->first();
 
                 if (!$mov) {
                     Log::warning("Movimiento no encontrado para charge.refunded: {$chargeId}");

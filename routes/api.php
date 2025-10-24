@@ -272,6 +272,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
+Route::post('stripe/confirmStripePayment', [StripeController::class, 'confirmStripePayment']);
 
 
 //Facturacion
