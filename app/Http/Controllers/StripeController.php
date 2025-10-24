@@ -47,9 +47,7 @@ class StripeController extends Controller
                     'user_id' => $id_user,
                     'prepago_id' => $prepago->id,
                     'origin' => 'app_mobile'
-                ],
-                'payment_method_types' => ['card']
-                // opcional: 'metadata' => ['order_id' => 1234]
+                ]
             ]);
 
             $stripeCustomerId = $paymentIntent->customer ?? null;
