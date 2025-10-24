@@ -43,7 +43,8 @@ class DatabaseSeeder extends Seeder
             MontosPrepagoSeeder::class,
             CatGirosSeeder::class,
             DatosPorGiroSeeder::class,
-            CatEstatusMovimientoSeeder::class
+            CatEstatusMovimientoSeeder::class,
+            PreciosSeeder::class
             // CatEmpresasSeeder::class
 
         ]);

@@ -61,7 +61,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $parameters = [
                 'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
             ];
-      
+
             // Extraer datos estructurados con IA
             $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters, "receipt_extraction", $parameters, "receipt_extraction", $parameters);
 
@@ -298,28 +298,28 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $query->where('empleado_id', $idUsr);
         }
 
-                    // Select dinámico para estatus
-                    $selects = ['COUNT(*) as total_tickets'];
-                    foreach ($estatus as $estatusItem) {
-                        $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
-                    }
+        // Select dinámico para estatus
+        $selects = ['COUNT(*) as total_tickets'];
+        foreach ($estatus as $estatusItem) {
+            $selects[] = "SUM(CASE WHEN estado_id = {$estatusItem->id} THEN 1 ELSE 0 END) as tickets_estatus_{$estatusItem->id}";
+        }
 
-                    $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
-                    $totalTickets = $estadisticas->total_tickets ?? 0;
+        $estadisticas = $query->selectRaw(implode(', ', $selects))->first();
+        $totalTickets = $estadisticas->total_tickets ?? 0;
 
-                    // Estadísticas por estatus
-                    $estadisticasPorEstatus = [];
-                    foreach ($estatus as $estatusItem) {
-                        $campo = "tickets_estatus_{$estatusItem->id}";
-                        $cantidad = $estadisticas->$campo ?? 0;
+        // Estadísticas por estatus
+        $estadisticasPorEstatus = [];
+        foreach ($estatus as $estatusItem) {
+            $campo = "tickets_estatus_{$estatusItem->id}";
+            $cantidad = $estadisticas->$campo ?? 0;
 
-                        $estadisticasPorEstatus[] = [
-                            'estatus_id' => $estatusItem->id,
-                            'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
-                            'total_tickets' => (int)$cantidad,
-                            'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
-                        ];
-                    }
+            $estadisticasPorEstatus[] = [
+                'estatus_id' => $estatusItem->id,
+                'descripcion_estatus_solicitud' => $estatusItem->descripcion_estatus_solicitud,
+                'total_tickets' => (int)$cantidad,
+                'porcentaje' => $totalTickets > 0 ? round(($cantidad / $totalTickets) * 100, 2) : 0
+            ];
+        }
 
         // --------------------------2da parte estadistica por año-------------------------------------
 
@@ -579,6 +579,18 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
     }
+    public function subirFactura($idUsr, $pdf,$xml, $id_solicitud)
+    {
+        $sol = Solicitud::find($id_solicitud);
+        $rutaPdf = $sol->guardarPDF($pdf, $idUsr);
+        $sol->pdf_url = $rutaPdf;
+        $rutaXML = $sol->guardarXML($xml, $idUsr);
+        $sol->xml_url = $rutaXML;
+        $sol->estado_id=6;
+        $sol->save();
+        return $sol;
+
+    }
 
     public function getConsola($idUsr)
     {
@@ -831,9 +843,4 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         return null;
     }
-
-
-
-
-    
 }

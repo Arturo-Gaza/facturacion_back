@@ -8,6 +8,7 @@ interface SolicitudRepositoryInterface
 {
     public function getAll();
     public function getConsola($idUsr);
+    public function subirFactura($idUsr,$pdf,$xml,$id_solicitud);
      public function getMesaAyuda();
      public function getDashboard($id);
      public function getByUsuario(int $usuario_id);

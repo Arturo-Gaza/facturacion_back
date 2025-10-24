@@ -23,6 +23,8 @@ class Solicitud extends Model
         'num_ticket',
         'usuario_id',
         'imagen_url',
+        'pdf_url',
+        'xml_url',
         'texto_ocr',
         'texto_json',
         'monto',
@@ -58,12 +60,12 @@ class Solicitud extends Model
     {
         return $this->belongsTo(CatEstatusSolicitud::class, 'estado_id');
     }
-public function datosGiro()
-{
-    // Se carga también la relación 'dato' y solo los campos que necesitas
-    return $this->hasMany(SolicitudDatoGiro::class, 'id_solicitud')
-                ->with('dato:id,nombre_dato_giro');
-}
+    public function datosGiro()
+    {
+        // Se carga también la relación 'dato' y solo los campos que necesitas
+        return $this->hasMany(SolicitudDatoGiro::class, 'id_solicitud')
+            ->with('dato:id,nombre_dato_giro');
+    }
     /**
      * Manejo de la carga de archivos
      */
@@ -73,7 +75,7 @@ public function datosGiro()
         if (!$usuarioId) {
             throw new Exception('Usuario no autenticado');
         }
-        $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId;
+        $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId . '/imagen';
         // Generar hash del contenido del archivo
         $hash = md5_file($archivo->getPathname());
 
@@ -125,6 +127,124 @@ public function datosGiro()
      * Eliminar imagen asociada
      */
     public function eliminarImagen(): void
+    {
+        if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
+            Storage::delete($this->getRawOriginal('imagen_url'));
+        }
+    }
+
+    public function guardarPDF(UploadedFile $archivo, $usuarioId, string $carpeta = 'pdf'): string
+    {
+
+        if (!$usuarioId) {
+            throw new Exception('Usuario no autenticado');
+        }
+        $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId . '/PDF';
+        // Generar hash del contenido del archivo
+        $hash = md5_file($archivo->getPathname());
+
+        // Verificar si ya existe un archivo con el mismo hash
+        $archivosExistentes = Storage::disk('public')->files($carpetaUsuario);
+        // Eliminar imagen anterior si existe
+
+        foreach ($archivosExistentes as $archivoExistente) {
+            $hashExistente = md5_file(Storage::disk('public')->path($archivoExistente));
+            if ($hash === $hashExistente) {
+                Storage::delete($this->pdf_url);
+            }
+        }
+
+
+        // Guardar nueva imagen
+        $ruta = $archivo->store($carpetaUsuario, 'public');
+
+        return $ruta;
+    }
+
+    public function getPDFUrlAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($value);
+    }
+
+    /**
+     * Obtener ruta del archivo en storage
+     */
+    public function getRutaPDFAttribute(): ?string
+    {
+        if (!$this->imagen_url) {
+            return null;
+        }
+
+        return Storage::disk('public')->path($this->getRawOriginal('imagen_url'));
+    }
+
+    /**
+     * Eliminar imagen asociada
+     */
+    public function eliminarPDF(): void
+    {
+        if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
+            Storage::delete($this->getRawOriginal('imagen_url'));
+        }
+    }
+
+    public function guardarXML(UploadedFile $archivo, $usuarioId, string $carpeta = 'xml'): string
+    {
+
+        if (!$usuarioId) {
+            throw new Exception('Usuario no autenticado');
+        }
+        $carpetaUsuario = $carpeta . '/usuario_' . $usuarioId . '/XML';
+        // Generar hash del contenido del archivo
+        $hash = md5_file($archivo->getPathname());
+
+        // Verificar si ya existe un archivo con el mismo hash
+        $archivosExistentes = Storage::disk('public')->files($carpetaUsuario);
+        // Eliminar imagen anterior si existe
+
+        foreach ($archivosExistentes as $archivoExistente) {
+            $hashExistente = md5_file(Storage::disk('public')->path($archivoExistente));
+            if ($hash === $hashExistente) {
+                Storage::delete($this->xml_url);
+            }
+        }
+
+
+        // Guardar nueva imagen
+        $ruta = $archivo->store($carpetaUsuario, 'public');
+
+        return $ruta;
+    }
+
+    public function getXMLUrlAttribute($value): ?string
+    {
+        if (!$value) {
+            return null;
+        }
+
+        return Storage::disk('public')->url($value);
+    }
+
+    /**
+     * Obtener ruta del archivo en storage
+     */
+    public function getRutaXMLFAttribute(): ?string
+    {
+        if (!$this->imagen_url) {
+            return null;
+        }
+
+        return Storage::disk('public')->path($this->getRawOriginal('imagen_url'));
+    }
+
+    /**
+     * Eliminar imagen asociada
+     */
+    public function eliminarXML(): void
     {
         if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
             Storage::delete($this->getRawOriginal('imagen_url'));

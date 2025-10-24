@@ -39,6 +39,28 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+    public function subirFactura(Request $request)
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $request->validate([
+                'id_solicitud' => 'required|integer'
+            ]);
+
+            $id_solicitud = $request->input('id_solicitud');
+            
+            if ($request->hasFile('pdf')) {
+                $pdf = $request->file('pdf');
+            }
+            if ($request->hasFile('xml')) {
+                $xml = $request->file('xml');
+            }
+            $all = $this->solicitudRepository->subirFactura($idUsr, $pdf,$xml, $id_solicitud);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
 
     public function getMesaAyuda()
     {
@@ -51,7 +73,7 @@ class SolicitudController extends Controller
         }
     }
 
-        public function getDashboard()
+    public function getDashboard()
     {
         try {
             $idUsr = auth()->user()->id;
@@ -82,8 +104,8 @@ class SolicitudController extends Controller
 
             $id_solicitud = $request->input('id_solicitud');
             $id_estatus = $request->input('id_estatus');
-             $id_usuario = auth()->user()->id;
-            $all = $this->solicitudRepository->actualizarEstatus($id_solicitud,$id_estatus,$id_usuario);
+            $id_usuario = auth()->user()->id;
+            $all = $this->solicitudRepository->actualizarEstatus($id_solicitud, $id_estatus, $id_usuario);
             return ApiResponseHelper::sendResponse($all, 'Estatus actualizado correctamente', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'Error al actualizar estatus: ' . $ex->getMessage(), 500);
