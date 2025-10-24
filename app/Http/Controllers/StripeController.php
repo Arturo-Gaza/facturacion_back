@@ -76,7 +76,7 @@ class StripeController extends Controller
             DB::beginTransaction();
 
             $mov = MovimientoSaldo::create([
-                'tipo'=>"abono",
+                'tipo' => "abono",
                 'usuario_id' => $id_user,
                 'monto' => $montoDecimal, // según tu convención: positivo para pago/recarga
                 'currency' => $paymentIntent->currency ?? env('DIVISA', 'mxn'),
@@ -98,8 +98,19 @@ class StripeController extends Controller
                 'refunded_amount' => 0,
                 'reverted' => false,
             ]);
-            if(env('APP_ENV')==='local'){
-
+            if (env('APP_ENV') === 'local') {
+                $estatusCompletado = 3;
+                $user = User::find($mov->usuario_id);
+                if ($user) {
+                    // Asumo que 'monto' es positivo para recarga; si en tu app es negativo para cobro, ajusta.
+                    $nuevoSaldo = (float)$user->saldo + (float)$mov->monto;
+                    $user->saldo = $nuevoSaldo;
+                    $user->save();
+                    $mov->estatus_movimiento_id = $estatusCompletado;
+                    // Actualizar nuevo_monto en movimiento
+                    $mov->saldo_resultante = $nuevoSaldo;
+                    $mov->save();
+                }
             }
 
             DB::commit();
