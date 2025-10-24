@@ -116,7 +116,7 @@ class StripeController extends Controller
             DB::commit();
 
 
-            return ApiResponseHelper::sendResponse($paymentIntent->client_secret, 'Pago creado correctamente para el plan de prepago.', 200);
+            return ApiResponseHelper::sendResponse($paymentIntent->client_secret, 'Pago creado correctamente para el plan de prepago.', 200,$nuevoSaldo);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
