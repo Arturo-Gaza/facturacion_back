@@ -38,12 +38,12 @@ class UserProfileDTO
             $direccionPersonalArray = $user->direccionPersonal->toArray();
         }
         if ($user->suscripcionActiva) {
-            
+
             $suscripcionArray = [
                 'id' => $user->suscripcionActiva->id,
                 'id_plan' => $user->suscripcionActiva->id_plan,
                 'fecha_inicio' => $user->suscripcionActiva->fecha_inicio->format('Y-m-d'),
-                'fecha_vencimiento' => $user->suscripcionActiva->fecha_vencimiento->format('Y-m-d'),
+                'fecha_vencimiento' => $user->suscripcionActiva?->fecha_vencimiento?->format('Y-m-d'),
                 'estado' => $user->suscripcionActiva->estado,
                 'perfiles_utilizados' => $user->suscripcionActiva->perfiles_utilizados,
                 'facturas_realizadas' => $user->suscripcionActiva->facturas_realizadas,
@@ -56,8 +56,8 @@ class UserProfileDTO
                     'vigencia_fin' => $user->suscripcionActiva->plan->vigencia_fin?->format('Y-m-d'),
                 ] : null
             ];
-        }else{
-            $suscripcionArray=[];
+        } else {
+            $suscripcionArray = [];
         }
 
         return new self(
@@ -78,7 +78,7 @@ class UserProfileDTO
             password_temporal: $user->password_temporal,
             id_estatus_usuario: $user->id_estatus_usuario,
             suscripcionActiva: $suscripcionArray,
-            tieneSuscripcionActiva:$tieneSuscripcionActiva
+            tieneSuscripcionActiva: $tieneSuscripcionActiva
         );
     }
 
