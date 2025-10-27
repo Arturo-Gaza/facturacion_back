@@ -655,12 +655,18 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function subirFactura($idUsr, $pdf, $xml, $id_solicitud)
     {
+        $status = 6;
         $sol = Solicitud::find($id_solicitud);
         $rutaPdf = $sol->guardarPDF($pdf, $idUsr);
         $sol->pdf_url = $rutaPdf;
         $rutaXML = $sol->guardarXML($xml, $idUsr);
         $sol->xml_url = $rutaXML;
-        $sol->estado_id = 6;
+        $sol->estado_id = $status;
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_solicitud,
+            'id_estatus' => $status, // Asumiendo que 2 es el ID del estatus "Enviado"
+            'id_usuario' => $idUsr // O el ID del usuario que realiza la acción
+        ]);
         $sol->save();
         return $sol;
     }
