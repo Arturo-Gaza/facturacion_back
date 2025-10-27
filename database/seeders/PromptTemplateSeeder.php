@@ -77,6 +77,10 @@ Estructura requerida:
     "url_facturacion": "URL para facturación electrónica si está disponible, si no encuentras ninguna url regresa null, no inventes nada"
     "giro": "giro comercial identificado",
     "id_giro": "id del giro comercial identificado",
+    "datos_facturacion_adicionales": {
+        "clave_facturacion": "valor",
+        "otro_identificador": "valor"
+    }
 }
 
 INSTRUCCIONES ESPECÍFICAS:
@@ -90,6 +94,7 @@ INSTRUCCIONES ESPECÍFICAS:
 - Las fechas utiliza el formato 'Y-m-d'
 - Para url_facturacion: buscar URLs que comiencen con http://, https://, www., o que estén precedidas por frases como "factura en", "obtener factura", "facturar en", "descargar factura", "validar factura", "cfdi", "sat", incluso si están mezcladas con texto y omite los que tengan texto como "encuesta"
 - Para el giro busca en el cat_giro el giro que sea correspondiente de la empresa que emitio el ticket,utiliza solo la informacion de cat_giro, no inventes nada   
+- Para datos_facturacion_adicionales: Identificar y extraer cualquier par de "clave:valor" que parezca ser un identificador, código de facturación, número de serie, clave de caja, folio fiscal, o cualquier dato que esté explícitamente etiquetado como necesario para el proceso de facturación y que no se haya capturado en los campos principales. Ejemplos de claves a buscar: "CLAVE","CÓDIGO DE FACTURACIÓN", "SERIE", "CAJA", "FOLIO FISCAL", "TERMINACIÓN TARJETA", "MÉTODO DE PAGO", "USO CFDI", etc. Almacenar estos pares dentro del objeto JSON. Si no hay datos adicionales relevantes, regresa un objeto vacío
 PARA IDENTIFICACIÓN DE RFC:
    - Buscar patrones de 12-13 caracteres alfanuméricos
    - Formato: 3 letras (persona moral) + 6 números + 3 letras/dígitos

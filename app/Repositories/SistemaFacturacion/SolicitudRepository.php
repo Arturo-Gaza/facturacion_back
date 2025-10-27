@@ -10,6 +10,7 @@ use App\Models\DatosFiscal;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\Solicitud;
+use App\Models\SolicitudDatoAdicional;
 use App\Models\SolicitudDatoGiro;
 use App\Models\User;
 use App\Services\AIDataExtractionService;
@@ -64,7 +65,25 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             // Extraer datos estructurados con IA
             $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters, "receipt_extraction", $parameters, "receipt_extraction", $parameters);
+            $datosAdicionales = $datosExtraidos['datos_facturacion_adicionales'];
 
+            DB::transaction(function () use ($solicitud, $datosAdicionales) {
+
+                // 2. Iterar sobre el array de datos adicionales (clave => valor)
+                foreach ($datosAdicionales as $etiqueta => $valor) {
+
+                    // 3. Opcional: Sanitizar la etiqueta y el valor si es necesario
+                    $etiquetaLimpia = str_replace(['_', '-'], ' ', strtolower($etiqueta));
+                    $etiquetaFormato = ucwords($etiquetaLimpia);
+
+                    // 4. Crear un nuevo registro en la tabla 'solicitud_dato_adicional'
+                    SolicitudDatoAdicional::create([
+                        'id_solicitud' => $solicitud->id, // Usamos la ID de la solicitud principal
+                        'etiqueta' => $etiquetaFormato, // Ejemplo: "Codigo Facturacion Idw"
+                        'valor' => $valor                  // Ejemplo: "001 E94E 65V9 CR4X GFQK"
+                    ]);
+                }
+            });
 
             $rfcExtraido = $datosExtraidos['rfc'] ?? null;
             $rfc = $rfcExtraido ? strtoupper(preg_replace('/\s+/', '', $rfcExtraido)) : null;
@@ -115,7 +134,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     'texto_json' => json_encode($datosExtraidos),
                     'fecha_ticket' => $datosExtraidos['fecha'],
                 ]);
-
+                /*
                 if (!empty($empresa->id_giro)) {
                     $datosGiroGuardados = $this->extractDatosPorGiroAndSave($solicitud->id, $empresa->id_giro, $textoOCR);
                     // opcional: guardar un JSON resumen en solicitud
@@ -123,71 +142,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                         'texto_json' => json_encode(array_merge(json_decode($solicitud->texto_json ?? '{}', true) ?? [], ['datos_giro' => $datosGiroGuardados]))
                     ]);
                 }
+                */
 
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                // opcional: loguear $e->getMessage()
-                // no abortamos; devolvemos la solicitud sin los cambios extra si quieres
-            }
-
-            $rfcExtraido = $datosExtraidos['rfc'] ?? null;
-            $rfc = $rfcExtraido ? strtoupper(preg_replace('/\s+/', '', $rfcExtraido)) : null;
-
-            $nombreExtraido = $datosExtraidos['nombre_empresa'] ?? $datosExtraidos['establecimiento'] ?? null;
-            $urlExtraida = $datosExtraidos['url_facturacion'] ?? null;
-
-            DB::beginTransaction();
-            try {
-                $empresa = null;
-
-                // 1) Buscar por RFC (preferible)
-                if ($rfc) {
-                    $empresa = CatEmpresa::where('rfc', $rfc)->first();
-                }
-
-                // 2) Si no encontró por RFC y hay nombre, intentar buscar por nombre parecido
-                if (!$empresa && $nombreExtraido) {
-                    $empresa = CatEmpresa::where('nombre_empresa', 'LIKE', '%' . mb_strtolower($nombreExtraido) . '%')->first();
-                }
-
-                // 3) Si no existe, crear una entrada en catálogo
-                if (!$empresa) {
-                    // intentar obtener id_giro si IA devolvió algo
-                    $idGiro = $datosExtraidos['id_giro'];
-
-
-                    $empresa = CatEmpresa::create([
-                        'rfc' => $rfc ?? null,
-                        'nombre_empresa' => $nombreExtraido ? mb_convert_case($nombreExtraido, MB_CASE_TITLE) : null,
-                        'pagina_web' => $urlExtraida ?? null,
-                        'id_giro' => $idGiro,
-                        'activo' => true,
-                    ]);
-                }
-
-                // Definir los valores finales a guardar en la solicitud
-                $urlFacturacionFinal = $empresa->pagina_web ?? $urlExtraida ?? null;
-                $establecimientoFinal = $empresa->nombre_empresa ?? $nombreExtraido ?? null;
-
-                // Actualizar solicitud con lo extraído / resuelto
-                $solicitud->update([
-                    'num_ticket' => $datosExtraidos['num_ticket'] ?? null,
-                    'texto_ocr' => $textoOCR,
-                    'establecimiento' => $establecimientoFinal,
-                    'url_facturacion' => $urlFacturacionFinal,
-                    'monto' => $datosExtraidos['monto'] ?? null,
-                    'texto_json' => json_encode($datosExtraidos),
-                    'fecha_ticket' => $datosExtraidos['fecha'],
-                ]);
-
-                if (!empty($empresa->id_giro)) {
-                    $datosGiroGuardados = $this->extractDatosPorGiroAndSave($solicitud->id, $empresa->id_giro, $textoOCR);
-                    // opcional: guardar un JSON resumen en solicitud
-                    $solicitud->update([
-                        'texto_json' => json_encode(array_merge(json_decode($solicitud->texto_json ?? '{}', true) ?? [], ['datos_giro' => $datosGiroGuardados]))
-                    ]);
-                }
 
                 DB::commit();
             } catch (\Exception $e) {
@@ -579,17 +535,16 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
     }
-    public function subirFactura($idUsr, $pdf,$xml, $id_solicitud)
+    public function subirFactura($idUsr, $pdf, $xml, $id_solicitud)
     {
         $sol = Solicitud::find($id_solicitud);
         $rutaPdf = $sol->guardarPDF($pdf, $idUsr);
         $sol->pdf_url = $rutaPdf;
         $rutaXML = $sol->guardarXML($xml, $idUsr);
         $sol->xml_url = $rutaXML;
-        $sol->estado_id=6;
+        $sol->estado_id = 6;
         $sol->save();
         return $sol;
-
     }
 
     public function getConsola($idUsr)
@@ -649,7 +604,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
             $datosGiro = $solicitud->datosGiro->map(function ($item) {
                 return [
-                    'nombre' => $item->dato->nombre_dato_giro ?? null,
+                    'nombre' => $item->etiqueta ?? null,
                     'valor'  => $item->valor,
                 ];
             });

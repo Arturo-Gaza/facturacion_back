@@ -63,8 +63,7 @@ class Solicitud extends Model
     public function datosGiro()
     {
         // Se carga también la relación 'dato' y solo los campos que necesitas
-        return $this->hasMany(SolicitudDatoGiro::class, 'id_solicitud')
-            ->with('dato:id,nombre_dato_giro');
+        return $this->hasMany(SolicitudDatoAdicional::class, 'id_solicitud');
     }
     /**
      * Manejo de la carga de archivos
