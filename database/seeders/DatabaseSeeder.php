@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CatEmpresa;
 use App\Models\CatGiro;
+use App\Models\CatMotivoRechazo;
 use App\Models\DatosPorGiro;
 use App\Models\SistemaTickets\EstatusSolicitud;
 use App\Models\User;
@@ -44,7 +45,8 @@ class DatabaseSeeder extends Seeder
             CatGirosSeeder::class,
             DatosPorGiroSeeder::class,
             CatEstatusMovimientoSeeder::class,
-            PreciosSeeder::class
+            PreciosSeeder::class,
+            CatMotivoRechazoSeeder::class
             // CatEmpresasSeeder::class
 
         ]);

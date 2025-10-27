@@ -44,6 +44,7 @@ use App\Http\Controllers\PrecioController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DatosFiscalesController;
+use App\Http\Controllers\MotivoRechazoController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SuscripcionController;
@@ -211,11 +212,11 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('tabDepartamento/cateDepartamento', [TabDepartamentosCategoriasController::class, 'AddDelete']);
 
     //Ruta para tab observaciones solicitud
-    Route::get('tabObservacionSolicitud/getAll', [TabObservacionesSolicitudController::class, 'getAll']);
-    Route::get('tabObservacionSolicitud/getById/{id}', [TabObservacionesSolicitudController::class, 'getById']);
-    Route::get('tabObservacionSolicitud/solicitud/{id}', [TabObservacionesSolicitudController::class, 'getBySolicitud']);
-    Route::post('tabObservacionSolicitud/register', [TabObservacionesSolicitudController::class, 'store']);
-    Route::put('tabObservacionSolicitud/update/{id}', [TabObservacionesSolicitudController::class, 'update']);
+    Route::get('ObservacionSolicitud/getAll', [TabObservacionesSolicitudController::class, 'getAll']);
+    Route::get('ObservacionSolicitud/getById/{id}', [TabObservacionesSolicitudController::class, 'getById']);
+    Route::get('ObservacionSolicitud/solicitud/{id}', [TabObservacionesSolicitudController::class, 'getBySolicitud']);
+    Route::post('ObservacionSolicitud/register', [TabObservacionesSolicitudController::class, 'store']);
+    Route::put('ObservacionSolicitud/update/{id}', [TabObservacionesSolicitudController::class, 'update']);
 
     Route::post('tabSolicitudes/cambiarEstatus', [TabSolicitudesController::class, 'cambiarEstatus']);
 
@@ -372,6 +373,9 @@ Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::c
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 
+Route::post('solicitud/rechazar', [SolicitudController::class, 'rechazar']);
+
+
 Route::get('solicitud/eliminar/{id}', [SolicitudController::class, 'eliminar']);
 Route::get('solicitud/obtenerImagen/{id}', [SolicitudController::class, 'obtenerImagen']);
 Route::get('solicitud/getById/{id}', [SolicitudController::class, 'getById']);
@@ -379,7 +383,7 @@ Route::post('solicitud/register', [SolicitudController::class, 'store']);
 Route::put('solicitud/update/{id}', [SolicitudController::class, 'update']);
 Route::post('solicitud/actualizarReceptor', [SolicitudController::class, 'actualizarReceptor']);
 
-
+Route::get('motivoRechazo/getAllActivo', [MotivoRechazoController::class, 'getAllActivo']);
 
 Route::get('datosFiscales/getAll', [DatosFiscalesController::class, 'getAll']);
 Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getById']);

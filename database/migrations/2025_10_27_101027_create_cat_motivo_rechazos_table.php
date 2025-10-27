@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tab_solicitudes', function (Blueprint $table) {
-            //
-              $table->boolean('cotizacion_global')->default(false)->nullable();
+        Schema::create('cat_motivo_rechazos', function (Blueprint $table) {
+            $table->id();
+            $table->text('descripcion')->nullable();
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
         });
     }
 
@@ -22,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tab_solicitudes', function (Blueprint $table) {
-            $table->dropColumn('cotizacion_global');
-        });
+        Schema::dropIfExists('cat_motivo_rechazos');
     }
 };

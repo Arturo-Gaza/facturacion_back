@@ -28,7 +28,7 @@ class SolicitudController extends Controller
         }
     }
 
-        public function getFacturaPDF($id_solicitud)
+    public function getFacturaPDF($id_solicitud)
     {
         try {
             $all = $this->solicitudRepository->getFacturaPDF($id_solicitud);
@@ -38,10 +38,10 @@ class SolicitudController extends Controller
         }
     }
 
-        public function getFacturaXML($id_solicitud)
+    public function getFacturaXML($id_solicitud)
     {
         try {
-            
+
             $all = $this->solicitudRepository->getFacturaXML($id_solicitud);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
@@ -69,14 +69,14 @@ class SolicitudController extends Controller
             ]);
 
             $id_solicitud = $request->input('id_solicitud');
-            
+
             if ($request->hasFile('pdf')) {
                 $pdf = $request->file('pdf');
             }
             if ($request->hasFile('xml')) {
                 $xml = $request->file('xml');
             }
-            $all = $this->solicitudRepository->subirFactura($idUsr, $pdf,$xml, $id_solicitud);
+            $all = $this->solicitudRepository->subirFactura($idUsr, $pdf, $xml, $id_solicitud);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
@@ -109,6 +109,24 @@ class SolicitudController extends Controller
     {
         try {
             $all = $this->solicitudRepository->procesar($id);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
+
+
+    public function rechazar(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_solicitud' => 'required|integer',
+                'id_motivo_rechazo' => 'required|integer'
+            ]);
+            $id_user = auth('sanctum')->id();
+            $id_solicitud = $request->input('id_solicitud');
+            $id_motivo_rechazo = $request->input('id_motivo_rechazo');
+            $all = $this->solicitudRepository->rechazar($id_solicitud, $id_motivo_rechazo, $id_user);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);

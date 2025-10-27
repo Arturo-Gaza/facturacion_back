@@ -2,6 +2,7 @@
 
 namespace App\Models\SistemaTickets;
 
+use App\Models\Solicitud;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ class TabObservacionesSolicitudes extends Model
     ];
     public function solicitud()
     {
-        return $this->belongsTo(TabSolicitud::class, 'id_solicitud');
+        return $this->belongsTo(Solicitud::class, 'id_solicitud');
     }
     public function usuario()
     {

@@ -3,12 +3,15 @@
 namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
+use App\Models\ArchivoCarga\TabObservaciones;
 use App\Models\CatDatosPorGiro;
 use App\Models\CatEmpresa;
 use App\Models\CatGiro;
+use App\Models\CatMotivoRechazo;
 use App\Models\DatosFiscal;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
+use App\Models\SistemaTickets\TabObservacionesSolicitudes;
 use App\Models\Solicitud;
 use App\Models\SolicitudDatoAdicional;
 use App\Models\SolicitudDatoGiro;
@@ -209,6 +212,49 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return $solicitud->fresh();
     }
 
+    public function rechazar($id_solicitud, $id_motivo_rechazo, $id_user)
+    {
+        return DB::transaction(function () use ($id_solicitud, $id_motivo_rechazo, $id_user) {
+
+            $solicitud = Solicitud::find($id_solicitud);
+            if (!$solicitud) {
+                throw new \Exception('Solicitud no encontrada.');
+            }
+
+            $motivo = CatMotivoRechazo::find($id_motivo_rechazo);
+            if (!$motivo) {
+                throw new \Exception('Motivo de rechazo no encontrado.');
+            }
+
+            // Evitar rechazar varias veces la misma solicitud
+            if ($solicitud->estado_id === 7) {
+                throw new \Exception('La solicitud ya fue rechazada.');
+            }
+
+            // Actualizar estado de solicitud
+            $solicitud->update([
+                'estado_id' => 7
+            ]);
+
+            // Registrar en bitácora
+            TabBitacoraSolicitud::create([
+                'id_solicitud' => $id_solicitud,
+                'id_estatus'   => 7,
+                'id_usuario'   => $id_user
+            ]);
+
+            // Registrar observación (guarda texto y referencia)
+            TabObservacionesSolicitudes::create([
+                'id_solicitud'          => $id_solicitud,
+                'id_usuario'            => $id_user,
+                'id_motivo_rechazo'     => $id_motivo_rechazo, // 👈 añade este campo en la tabla si aún no existe
+                'observacion'           => "Rechazado por:" . $motivo->descripcion
+            ]);
+
+            return $solicitud->fresh();
+        });
+    }
+
     private function procesarImagenConOCR(Solicitud $solicitud): ?string
     {
         try {
@@ -236,7 +282,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function getFacturaPDF($id_solicitud)
     {
-                $solicitud = Solicitud::find($id_solicitud);
+        $solicitud = Solicitud::find($id_solicitud);
 
         if (!$solicitud) {
             Log::error("Solicitud no encontrada: {$id_solicitud}");
@@ -262,7 +308,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function getFacturaXML($id_solicitud)
     {
-                $solicitud = Solicitud::find($id_solicitud);
+        $solicitud = Solicitud::find($id_solicitud);
 
         if (!$solicitud) {
             Log::error("Solicitud no encontrada: {$id_solicitud}");
