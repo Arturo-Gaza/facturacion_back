@@ -261,6 +261,9 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('solicitud/actualizarEstatus', [SolicitudController::class, 'actualizarEstatus']);
 
     Route::post('solicitud/subirFactura', [SolicitudController::class, 'subirFactura']);
+    Route::get('solicitud/getFacturaPDF/{id}', [SolicitudController::class, 'getFacturaPDF']);
+    Route::get('solicitud/getFacturaXML/{id}', [SolicitudController::class, 'getFacturaXML']);
+
     Route::get('solicitud/getConsola', [SolicitudController::class, 'getConsola']);
     Route::get('solicitud/getMesaAyuda', [SolicitudController::class, 'getMesaAyuda']);
     Route::get('solicitud/getDashboard', [SolicitudController::class, 'getDashboard']);

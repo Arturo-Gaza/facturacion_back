@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -232,6 +233,58 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getAll()
     {
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->get();
+    }
+    public function getFacturaPDF($id_solicitud)
+    {
+                $solicitud = Solicitud::find($id_solicitud);
+
+        if (!$solicitud) {
+            Log::error("Solicitud no encontrada: {$id_solicitud}");
+            return null;
+        }
+
+        if (
+            !$solicitud->pdf_url ||
+            !Storage::disk('public')->exists($solicitud->getRawOriginal('pdf_url'))
+        ) {
+            Log::error("PDF no encontrado para solicitud: {$solicitud->id}");
+            return null;
+        }
+
+        try {
+            $pdfPath = Storage::disk('public')->path($solicitud->getRawOriginal('pdf_url'));
+            $pdfData = base64_encode(file_get_contents($pdfPath));
+            return $pdfData;
+        } catch (\Exception $e) {
+            Log::error("Error al leer el PDF de la solicitud {$solicitud->id}: " . $e->getMessage());
+            return null;
+        }
+    }
+    public function getFacturaXML($id_solicitud)
+    {
+                $solicitud = Solicitud::find($id_solicitud);
+
+        if (!$solicitud) {
+            Log::error("Solicitud no encontrada: {$id_solicitud}");
+            return null;
+        }
+
+        if (
+            !$solicitud->xml_url ||
+            !Storage::disk('public')->exists($solicitud->getRawOriginal('xml_url'))
+        ) {
+            Log::error("XML no encontrado para solicitud: {$solicitud->id}");
+            return null;
+        }
+
+        try {
+            $xmlPath = Storage::disk('public')->path($solicitud->getRawOriginal('xml_url'));
+            $xmlData = base64_encode(file_get_contents($xmlPath));
+            return $xmlData;
+        } catch (\Exception $e) {
+            Log::error("Error al leer el XML de la solicitud {$solicitud->id}: " . $e->getMessage());
+            return null;
+        }
     }
     public function getMesaAyuda()
     {

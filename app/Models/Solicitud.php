@@ -186,8 +186,8 @@ class Solicitud extends Model
      */
     public function eliminarPDF(): void
     {
-        if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
-            Storage::delete($this->getRawOriginal('imagen_url'));
+        if ($this->pdf_url && Storage::exists($this->getRawOriginal('pdf_url'))) {
+            Storage::delete($this->getRawOriginal('pdf_url'));
         }
     }
 
@@ -233,11 +233,11 @@ class Solicitud extends Model
      */
     public function getRutaXMLFAttribute(): ?string
     {
-        if (!$this->imagen_url) {
+        if (!$this->xml_url) {
             return null;
         }
 
-        return Storage::disk('public')->path($this->getRawOriginal('imagen_url'));
+        return Storage::disk('public')->path($this->getRawOriginal('xml_url'));
     }
 
     /**
@@ -245,8 +245,8 @@ class Solicitud extends Model
      */
     public function eliminarXML(): void
     {
-        if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
-            Storage::delete($this->getRawOriginal('imagen_url'));
+        if ($this->xml_url && Storage::exists($this->getRawOriginal('xml_url'))) {
+            Storage::delete($this->getRawOriginal('xml_url'));
         }
     }
 

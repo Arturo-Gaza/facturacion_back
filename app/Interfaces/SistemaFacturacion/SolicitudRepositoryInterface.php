@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 interface SolicitudRepositoryInterface
 {
     public function getAll();
+     public function getFacturaPDF($id);
+      public function getFacturaXML($id);
     public function getConsola($idUsr);
     public function subirFactura($idUsr,$pdf,$xml,$id_solicitud);
      public function getMesaAyuda();
