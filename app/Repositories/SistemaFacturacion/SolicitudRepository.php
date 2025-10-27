@@ -280,6 +280,25 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->get();
     }
+
+    public function getTodosDatos($id)
+    {
+        $sol = Solicitud::find($id);
+        $todo_datos_txt = $sol->texto_json;
+        $data = json_decode($todo_datos_txt, true);
+        if ($data === null || !isset($data['todos_datos'])) {
+            // Manejar el caso de error o campo no encontrado
+            error_log("Error al decodificar JSON o el campo 'todos_datos' no existe.");
+            return null;
+        }
+        $todosDatos = $data['todos_datos'];
+
+
+        $datosLimpios = array_filter($todosDatos, function ($value) {
+            return $value !== null;
+        });
+        return $datosLimpios;
+    }
     public function getFacturaPDF($id_solicitud)
     {
         $solicitud = Solicitud::find($id_solicitud);

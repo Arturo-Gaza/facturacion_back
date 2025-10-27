@@ -237,9 +237,21 @@ class SolicitudController extends Controller
         }
     }
 
+
+    public function getTodosDatos($id)
+    {
+        try {
+            $solicitud = $this->solicitudRepository->getTodosDatos($id);
+            return ApiResponseHelper::sendResponse($solicitud, 'Solicitud obtenida', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(Request $request)
     {
         DB::beginTransaction();
+        info('Este es un mensaje informativo');
         try {
             $id_user = auth('sanctum')->id();
             $solicitud = $this->solicitudRepository->store($request, $id_user);

@@ -21,7 +21,7 @@ class AIDataExtractionService
         $this->apiUrl = $config['api_url'];
     }
 
-    public function extractStructuredData(string $textoOCR, string $promptType = 'receipt_extraction',array $parameters=null): array
+    public function extractStructuredData(string $textoOCR, string $promptType = 'receipt_extraction', array $parameters = null): array
     {
         $prompt = $this->getPromptTemplate($promptType, $textoOCR);
         if ($parameters) {
@@ -122,13 +122,15 @@ class AIDataExtractionService
                     'contents' => [['parts' => [['text' => $prompt]]]],
                     'generationConfig' => [
                         'temperature' => 0.1,
-                        'maxOutputTokens' => 1000,
+                        'maxOutputTokens' => 4096,
                     ]
                 ]);
 
             if ($response->successful()) {
                 $data = $response->json();
-                $jsonString = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                error_log(json_encode($data));
+                $jsonString = $this->extractTextFromResponse($data);
+                error_log($jsonString);
                 return $this->parseJSONResponse($jsonString);
             }
         } catch (\Exception $e) {
@@ -136,6 +138,36 @@ class AIDataExtractionService
         }
 
         return $this->fallbackExtraction($textoOCR);
+    }
+    private function extractTextFromResponse(array $data): string
+    {
+        // Múltiples formas de extraer el texto
+        $text = '';
+
+        // Intento 1: Forma normal
+        if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
+            $text = $data['candidates'][0]['content']['parts'][0]['text'];
+        }
+        // Intento 2: Si está vacío, buscar en otra estructura
+        elseif (isset($data['candidates'][0]['content']['parts'][0])) {
+            $part = $data['candidates'][0]['content']['parts'][0];
+            if (is_string($part)) {
+                $text = $part;
+            } elseif (is_array($part) && isset($part['text'])) {
+                $text = $part['text'];
+            }
+        }
+        // Intento 3: Buscar en toda la estructura
+        else {
+            $text = json_encode($data); // Como fallback
+        }
+
+        // Limpiar markdown si existe
+        $text = str_replace('```json', '', $text);
+        $text = str_replace('```', '', $text);
+        $text = trim($text);
+
+        return $text;
     }
 
     private function getPromptTemplate(string $type, string $textoOCR): string
@@ -182,6 +214,7 @@ PROMPT
 
     private function parseJSONResponse(string $jsonString): array
     {
+
         $jsonString = preg_replace('/```json|```/', '', $jsonString);
         $jsonString = trim($jsonString);
 
