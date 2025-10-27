@@ -100,6 +100,10 @@ INSTRUCCIONES ESPECÍFICAS:
 - Para el giro busca en el cat_giro el giro que sea correspondiente de la empresa que emitio el ticket,utiliza solo la informacion de cat_giro, no inventes nada   
 - Para datos_facturacion_adicionales: Identificar y extraer cualquier par de "clave:valor" que parezca ser un identificador, código de facturación, número de serie, clave de caja, folio fiscal, o cualquier dato que esté explícitamente etiquetado como necesario para el proceso de facturación y que no se haya capturado en los campos principales. Ejemplos de claves a buscar: "CLAVE","CÓDIGO DE FACTURACIÓN", "SERIE", "CAJA", "FOLIO FISCAL", "TERMINACIÓN TARJETA", "MÉTODO DE PAGO", "USO CFDI", etc. Almacenar estos pares dentro del objeto JSON. Si no hay datos adicionales relevantes, regresa un objeto vacío
 - Para todos_datos: Identificar y extraer cualquier par de "clave:valor" de todo el tiquet, puedes anidar los elementos si es necesario pero omite todos los campos que tengan valor o etiqueta null
+- Algunos campos que es importante considerar para datos_facturacion_adicionales pueden ser, pero puede haber mas:
+--CÓDIGO DE AUTORIZACIÓN
+--MÉTODO DE PAGO
+--Numero de sucursal
 
 PARA IDENTIFICACIÓN DE RFC:
    - Buscar patrones de 12-13 caracteres alfanuméricos
