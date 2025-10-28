@@ -9,12 +9,14 @@ use App\Models\CatEmpresa;
 use App\Models\CatGiro;
 use App\Models\CatMotivoRechazo;
 use App\Models\DatosFiscal;
+use App\Models\Precio;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
 use App\Models\SistemaTickets\TabObservacionesSolicitudes;
 use App\Models\Solicitud;
 use App\Models\SolicitudDatoAdicional;
 use App\Models\SolicitudDatoGiro;
+use App\Models\Suscripciones;
 use App\Models\User;
 use App\Services\AIDataExtractionService;
 use App\Services\OCRService;
@@ -279,6 +281,64 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getAll()
     {
         return Solicitud::with(['usuario', 'empleado', 'estadoSolicitud'])->get();
+    }
+
+    public function calcularPrecio($id_solicitud, $id_user)
+    {
+        $hoy = Carbon::now()->startOfDay();
+        $user = User::find($id_user);
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+        // Si no hay plan directo, intentar suscripción activa
+        $plan = null;
+
+        if ($efectivoUsuario->suscripcionActiva) {
+            $plan = $efectivoUsuario->suscripcionActiva->plan;
+        }
+        if (!$plan) {
+            return [
+                'error' => 'No se encontró plan para el usuario.',
+                'monto_a_cobrar' => 0.00,
+                'tier' => null,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo,
+                'insuficiente_saldo' => false,
+                'tipo' => null,
+            ];
+        }
+         if ($plan->esMensual()) {
+            // Buscar suscripción activa/vigente (si aplica)
+            $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+            $vigente = false;
+            if ($suscripcion) {
+                $vigente = $suscripcion->estaVigente();
+            }
+
+            return [
+                'tipo' => 'mensual',
+                'vigente' => (bool) $vigente,
+                'monto_a_cobrar' => 0.00,
+                'tier' => null,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo,
+                'insuficiente_saldo' => false,
+            ];
+        }
+         $precioRegistro = Precio::where('id_plan', $plan->id)
+            ->where(function ($q) use ($hoy) {
+                $q->whereNull('vigencia_desde')->orWhere('vigencia_desde', '<=', $hoy);
+            })
+            ->where(function ($q) use ($hoy) {
+                $q->whereNull('vigencia_hasta')->orWhere('vigencia_hasta', '>=', $hoy);
+            })
+            ->orderByDesc('vigencia_desde')
+            ->first();
+
+        // fallback al precio directo en la tabla cat_planes si existe
+        $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
+
     }
 
     public function getTodosDatos($id)
@@ -649,7 +709,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getByUsuario(int $usuario_id)
     {
         return Solicitud::where('usuario_id', $usuario_id)
-            ->whereNot('estado_id', 5)
+           // ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
     }
@@ -786,7 +846,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         // Obtener conteos con los nombres de estado desde el catálogo
         $conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
-            ->whereNot('estado_id', 5)
+            //->whereNot('estado_id', 5)
             ->where('solicitudes.created_at', '>=', now()->subDays(30))
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
             ->selectRaw('cat_estatus_solicitud.descripcion_estatus_solicitud as estado, COUNT(*) as count')
