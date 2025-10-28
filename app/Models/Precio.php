@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+
 class Precio extends Model
 {
     use HasFactory;
@@ -15,9 +16,12 @@ class Precio extends Model
 
     protected $fillable = [
         'id_plan',
+        'nombre_precio',
         'precio',
         'vigencia_desde',
-        'vigencia_hasta'
+        'vigencia_hasta',
+        'desde_factura',
+        'hasta_factura'
     ];
 
     protected $casts = [
@@ -28,6 +32,6 @@ class Precio extends Model
 
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(CatPlanes::class);
     }
 }

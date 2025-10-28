@@ -305,11 +305,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_despues' => (float) $efectivoUsuario->saldo,
                 'insuficiente_saldo' => false,
                 'tipo' => null,
+                'factura_numero' => 0
             ];
         }
-         if ($plan->esMensual()) {
+        $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+        if ($plan->esMensual()) {
             // Buscar suscripción activa/vigente (si aplica)
-            $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
 
             $vigente = false;
             if ($suscripcion) {
@@ -324,21 +326,38 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
                 'saldo_despues' => (float) $efectivoUsuario->saldo,
                 'insuficiente_saldo' => false,
+                'factura_numero' => 0
             ];
         }
-         $precioRegistro = Precio::where('id_plan', $plan->id)
+        $num_factura = $suscripcion->facturas_realizadas + 1;
+        $precioRegistro = Precio::where('id_plan', $plan->id)
             ->where(function ($q) use ($hoy) {
                 $q->whereNull('vigencia_desde')->orWhere('vigencia_desde', '<=', $hoy);
             })
             ->where(function ($q) use ($hoy) {
                 $q->whereNull('vigencia_hasta')->orWhere('vigencia_hasta', '>=', $hoy);
             })
+            ->where(function ($q) use ($num_factura) {
+                $q->whereNull('desde_factura')->orWhere('desde_factura', '<=', $num_factura );
+            })
+            ->where(function ($q) use ($num_factura) {
+                $q->whereNull('hasta_factura')->orWhere('hasta_factura', '>=', $num_factura );
+            })
             ->orderByDesc('vigencia_desde')
             ->first();
 
         // fallback al precio directo en la tabla cat_planes si existe
+
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
 
+        return [
+            'monto_a_cobrar' =>  $precioUnitario,
+            'tier' => $precioRegistro->nombre_precio,
+            'saldo_actual' => (float) $efectivoUsuario->saldo,
+            'saldo_despues' => (float) $efectivoUsuario->saldo +$precioUnitario,
+            'insuficiente_saldo' => false,
+            'factura_numero' => $num_factura 
+        ];
     }
 
     public function getTodosDatos($id)
@@ -709,7 +728,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getByUsuario(int $usuario_id)
     {
         return Solicitud::where('usuario_id', $usuario_id)
-           // ->whereNot('estado_id', 5)
+            // ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
     }

@@ -27,6 +27,16 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
+    public function calcularPrecio($id_solicitud)
+    {
+        try {
+            $id_user = auth()->user()->id;
+            $all = $this->solicitudRepository->calcularPrecio($id_solicitud, $id_user);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
+        }
+    }
 
     public function getFacturaPDF($id_solicitud)
     {

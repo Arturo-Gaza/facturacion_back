@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 interface SolicitudRepositoryInterface
 {
   public function getAll();
+  public function calcularPrecio($id_solicitud,$id_user);
   public function getFacturaPDF($id);
   public function getFacturaXML($id);
   public function getConsola($idUsr);

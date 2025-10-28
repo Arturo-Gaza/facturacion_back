@@ -270,6 +270,8 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('solicitud/getDashboard', [SolicitudController::class, 'getDashboard']);
     Route::put('solicitud/editarTicket/{id}', [SolicitudController::class, 'editarTicket']);
 
+    Route::get('solicitud/calcularPrecio/{id}', [SolicitudController::class, 'calcularPrecio']);
+
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
     Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
 
