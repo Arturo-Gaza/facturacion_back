@@ -20,13 +20,21 @@ class MovimientoSaldo extends Model
         'monto',
         'currency',
         'amount_cents',
-        'estatus_movimiento_id', // coincide con la migración
+        'estatus_movimiento_id',
         'saldo_resultante',
+        'saldo_antes',           // <-- nuevo
         'descripcion',
         'payment_intent_id',
         'stripe_charge_id',
         'customer_id',
         'payment_method',
+        'payment_method_type',   // <-- nuevo
+        'card_brand',            // <-- nuevo
+        'card_last4',            // <-- nuevo
+        'fees_amount',           // <-- nuevo
+        'fees_currency',         // <-- nuevo
+        'net_amount',            // <-- nuevo
+        'fees_raw',              // <-- nuevo (JSON)
         'metadata',
         'stripe_event_id',
         'webhook_payload',
@@ -50,22 +58,24 @@ class MovimientoSaldo extends Model
         'refunded_amount' => 'decimal:2',
         'reverted' => 'boolean',
         'processed_at' => 'datetime',
+
+        // casts nuevos
+        'saldo_antes' => 'decimal:2',
+        'fees_amount' => 'decimal:2',
+        'net_amount' => 'decimal:2',
+        'fees_raw' => 'array',
+        'card_last4' => 'string',
+        'card_brand' => 'string',
+        'payment_method_type' => 'string',
+        'fees_currency' => 'string',
     ];
 
-    /**
-     * Relaciones
-     */
-    public function usuario(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'usuario_id');
-    }
-
-    /**
-     * Relación al estatus/ cat_estatus_movimiento
-     * Ajusta el nombre del modelo si tienes otro.
-     */
     public function estatusMovimiento(): BelongsTo
     {
         return $this->belongsTo(EstatusMovimiento::class, 'estatus_movimiento_id');
+    }
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'usuario_id');
     }
 }

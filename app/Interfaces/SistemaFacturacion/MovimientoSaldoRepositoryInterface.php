@@ -8,6 +8,7 @@ interface MovimientoSaldoRepositoryInterface
 {
     public function getAll();
     public function getByID($id): ?MovimientoSaldo;
+    public function getMyMovimientos($idUsr);
     public function store(array $data): MovimientoSaldo;
     public function update(array $data, $id): ?MovimientoSaldo;
 }

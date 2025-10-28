@@ -272,7 +272,13 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
     Route::post('suscripcion/getAll', [SuscripcionController::class, 'getAll']);
-    
+
+    // MovimientoSaldo
+    Route::get('MovimientoSaldo/getAll', [MovimientoSaldoController::class, 'getAll']);
+    Route::get('MovimientoSaldo/getMyMovimientos', [MovimientoSaldoController::class, 'getMyMovimientos']);
+    Route::get('MovimientoSaldo/getById/{id}', [MovimientoSaldoController::class, 'getById']);
+    Route::post('MovimientoSaldo/register', [MovimientoSaldoController::class, 'store']);
+    Route::put('MovimientoSaldo/update/{id}', [MovimientoSaldoController::class, 'update']);
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
@@ -349,11 +355,6 @@ Route::get('Factura/getById/{id}', [FacturaController::class, 'getById']);
 Route::post('Factura/register', [FacturaController::class, 'store']);
 Route::put('Factura/update/{id}', [FacturaController::class, 'update']);
 
-// MovimientoSaldo
-Route::get('MovimientoSaldo/getAll', [MovimientoSaldoController::class, 'getAll']);
-Route::get('MovimientoSaldo/getById/{id}', [MovimientoSaldoController::class, 'getById']);
-Route::post('MovimientoSaldo/register', [MovimientoSaldoController::class, 'store']);
-Route::put('MovimientoSaldo/update/{id}', [MovimientoSaldoController::class, 'update']);
 
 // Precio
 Route::get('Precio/getAll', [PrecioController::class, 'getAll']);

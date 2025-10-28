@@ -37,6 +37,17 @@ class MovimientoSaldoController extends Controller
         }
     }
 
+        public function getMyMovimientos()
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $movimiento = $this->movimientoSaldoRepository->getMyMovimientos($idUsr);
+            return ApiResponseHelper::sendResponse($movimiento, 'Movimiento de saldo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
     public function store(Request $request)
     {
         DB::beginTransaction();
