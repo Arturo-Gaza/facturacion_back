@@ -9,6 +9,7 @@ use App\Models\CatEmpresa;
 use App\Models\CatGiro;
 use App\Models\CatMotivoRechazo;
 use App\Models\DatosFiscal;
+use App\Models\MovimientoSaldo;
 use App\Models\Precio;
 use App\Models\SistemaTickets\CatEstatusSolicitud;
 use App\Models\SistemaTickets\TabBitacoraSolicitud;
@@ -161,23 +162,97 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $solicitud->fresh();
     }
-    public function enviar(int $id_sol, int $id_user)
-    {
+   public function enviar(int $id_sol, int $id_user)
+{
+    DB::beginTransaction();
+
+    try {
         $solicitud = Solicitud::find($id_sol);
         if (!$solicitud) {
+            DB::rollBack();
             return null;
         }
+
+        // Actualizar estado de la solicitud
         $solicitud->update([
             'estado_id' => 2
         ]);
 
+        // Crear registro en bitácora
         TabBitacoraSolicitud::create([
             'id_solicitud' => $id_sol,
-            'id_estatus' => 2, // Asumiendo que 2 es el ID del estatus "Enviado"
-            'id_usuario' => $id_user // O el ID del usuario que realiza la acción
+            'id_estatus' => 2,
+            'id_usuario' => $id_user
         ]);
+
+        $user = User::find($id_user);
+        $estatusPendienteId = 1;
+
+        // Calcular precio y obtener datos de cobro
+        $datosCobro = $this->calcularPrecio($id_sol, $id_user);
+        $monto_a_cobrar = $datosCobro["monto_a_cobrar"];
+
+        // Crear movimiento de saldo
+        $mov = MovimientoSaldo::create([
+            'tipo' => "abono",
+            'usuario_id' => $id_user,
+            'monto' => $monto_a_cobrar,
+            'currency' => env('DIVISA', 'mxn'),
+            'amount_cents' => $monto_a_cobrar * 100,
+            'estatus_movimiento_id' => $estatusPendienteId,
+            'saldo_antes' => $datosCobro["saldo_actual"],
+            'saldo_resultante' => $datosCobro["saldo_despues"],
+            'descripcion' => sprintf(
+                "Cobro de %s %s por la facturación del ticket %s",
+                $monto_a_cobrar,
+                env('DIVISA', 'mxn'),
+                $solicitud->num_ticket
+            ),
+            'refunded_amount' => 0,
+            'reverted' => false,
+        ]);
+
+        // Actualizar saldo del usuario
+        $user->saldo = $datosCobro["saldo_despues"];
+        $user->save();
+
+        // Incrementar contador de facturas
+        $this->incrementarFacturasRealizadas($id_sol, $id_user);
+
+        DB::commit();
+
         return $solicitud->fresh();
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error en enviar solicitud: ' . $e->getMessage());
+        
+        return null;
     }
+}
+
+    public function incrementarFacturasRealizadas($id_solicitud, $id_user)
+    {
+        try {
+            $user = User::find($id_user);
+            $efectivoUsuario = $user->usuario_padre
+                ? User::find($user->usuario_padre) ?? $user
+                : $user;
+
+            $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+            if ($suscripcion) {
+                $suscripcion->increment('facturas_realizadas');
+                return true;
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error al incrementar facturas realizadas: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     public function asignar($id_user, $id_solicitud, $id_empleado)
     {
         $solicitud = Solicitud::find($id_solicitud);
@@ -354,7 +429,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'monto_a_cobrar' =>  $precioUnitario,
             'tier' => $precioRegistro->nombre_precio,
             'saldo_actual' => (float) $efectivoUsuario->saldo,
-            'saldo_despues' => (float) $efectivoUsuario->saldo + $precioUnitario,
+            'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
             'insuficiente_saldo' => false,
             'factura_numero' => $num_factura
         ];
