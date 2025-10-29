@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::table('cat_estatus_solicitud', function (Blueprint $table) {
             //
             $table->string('descripcion_cliente')->nullable()->after('descripcion_estatus_solicitud');
-            $table->string('color', 7)->nullable()->after('mandarCorreo');
-            $table->string('color_cliente', 7)->nullable()->after('color');
+            $table->string('color', 20)->nullable()->after('mandarCorreo');
+            $table->string('color_cliente', 20)->nullable()->after('color');
         });
     }
 
