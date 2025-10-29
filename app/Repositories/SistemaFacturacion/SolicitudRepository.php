@@ -162,74 +162,73 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $solicitud->fresh();
     }
-   public function enviar(int $id_sol, int $id_user)
-{
-    DB::beginTransaction();
+    public function enviar(int $id_sol, int $id_user)
+    {
+        DB::beginTransaction();
 
-    try {
-        $solicitud = Solicitud::find($id_sol);
-        if (!$solicitud) {
+        try {
+            $solicitud = Solicitud::find($id_sol);
+            if (!$solicitud) {
+                DB::rollBack();
+                return null;
+            }
+
+            // Actualizar estado de la solicitud
+            $solicitud->update([
+                'estado_id' => 2
+            ]);
+
+            // Crear registro en bitácora
+            TabBitacoraSolicitud::create([
+                'id_solicitud' => $id_sol,
+                'id_estatus' => 2,
+                'id_usuario' => $id_user
+            ]);
+
+            $user = User::find($id_user);
+            $estatusPendienteId = 1;
+
+            // Calcular precio y obtener datos de cobro
+            $datosCobro = $this->calcularPrecio($id_sol, $id_user);
+            $monto_a_cobrar = $datosCobro["monto_a_cobrar"];
+
+            // Crear movimiento de saldo
+            $mov = MovimientoSaldo::create([
+                'tipo' => "cargo",
+                'usuario_id' => $id_user,
+                'monto' => $monto_a_cobrar,
+                'currency' => env('DIVISA', 'mxn'),
+                'amount_cents' => $monto_a_cobrar * 100,
+                'estatus_movimiento_id' => $estatusPendienteId,
+                'saldo_antes' => $datosCobro["saldo_actual"],
+                'saldo_resultante' => $datosCobro["saldo_despues"],
+                'descripcion' => sprintf(
+                    "Cobro de %s %s por la facturación del ticket %s",
+                    $monto_a_cobrar,
+                    env('DIVISA', 'mxn'),
+                    $solicitud->num_ticket
+                ),
+                'refunded_amount' => 0,
+                'reverted' => false,
+            ]);
+
+            // Actualizar saldo del usuario
+            $user->saldo = $datosCobro["saldo_despues"];
+            $user->save();
+
+            // Incrementar contador de facturas
+            $this->incrementarFacturasRealizadas($id_sol, $id_user);
+
+            DB::commit();
+
+            return $datosCobro["saldo_despues"];
+        } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error en enviar solicitud: ' . $e->getMessage());
+
             return null;
         }
-
-        // Actualizar estado de la solicitud
-        $solicitud->update([
-            'estado_id' => 2
-        ]);
-
-        // Crear registro en bitácora
-        TabBitacoraSolicitud::create([
-            'id_solicitud' => $id_sol,
-            'id_estatus' => 2,
-            'id_usuario' => $id_user
-        ]);
-
-        $user = User::find($id_user);
-        $estatusPendienteId = 1;
-
-        // Calcular precio y obtener datos de cobro
-        $datosCobro = $this->calcularPrecio($id_sol, $id_user);
-        $monto_a_cobrar = $datosCobro["monto_a_cobrar"];
-
-        // Crear movimiento de saldo
-        $mov = MovimientoSaldo::create([
-            'tipo' => "cargo",
-            'usuario_id' => $id_user,
-            'monto' => $monto_a_cobrar,
-            'currency' => env('DIVISA', 'mxn'),
-            'amount_cents' => $monto_a_cobrar * 100,
-            'estatus_movimiento_id' => $estatusPendienteId,
-            'saldo_antes' => $datosCobro["saldo_actual"],
-            'saldo_resultante' => $datosCobro["saldo_despues"],
-            'descripcion' => sprintf(
-                "Cobro de %s %s por la facturación del ticket %s",
-                $monto_a_cobrar,
-                env('DIVISA', 'mxn'),
-                $solicitud->num_ticket
-            ),
-            'refunded_amount' => 0,
-            'reverted' => false,
-        ]);
-
-        // Actualizar saldo del usuario
-        $user->saldo = $datosCobro["saldo_despues"];
-        $user->save();
-
-        // Incrementar contador de facturas
-        $this->incrementarFacturasRealizadas($id_sol, $id_user);
-
-        DB::commit();
-
-        return $datosCobro["saldo_despues"];
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error en enviar solicitud: ' . $e->getMessage());
-        
-        return null;
     }
-}
 
     public function incrementarFacturasRealizadas($id_solicitud, $id_user)
     {
@@ -849,7 +848,10 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         $solicitudesFormateadas = $solicitudes->map(function ($solicitud) {
             $estatusCatalogo = CatEstatusSolicitud::pluck('descripcion_estatus_solicitud', 'id')->toArray();
+            $coloresCatalogo = CatEstatusSolicitud::pluck('color', 'id')->toArray();
+
             $nombreEstatus = $estatusCatalogo[$solicitud->estado_id] ?? 'Desconocido';
+            $colorEstatus = $coloresCatalogo[$solicitud->estado_id] ?? '#CCCCCC'; // Color por defecto
             // --- PREPARACIÓN: Definir todas las posibles claves de fecha inicializadas a null ---
             $clavesFechaNull = [];
             foreach ($estatusCatalogo as $descripcion) {
@@ -902,6 +904,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'asignado_a' => $nombreAsignado,
                 'estado_id' => $solicitud->estado_id,
                 'nombre_estado' => $nombreEstatus,
+                'color_estado' => $colorEstatus,
                 'url_facturacion' => $solicitud->url_facturacion,
                 'monto' => $solicitud->monto,
                 'idreceptor' => $solicitud->id_receptor,
