@@ -37,12 +37,43 @@ class MovimientoSaldoController extends Controller
         }
     }
 
-        public function getMyMovimientos()
+    public function getMyMovimientos()
     {
         try {
             $idUsr = auth()->user()->id;
             $movimiento = $this->movimientoSaldoRepository->getMyMovimientos($idUsr);
             return ApiResponseHelper::sendResponse($movimiento, 'Movimiento de saldo obtenido', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
+    }
+
+    public function exportExcel()
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $tempFile = $this->movimientoSaldoRepository->exportExcel($idUsr);
+            return response()->download($tempFile)->deleteFileAfterSend(true);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+    public function exportPdf()
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $datos = $this->movimientoSaldoRepository->exportPdf($idUsr);
+            $pdf = $datos["pdf"];
+            $fileName = $datos["fileName"];
+            return response()->streamDownload(
+                function () use ($pdf) {
+                    echo $pdf->output();
+                },
+                $fileName,
+                [
+                    'Content-Type' => 'application/pdf',
+                ]
+            );
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }

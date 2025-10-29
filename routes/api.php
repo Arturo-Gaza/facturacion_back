@@ -281,6 +281,10 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('MovimientoSaldo/getById/{id}', [MovimientoSaldoController::class, 'getById']);
     Route::post('MovimientoSaldo/register', [MovimientoSaldoController::class, 'store']);
     Route::put('MovimientoSaldo/update/{id}', [MovimientoSaldoController::class, 'update']);
+    Route::get('MovimientoSaldo/exportExcel', [MovimientoSaldoController::class, 'exportExcel']);
+    Route::get('MovimientoSaldo/exportPdf', [MovimientoSaldoController::class, 'exportPdf']);
+
+
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
