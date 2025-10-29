@@ -194,7 +194,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         // Crear movimiento de saldo
         $mov = MovimientoSaldo::create([
-            'tipo' => "abono",
+            'tipo' => "cargo",
             'usuario_id' => $id_user,
             'monto' => $monto_a_cobrar,
             'currency' => env('DIVISA', 'mxn'),

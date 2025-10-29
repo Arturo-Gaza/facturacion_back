@@ -41,7 +41,7 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
                 'currency' => $movimiento->currency,
                 'descripcion' => $movimiento->descripcion,
                 'saldo_antes' => $movimiento->saldo_antes,
-                'saldo_resultante' => $movimiento->processed_at ? $movimiento->saldo_resultante : null,
+                'saldo_resultante' => $movimiento->saldo_resultante ,
                 'tipo' => $movimiento->tipo,
                 'estatus' => $movimiento->estatusMovimiento->nombre ?? null,
                 'payment_method' => $movimiento->payment_method,
