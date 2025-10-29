@@ -221,7 +221,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         DB::commit();
 
-        return $solicitud->fresh();
+        return $datosCobro["saldo_despues"];
 
     } catch (\Exception $e) {
         DB::rollBack();
