@@ -18,64 +18,64 @@ class EstatusSolicitudSeeder extends Seeder
                 'descripcion_estatus_solicitud' => 'Cargado',
                 'descripcion_cliente' => 'Cargado',
                 'mandarCorreo' => false,
-                'color' => '#3498db', // Azul
-                'color_cliente' => '#3498db'
+                'color' => 'bg-blue-600', // Azul
+                'color_cliente' => 'bg-blue-600'
             ],
             [
                 'descripcion_estatus_solicitud' => 'En Revisión',
                 'descripcion_cliente' => 'Procesando',
                 'mandarCorreo' => false,
-                'color' => '#f39c12', // Naranja
-                'color_cliente' => '#f39c12'
+                'color' => 'bg-yellow-400', // Naranja
+                'color_cliente' => 'bg-yellow-400'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Asignado',
                 'descripcion_cliente' => 'Procesando',
                 'mandarCorreo' => true,
-                'color' => '#27ae60', // Verde
-                'color_cliente' => '#f39c12'
+                'color' => 'bg-purple-500', // Verde
+                'color_cliente' => 'bg-purple-500'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Visualizado',
                 'descripcion_cliente' => 'Procesando',
                 'mandarCorreo' => false,
-                'color' => '#9b59b6', // Morado
-                'color_cliente' => '#f39c12'
+                'color' => 'bg-green-400', // Morado
+                'color_cliente' => 'bg-green-400'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Procesando',
                 'descripcion_cliente' => 'Procesando',
                 'mandarCorreo' => false,
-                'color' => '#e67e22', // Naranja oscuro
-                'color_cliente' => '#f39c12'
+                'color' => 'bg-orange-600', // Naranja oscuro
+                'color_cliente' => 'bg-orange-600'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Recuperado',
                 'descripcion_cliente' => 'Recuperado',
                 'mandarCorreo' => false,
-                'color' => '#2ecc71', // Verde claro
-                'color_cliente' => '#2ecc71'
+                'color' => 'bg-teal-500', // Verde claro
+                'color_cliente' => 'bg-teal-500'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Rechazado',
                 'descripcion_cliente' => 'Rechazado',
                 'mandarCorreo' => false,
-                'color' => '#e74c3c', // Rojo
-                'color_cliente' => '#e74c3c'
+                'color' => 'bg-red-600', // Rojo
+                'color_cliente' => 'bg-red-600'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Descargado',
                 'descripcion_cliente' => 'Descargado',
                 'mandarCorreo' => false,
-                'color' => '#16a085', // Verde azulado
-                'color_cliente' => '#16a085'
+                'color' => 'bg-indigo-500', // Verde azulado
+                'color_cliente' => 'bg-indigo-500'
             ],
             [
                 'descripcion_estatus_solicitud' => 'Concluido',
                 'descripcion_cliente' => 'Concluido',
                 'mandarCorreo' => false,
-                'color' => '#2c3e50', // Azul oscuro
-                'color_cliente' => '#2c3e50'
+                'color' => 'bg-emerald-600', // Azul oscuro
+                'color_cliente' => 'bg-emerald-600'
             ]
         ];
 
