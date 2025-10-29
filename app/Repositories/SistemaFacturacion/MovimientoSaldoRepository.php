@@ -2,19 +2,13 @@
 
 namespace App\Repositories\SistemaFacturacion;
 
-use App\Exports\MovimientosExport;
+
 use App\Interfaces\SistemaFacturacion\MovimientoSaldoRepositoryInterface;
 use App\Models\MovimientoSaldo;
-use Stripe\PaymentMethod;
 use Stripe\Stripe;
-use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Stripe\BalanceTransaction;
-use Stripe\PaymentIntent;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
 {
