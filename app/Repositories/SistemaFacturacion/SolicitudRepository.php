@@ -338,10 +338,10 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 $q->whereNull('vigencia_hasta')->orWhere('vigencia_hasta', '>=', $hoy);
             })
             ->where(function ($q) use ($num_factura) {
-                $q->whereNull('desde_factura')->orWhere('desde_factura', '<=', $num_factura );
+                $q->whereNull('desde_factura')->orWhere('desde_factura', '<=', $num_factura);
             })
             ->where(function ($q) use ($num_factura) {
-                $q->whereNull('hasta_factura')->orWhere('hasta_factura', '>=', $num_factura );
+                $q->whereNull('hasta_factura')->orWhere('hasta_factura', '>=', $num_factura);
             })
             ->orderByDesc('vigencia_desde')
             ->first();
@@ -354,9 +354,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'monto_a_cobrar' =>  $precioUnitario,
             'tier' => $precioRegistro->nombre_precio,
             'saldo_actual' => (float) $efectivoUsuario->saldo,
-            'saldo_despues' => (float) $efectivoUsuario->saldo +$precioUnitario,
+            'saldo_despues' => (float) $efectivoUsuario->saldo + $precioUnitario,
             'insuficiente_saldo' => false,
-            'factura_numero' => $num_factura 
+            'factura_numero' => $num_factura
         ];
     }
 
@@ -727,10 +727,17 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
     public function getByUsuario(int $usuario_id)
     {
-        return Solicitud::where('usuario_id', $usuario_id)
+        $solicitudes = Solicitud::where('usuario_id', $usuario_id)
             // ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
+        $solicitudes->each(function ($solicitud) {
+            if ($solicitud->estadoSolicitud) {
+                $solicitud->estadoSolicitud->descripcion_estatus_solicitud = $solicitud->estadoSolicitud->descripcion_cliente ?? $solicitud->estadoSolicitud->descripcion_estatus_solicitud;
+                $solicitud->estadoSolicitud->color = $solicitud->estadoSolicitud->color_cliente ?? $solicitud->estadoSolicitud->color;
+            }
+        });
+        return $solicitudes;
     }
     public function subirFactura($idUsr, $pdf, $xml, $id_solicitud)
     {
