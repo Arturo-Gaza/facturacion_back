@@ -37,6 +37,7 @@ class DatosFiscal extends Model
         'id_estatus_sat',
         'datos_extra',
         'email_facturacion_id',
+        'email_facturacion_text',
         'habilitado'
     ];
 

@@ -52,10 +52,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function validar($datosExtraidos, $solicitud)
     {
         $exito = $datosExtraidos["exito"];
+        $idFueraVigencia = 1;
+        $idFueraTiempo = 4;
         if (!$exito) {
-             $id_motivo_rechazo = isset($datosExtraidos["motivo_de_rechazo"]) 
-                           ? $datosExtraidos["motivo_de_rechazo"] 
-                           : null;
+            $id_motivo_rechazo = isset($datosExtraidos["motivo_de_rechazo"])
+                ? $datosExtraidos["motivo_de_rechazo"]
+                : null;
             if ($id_motivo_rechazo) {
                 $motivo_rechazo = CatMotivoRechazo::find($id_motivo_rechazo);
             } else {
@@ -63,7 +65,32 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
             $solicitud->eliminarImagen();
             $solicitud->delete();
-            throw new Exception($motivo_rechazo->descripcion) ; 
+            throw new Exception($motivo_rechazo->descripcion);
+        } else {
+            if ($datosExtraidos["fecha"] && env("APLICA_VIGENCIA")) {
+                $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
+                $mesTicket = $fechaTicket->format('Y-m');
+                $mesActual = Carbon::now()->format('Y-m');
+
+                if ($mesTicket !== $mesActual) {
+                    $motivo_rechazo = CatMotivoRechazo::find($idFueraVigencia);
+                    $solicitud->eliminarImagen();
+                    $solicitud->delete();
+                    throw new Exception($motivo_rechazo->descripcion);
+                }
+            }
+             if ($datosExtraidos["fecha"] && env("APLICA_FUERA_TIEMPO") && env("HORAS_FUERA_TIEMPO")) {
+            $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
+            $fechaLimite = $fechaTicket->addHours(env("HORAS_FUERA_TIEMPO"));
+            $finDeMes = Carbon::now()->endOfMonth();
+            
+            if ($fechaLimite->gt($finDeMes)) {
+                $motivo_rechazo = CatMotivoRechazo::find($idFueraTiempo);
+                $solicitud->eliminarImagen();
+                $solicitud->delete();
+                throw new Exception($motivo_rechazo->descripcion);
+            }
+        }
         }
         return null;
     }
@@ -90,7 +117,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $parameters = [
                 'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
                 'cat_motivos_rechazo' => json_encode($cat_motivos_rechazo, JSON_PRETTY_PRINT),
-                'fecha' =>Carbon::now()->format('Y-m-d')
+                'fecha' => Carbon::now()->format('Y-m-d')
             ];
 
             // Extraer datos estructurados con IA

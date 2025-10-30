@@ -65,6 +65,7 @@ class UserSeeder extends Seeder
                 'fecha_inicio_op' => '2020-01-01',
                 'id_estatus_sat' => 1,
                 'email_facturacion_id' => $emailAdmin->id,
+                'email_facturacion_text' => $emailAdmin->email,
                 'habilitado' => true,
             ]);
 
@@ -84,6 +85,7 @@ class UserSeeder extends Seeder
                     'empleados' => 50
                 ]),
                 'email_facturacion_id' => $emailAdmin->id,
+                'email_facturacion_text' => $emailAdmin->email,
                 'habilitado' => true,
             ]);
 
@@ -172,6 +174,7 @@ class UserSeeder extends Seeder
                 'fecha_inicio_op' => '2023-01-01',
                 'id_estatus_sat' => 1,
                 'email_facturacion_id' => $emailMesaAyuda->id,
+                'email_facturacion_text' => $emailMesaAyuda->email,
                 'habilitado' => true,
             ]);
 
@@ -236,6 +239,7 @@ class UserSeeder extends Seeder
                 'fecha_inicio_op' => '2022-01-01',
                 'id_estatus_sat' => 1,
                 'email_facturacion_id' => $emailEmpleado->id,
+                'email_facturacion_text' => $emailEmpleado->email,
                 'habilitado' => true,
             ]);
 

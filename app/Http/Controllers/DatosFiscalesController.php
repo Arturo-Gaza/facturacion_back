@@ -201,7 +201,8 @@ class DatosFiscalesController extends Controller
                 'fecha_inicio_op',
                 'id_estatus_sat',
                 'datos_extra',
-                'email_facturacion_id'
+                'email_facturacion_id',
+                 'email_facturacion_text'
             ]);
 
             $updated = $this->datosFiscalesRepository->update($data, $id);

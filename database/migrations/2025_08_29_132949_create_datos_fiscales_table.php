@@ -28,6 +28,7 @@ return new class extends Migration
             $table->json('datos_extra')->nullable();
             // Relación al correo específico para facturación
             $table->foreignId('email_facturacion_id')->nullable();
+            $table->string('email_facturacion_text')->nullable();
             $table->timestamps();
         });
     }

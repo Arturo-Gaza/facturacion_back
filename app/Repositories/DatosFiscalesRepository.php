@@ -124,7 +124,6 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         try {
             // Crear el dato fiscal
             $datosFiscales = DatosFiscal::create($data);
-
             // Guardar los regímenes fiscales
             $this->guardarRegimenesFiscales($regimenes, $datosFiscales);
 
@@ -135,6 +134,10 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 Direccion::create($direccion);
             }
             $user = User::find($datosFiscales->id_usuario);
+            $correo = $user->mailPrincipal;
+            $datosFiscales->email_facturacion_id = $correo->id;
+            $datosFiscales->email_facturacion_text= $correo->email;
+            $datosFiscales->save(); 
             if ($data["predeterminado"]) {
                 // Actualizar el usuario con los nuevos datos fiscales principales
 
@@ -322,6 +325,11 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
 
     public function store(array $data): DatosFiscal
     {
+        $id_usuario = $data["id_usuario"];
+        $usr = User::find($id_usuario);
+        $correo = $usr->mailPrincipal;
+        $data["email_facturacion_id"] = $correo->id;
+        $data["email_facturacion_text"] = $correo->email;
         return DatosFiscal::create($data);
     }
 
@@ -329,6 +337,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
     {
         $datosFiscales = DatosFiscal::find($id);
         if ($datosFiscales) {
+
             $datosFiscales->update($data);
         }
         return $datosFiscales;
