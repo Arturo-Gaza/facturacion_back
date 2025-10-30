@@ -30,11 +30,14 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Services\EmailService;
+
 
 class SolicitudRepository implements SolicitudRepositoryInterface
 {
 
     private string $apiKey;
+    protected $emailService;
     private string $apiUrl;
 
     private OCRService $ocrService;
@@ -42,10 +45,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
     public function __construct(
         OCRService $ocrService = null,
-        AIDataExtractionService $aiService = null
+        AIDataExtractionService $aiService = null,
+        EmailService $emailService
     ) {
         $this->ocrService = $ocrService ?: new OCRService();
         $this->aiService = $aiService ?: new AIDataExtractionService();
+        $this->emailService = $emailService;
     }
 
     // ... (métodos existentes getAll, getByID, store, update, etc.)
@@ -79,18 +84,18 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     throw new Exception($motivo_rechazo->descripcion);
                 }
             }
-             if ($datosExtraidos["fecha"] && env("APLICA_FUERA_TIEMPO") && env("HORAS_FUERA_TIEMPO")) {
-            $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
-            $fechaLimite = $fechaTicket->addHours(env("HORAS_FUERA_TIEMPO"));
-            $finDeMes = Carbon::now()->endOfMonth();
-            
-            if ($fechaLimite->gt($finDeMes)) {
-                $motivo_rechazo = CatMotivoRechazo::find($idFueraTiempo);
-                $solicitud->eliminarImagen();
-                $solicitud->delete();
-                throw new Exception($motivo_rechazo->descripcion);
+            if ($datosExtraidos["fecha"] && env("APLICA_FUERA_TIEMPO") && env("HORAS_FUERA_TIEMPO")) {
+                $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
+                $fechaLimite = $fechaTicket->addHours(env("HORAS_FUERA_TIEMPO"));
+                $finDeMes = Carbon::now()->endOfMonth();
+
+                if ($fechaLimite->gt($finDeMes)) {
+                    $motivo_rechazo = CatMotivoRechazo::find($idFueraTiempo);
+                    $solicitud->eliminarImagen();
+                    $solicitud->delete();
+                    throw new Exception($motivo_rechazo->descripcion);
+                }
             }
-        }
         }
         return null;
     }
@@ -558,6 +563,52 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getMesaAyuda()
     {
         return User::whereIn('idRol', [4, 5])->get();
+    }
+    public function concluir($id_usuario, $id_solicitud)
+    {
+        $estatus_concluido = 9;
+        $solicitud = Solicitud::find($id_solicitud);
+        $solicitud->estado_id = 9; // Estado por defecto
+        $solicitud->save();
+        $receptor = $solicitud->receptor;
+        if ($receptor) {
+            $email = $receptor->email_facturacion_text;
+        }
+        if ($email) {
+            $xmlRelativePath = $solicitud->getRawOriginal('xml_url');
+
+            if (!empty($xmlRelativePath) && Storage::disk('public')->exists($xmlRelativePath)) {
+                $xmlPath = Storage::disk('public')->path($xmlRelativePath);
+                $archivos[] = $xmlPath;
+                Log::info("Archivo XML encontrado: " . $xmlPath);
+            } else {
+                Log::warning("Archivo XML no disponible o no encontrado. Path: " . ($xmlRelativePath ?? 'NULL'));
+            }
+
+            // Para PDF - con verificación de null
+            $pdfRelativePath = $solicitud->getRawOriginal('pdf_url');
+
+            if (!empty($pdfRelativePath) && Storage::disk('public')->exists($pdfRelativePath)) {
+                $pdfPath = Storage::disk('public')->path($pdfRelativePath);
+                $archivos[] = $pdfPath;
+                Log::info("Archivo PDF encontrado: " . $pdfPath);
+            } else {
+                Log::warning("Archivo PDF no disponible o no encontrado. Path: " . ($pdfRelativePath ?? 'NULL'));
+            }
+
+            // Verificar que tenemos archivos para enviar
+            if (empty($archivos)) {
+                Log::error("No hay archivos disponibles para adjuntar al correo");
+                return "Error: No hay archivos disponibles para enviar";
+            }
+            $this->emailService->enviarCorreoFac($email, $archivos);
+        }
+
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_solicitud,
+            'id_estatus' => $estatus_concluido,
+            'id_usuario' => $id_usuario
+        ]);
     }
 
     public function getDashboard($idUsr)

@@ -7,6 +7,7 @@ use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
 use App\Mail\MandarCorreoEliminar;
 use App\Mail\MandarCorreoEmpleado;
+use App\Mail\MandarCorreoFactura;
 use App\Mail\MandarCorreoHijo;
 use App\Mail\MandarCorreoInhabilitar;
 use App\Models\PasswordReset;
@@ -68,7 +69,22 @@ class EmailService
             }
         }
     }
+    public function enviarCorreoFac($email, $archivos)
+    {
+        try {
+            $datosMail = [
+                'email' => $email
+            ];
+            
 
+            Mail::to($email)->send(new MandarCorreoFactura($datosMail, $archivos));
+            return "Exito";
+        } catch (\Exception $e) {
+            // Guardar el error en log, base de datos, o notificar al admin
+            Log::error('Error al enviar correo: ' . $e->getMessage());
+            return $e->getMessage();
+        }
+    }
     public function enviarCorreoRec($email)
     {
         $usr = User::whereHas('mailPrincipal', function ($query) use ($email) {
@@ -211,47 +227,45 @@ class EmailService
     }
     public function enviarCorreoHijo($email, $password)
     {
-       
-            $datosMail = [
-                'email' => $email,
-                'password_temporal' => $password,
-                'url_login' => 'https://tudominio.com/login'
-            ];
+
+        $datosMail = [
+            'email' => $email,
+            'password_temporal' => $password,
+            'url_login' => 'https://tudominio.com/login'
+        ];
 
 
 
-            try {
-                Mail::to($datosMail["email"])->send(new MandarCorreoHijo($datosMail));
-                return "Exito";
-            } catch (\Exception $e) {
-                // Guardar el error en log, base de datos, o notificar al admin
-                Log::error('Error al enviar correo: ' . $e->getMessage());
-                return $e->getMessage();
-            }
-            return $usr;
-        
+        try {
+            Mail::to($datosMail["email"])->send(new MandarCorreoHijo($datosMail));
+            return "Exito";
+        } catch (\Exception $e) {
+            // Guardar el error en log, base de datos, o notificar al admin
+            Log::error('Error al enviar correo: ' . $e->getMessage());
+            return $e->getMessage();
+        }
+        return $usr;
     }
     public function enviarCorreoEmpleado($email, $password)
     {
-       
-            $datosMail = [
-                'email' => $email,
-                'password_temporal' => $password,
-                'url_login' => 'https://tudominio.com/login'
-            ];
+
+        $datosMail = [
+            'email' => $email,
+            'password_temporal' => $password,
+            'url_login' => 'https://tudominio.com/login'
+        ];
 
 
 
-            try {
-                Mail::to($datosMail["email"])->send(new MandarCorreoEmpleado($datosMail));
-                return "Exito";
-            } catch (\Exception $e) {
-                // Guardar el error en log, base de datos, o notificar al admin
-                Log::error('Error al enviar correo: ' . $e->getMessage());
-                return $e->getMessage();
-            }
-            return $usr;
-        
+        try {
+            Mail::to($datosMail["email"])->send(new MandarCorreoEmpleado($datosMail));
+            return "Exito";
+        } catch (\Exception $e) {
+            // Guardar el error en log, base de datos, o notificar al admin
+            Log::error('Error al enviar correo: ' . $e->getMessage());
+            return $e->getMessage();
+        }
+        return $usr;
     }
 
     // Puedes agregar más métodos según el tipo de correo
