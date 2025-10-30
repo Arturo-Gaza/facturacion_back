@@ -9,5 +9,7 @@ class CatMotivoRechazo extends Model
        protected $fillable = [
         'descripcion',
         'activo',
+        'validar_por_IA',
+        'detalle'
     ];
 }

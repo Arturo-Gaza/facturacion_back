@@ -49,7 +49,24 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
 
     // ... (métodos existentes getAll, getByID, store, update, etc.)
-
+    public function validar($datosExtraidos, $solicitud)
+    {
+        $exito = $datosExtraidos["exito"];
+        if (!$exito) {
+             $id_motivo_rechazo = isset($datosExtraidos["motivo_de_rechazo"]) 
+                           ? $datosExtraidos["motivo_de_rechazo"] 
+                           : null;
+            if ($id_motivo_rechazo) {
+                $motivo_rechazo = CatMotivoRechazo::find($id_motivo_rechazo);
+            } else {
+                $motivo_rechazo = CatMotivoRechazo::find(2);
+            }
+            $solicitud->eliminarImagen();
+            $solicitud->delete();
+            throw new Exception($motivo_rechazo->descripcion) ; 
+        }
+        return null;
+    }
     public function procesar(int $id_sol)
     {
         $solicitud = Solicitud::find($id_sol);
@@ -63,15 +80,22 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         if ($textoOCR) {
             $cat_giros = CatGiro::all()->toArray();
+            $cat_motivos_rechazo = CatMotivoRechazo::where('validar_por_IA', true)
+                ->where('activo', true)
+                ->get()
+                ->toArray();
 
 
             // Prepara los parámetros
             $parameters = [
                 'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
+                'cat_motivos_rechazo' => json_encode($cat_motivos_rechazo, JSON_PRETTY_PRINT),
+                'fecha' =>Carbon::now()->format('Y-m-d')
             ];
 
             // Extraer datos estructurados con IA
-            $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters, "receipt_extraction", $parameters, "receipt_extraction", $parameters);
+            $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters);
+            $this->validar($datosExtraidos, $solicitud);
             $datosAdicionales = $datosExtraidos['datos_facturacion_adicionales'];
 
             DB::transaction(function () use ($solicitud, $datosAdicionales) {

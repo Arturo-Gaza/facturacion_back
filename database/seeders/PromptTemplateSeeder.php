@@ -53,14 +53,17 @@ Del siguiente texto extraído de un ticket o factura, extrae la siguiente inform
 CATALGOGOS
 cat_giro
 {\$cat_giro}
-
+cat_motivos_rechazo
+{\$cat_motivos_rechazo}
 
 DATOS:
 {\$id}
+FECHA DE HOY
 {\$fecha}
 
 TEXTO:
 {\$textoOCR}
+
 
 
 Estructura requerida:
@@ -84,7 +87,9 @@ Estructura requerida:
     "todos_datos":{
         "clave_dato": "valor",
         "valor_dato": "valor"
-    }    
+    },
+    "exito":"regresa true si no hubo ningun problema que aplique CAT_MOTIVOS_RECHAZO y false si hubo algun problema"
+    "motivo_de_rechazo": "regresa el id del  CAT_MOTIVOS_RECHAZO si es que el exito fue false que mas se parezca al caso"   
 }
 
 INSTRUCCIONES ESPECÍFICAS:

@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('cat_motivo_rechazos', function (Blueprint $table) {
             $table->id();
             $table->text('descripcion')->nullable();
+            $table->text('detalle')->nullable();
             $table->boolean('activo')->default(true);
+            $table->boolean('validar_por_IA')->default(true);
             $table->timestamps();
         });
     }
