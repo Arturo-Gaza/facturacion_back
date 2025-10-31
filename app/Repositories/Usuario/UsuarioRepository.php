@@ -47,10 +47,10 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function getMesaAyuda()
     {
-           return User::join('cat_roles', 'users.idRol', '=', 'cat_roles.id')
-               ->where('cat_roles.consola', true)
-               ->select('users.*')
-               ->get();
+        return User::join('cat_roles', 'users.idRol', '=', 'cat_roles.id')
+            ->where('cat_roles.consola', true)
+            ->select('users.*')
+            ->get();
     }
 
     public function getAllUserAlmacen($idCarga)
@@ -233,6 +233,8 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'nombre_razon' => $request->nombre ?? null,
             'primer_apellido' => $request->primer_apellido ?? null,
             'segundo_apellido' => $request->segundo_apellido ?? null,
+            'segundo_apellido' => $request->segundo_apellido ?? null,
+            'enviar_correo' => $request->enviar_correo ?? null
         ];
         $direccon = $request->direccionPersonal;
         $direccionDataCompleta = [
@@ -663,7 +665,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'nombre_razon' => $datos_fiscales_personal['nombre_razon'],
             'primer_apellido' => $datos_fiscales_personal['primer_apellido'],
             'segundo_apellido' => $datos_fiscales_personal['segundo_apellido'],
-            'id_usuario'=>$user->id
+            'id_usuario' => $user->id
 
         ]);
 
