@@ -23,6 +23,7 @@ class UserProfileDTO
         public ?int $id_estatus_usuario,
         public ?array $suscripcionActiva,
         public ?bool $tieneSuscripcionActiva,
+        public ?bool $enviar_correo,
     ) {}
 
     public static function fromUserModel($user): self
@@ -78,7 +79,8 @@ class UserProfileDTO
             password_temporal: $user->password_temporal,
             id_estatus_usuario: $user->id_estatus_usuario,
             suscripcionActiva: $suscripcionArray,
-            tieneSuscripcionActiva: $tieneSuscripcionActiva
+            tieneSuscripcionActiva: $tieneSuscripcionActiva,
+             enviar_correo:$user->datosFiscalesPersonal?->enviar_correo
         );
     }
 
@@ -102,7 +104,8 @@ class UserProfileDTO
             'password_temporal' => $this->password_temporal,
             'id_estatus_usuario' => $this->id_estatus_usuario,
             'suscripcionActiva' => $this->suscripcionActiva,
-            'tieneSuscripcionActiva' => $this->tieneSuscripcionActiva
+            'tieneSuscripcionActiva' => $this->tieneSuscripcionActiva,
+            'enviar_correo'=>$this->enviar_correo
         ];
     }
 }
