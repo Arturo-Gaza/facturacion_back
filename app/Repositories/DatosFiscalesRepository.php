@@ -134,7 +134,9 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 Direccion::create($direccion);
             }
             $user = User::find($datosFiscales->id_usuario);
-
+            //$correo = $user->mailPrincipal;
+            //$datosFiscales->email_facturacion_id = $correo->id;
+            //$datosFiscales->email_facturacion_text= $correo->email;
             $datosFiscales->save(); 
             if ($data["predeterminado"]) {
                 // Actualizar el usuario con los nuevos datos fiscales principales
