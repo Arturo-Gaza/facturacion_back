@@ -246,6 +246,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             // Calcular precio y obtener datos de cobro
             $datosCobro = $this->calcularPrecio($id_sol, $id_user);
+            if( $datosCobro["insuficiente_saldo"] ){
+                throw new Exception(("Saldo insuiciente"));
+            }
             $monto_a_cobrar = $datosCobro["monto_a_cobrar"];
 
             // Crear movimiento de saldo
@@ -282,7 +285,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             DB::rollBack();
             Log::error('Error en enviar solicitud: ' . $e->getMessage());
 
-            return null;
+           throw new Exception($e->getMessage());
         }
     }
 
