@@ -102,7 +102,8 @@ class DatosFiscalesController extends Controller
                 'segundo_apellido',
                 'nombre_comercial',
                 'rfc',
-                'curp'
+                'curp',
+                'enviar_correo'
 
             ]);
             $direccionData = $request->input('direccion');

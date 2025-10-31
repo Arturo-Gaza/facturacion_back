@@ -38,7 +38,8 @@ class DatosFiscal extends Model
         'datos_extra',
         'email_facturacion_id',
         'email_facturacion_text',
-        'habilitado'
+        'habilitado',
+        'enviar_correo'
     ];
 
     protected $casts = [

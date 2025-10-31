@@ -198,7 +198,8 @@ class StripeController extends Controller
         $charge = null;
         $stripeChargeId = null;
         if (!empty($pi->latest_charge) ) {
-            $stripeChargeId = $pi->latest_charge;
+           // $charge = $pi->charges->data[0];
+           // $stripeChargeId = $pi->latest_charge;
         }
 
         // Preparar campos que vamos a rellenar
