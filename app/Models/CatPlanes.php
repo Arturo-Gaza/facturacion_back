@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CatPlanes extends Model
 {
@@ -75,5 +76,15 @@ class CatPlanes extends Model
     public function esMensual()
     {
         return $this->tipo_pago === self::PAGO_MENSUAL;
+    }
+    public function preciosVigentes($fecha = null): HasMany
+    {
+        $relation = $this->hasMany(Precio::class, 'id_plan')->orderByDesc('vigencia_desde');
+
+        if ($fecha) {
+            return $relation->vigente($fecha);
+        }
+
+        return $relation->vigente();
     }
 }

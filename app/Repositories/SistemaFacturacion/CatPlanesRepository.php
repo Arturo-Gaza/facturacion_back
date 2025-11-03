@@ -32,7 +32,7 @@ class CatPlanesRepository implements CatPlanesRepositoryInterface
             // O planes sin fechas de vigencia (siempre vigentes)
             $query->whereNull('vigencia_inicio')
                   ->whereNull('vigencia_fin');
-        })->get();
+        })->with('preciosVigentes')->get();
     
     }
 

@@ -438,7 +438,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_despues' => (float) $efectivoUsuario->saldo,
                 'insuficiente_saldo' => false,
                 'tipo' => null,
-                'factura_numero' => 0
+                'factura_numero' => 0,
+                'factura_restante' => 0
             ];
         }
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
@@ -459,10 +460,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
                 'saldo_despues' => (float) $efectivoUsuario->saldo,
                 'insuficiente_saldo' => false,
-                'factura_numero' => 0
+                'factura_numero' => 0,
+                'factura_restante' => 0
             ];
         }
         $num_factura = $suscripcion->facturas_realizadas + 1;
+
         $precioRegistro = Precio::where('id_plan', $plan->id)
             ->where(function ($q) use ($hoy) {
                 $q->whereNull('vigencia_desde')->orWhere('vigencia_desde', '<=', $hoy);
@@ -480,8 +483,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->first();
 
         // fallback al precio directo en la tabla cat_planes si existe
-
-        $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
+        $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura-$num_factura : null;
+        $precioUnitario = $precioRegistro ? (float) $precioRegistro->hasta_factura : (float) ($plan->precio ?? 0.00);
         if ($efectivoUsuario->saldo - $precioUnitario < 0) {
             return [
                 'monto_a_cobrar' =>  $precioUnitario,
@@ -489,7 +492,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
                 'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
                 'insuficiente_saldo' => true,
-                'factura_numero' => $num_factura
+                'factura_numero' => $num_factura,
+                'factura_restante' => $factura_restante
+
             ];
         }
         return [
@@ -498,7 +503,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'saldo_actual' => (float) $efectivoUsuario->saldo,
             'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
             'insuficiente_saldo' => false,
-            'factura_numero' => $num_factura
+            'factura_numero' => $num_factura,
+            'factura_restante' => $factura_restante
         ];
     }
 
