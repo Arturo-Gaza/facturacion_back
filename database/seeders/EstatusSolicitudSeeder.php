@@ -76,7 +76,14 @@ class EstatusSolicitudSeeder extends Seeder
                 'mandarCorreo' => false,
                 'color' => 'bg-emerald-600', // Azul oscuro
                 'color_cliente' => 'bg-emerald-600'
-            ]
+            ],
+            [
+                'descripcion_estatus_solicitud' => 'En espera de Archivos',
+                'descripcion_cliente' => 'Procesando',
+                'mandarCorreo' => false,
+                'color' => 'bg-emerald-600', // Azul oscuro
+                'color_cliente' => 'bg-emerald-600'
+            ],
         ];
 
         foreach ($estatusData as $data) {

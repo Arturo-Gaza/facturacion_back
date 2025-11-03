@@ -11,10 +11,10 @@ class CatMotivoRechazoSeeder extends Seeder
     {
         $motivos = [
             [
-                'descripcion' => 'Fuera del mes vigencia',
-                'detalle' => 'La fecha del ticket pertenece a un mes anterior al mes en curso',
+                'descripcion' => 'Fuera del horario permitido',
+                'detalle' => 'La solicitud no puede procesarse en horas próximas al cierre mensual',
                 'activo' => true,
-                'validar_por_IA' => true 
+                'validar_por_IA' => false
             ],
             [
                 'descripcion' => 'Ilegible',
@@ -29,8 +29,8 @@ class CatMotivoRechazoSeeder extends Seeder
                 'validar_por_IA' => false
             ],
             [
-                'descripcion' => 'Inoperable tiempo',
-                'detalle' => 'El ticket no puede ser procesado por tiempo',
+                'descripcion' => 'Inoperable por tiempo',
+                'detalle' => 'No procede: Estamos en el período de cierre mensual (menos del tiempo límite establecido para fin de mes)',
                 'activo' => true,
                 'validar_por_IA' => false
             ],

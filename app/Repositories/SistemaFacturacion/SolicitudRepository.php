@@ -70,7 +70,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
             $solicitud->eliminarImagen();
             $solicitud->delete();
-            throw new Exception($motivo_rechazo->descripcion);
+            throw new Exception($motivo_rechazo->detalle);
         } else {
             if ($datosExtraidos["fecha"] && env("APLICA_VIGENCIA")) {
                 $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
@@ -81,7 +81,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     $motivo_rechazo = CatMotivoRechazo::find($idFueraVigencia);
                     $solicitud->eliminarImagen();
                     $solicitud->delete();
-                    throw new Exception($motivo_rechazo->descripcion);
+                    throw new Exception($motivo_rechazo->detalle);
                 }
             }
             if ($datosExtraidos["fecha"] && env("APLICA_FUERA_TIEMPO") && env("HORAS_FUERA_TIEMPO")) {
@@ -93,7 +93,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     $motivo_rechazo = CatMotivoRechazo::find($idFueraTiempo);
                     $solicitud->eliminarImagen();
                     $solicitud->delete();
-                    throw new Exception($motivo_rechazo->descripcion);
+                    throw new Exception($motivo_rechazo->detalle);
                 }
             }
         }
