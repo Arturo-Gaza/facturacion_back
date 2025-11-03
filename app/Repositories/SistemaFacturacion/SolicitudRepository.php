@@ -484,7 +484,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         // fallback al precio directo en la tabla cat_planes si existe
         $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura-$num_factura : null;
-        $precioUnitario = $precioRegistro ? (float) $precioRegistro->hasta_factura : (float) ($plan->precio ?? 0.00);
+        $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
         if ($efectivoUsuario->saldo - $precioUnitario < 0) {
             return [
                 'monto_a_cobrar' =>  $precioUnitario,
