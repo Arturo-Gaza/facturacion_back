@@ -118,11 +118,15 @@ class SolicitudController extends Controller
         }
     }
 
-    public function getDashboard()
+    public function getDashboard(Request $request)
     {
         try {
             $idUsr = auth()->user()->id;
-            $all = $this->solicitudRepository->getDashboard($idUsr);
+
+            $fecha_inicio = $request->input('fecha_inicio', null);
+            $fecha_fin = $request->input('fecha_fin', null);
+
+            $all = $this->solicitudRepository->getDashboard($fecha_inicio,$fecha_fin,$idUsr);
             return ApiResponseHelper::sendResponse($all, 'Usuarios obtenidos', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);

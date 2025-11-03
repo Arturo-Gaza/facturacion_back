@@ -246,7 +246,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             // Calcular precio y obtener datos de cobro
             $datosCobro = $this->calcularPrecio($id_sol, $id_user);
-            if( $datosCobro["insuficiente_saldo"] ){
+            if ($datosCobro["insuficiente_saldo"]) {
                 throw new Exception(("Saldo insuiciente"));
             }
             $monto_a_cobrar = $datosCobro["monto_a_cobrar"];
@@ -285,7 +285,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             DB::rollBack();
             Log::error('Error en enviar solicitud: ' . $e->getMessage());
 
-           throw new Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 
@@ -482,16 +482,16 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         // fallback al precio directo en la tabla cat_planes si existe
 
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
-            if( $efectivoUsuario->saldo - $precioUnitario<0){
-                return [
-            'monto_a_cobrar' =>  $precioUnitario,
-            'tier' => $precioRegistro->nombre_precio,
-            'saldo_actual' => (float) $efectivoUsuario->saldo,
-            'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
-            'insuficiente_saldo' => true,
-            'factura_numero' => $num_factura
-        ];
-            }
+        if ($efectivoUsuario->saldo - $precioUnitario < 0) {
+            return [
+                'monto_a_cobrar' =>  $precioUnitario,
+                'tier' => $precioRegistro->nombre_precio,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
+                'insuficiente_saldo' => true,
+                'factura_numero' => $num_factura
+            ];
+        }
         return [
             'monto_a_cobrar' =>  $precioUnitario,
             'tier' => $precioRegistro->nombre_precio,
@@ -623,16 +623,24 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         ]);
     }
 
-    public function getDashboard($idUsr)
+    public function getDashboard($fecha_inicio, $fecha_fin, $idUsr)
     {
         $usr = User::find($idUsr);
-        $fechaInicio = now()->subDays(30);
+        $fecha_inicio = $fecha_inicio
+            ? Carbon::parse($fecha_inicio)
+            : now()->subDays(30);
+
+        $fecha_fin = $fecha_fin
+            ? Carbon::parse($fecha_fin)
+            : now();
+
 
         // Obtener todos los estatus del catálogo
         $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
 
         // Construir consulta base con filtros por rol
-        $query = Solicitud::where('created_at', '>=', $fechaInicio);
+        $query = Solicitud::whereBetween('created_at', [$fecha_inicio, $fecha_fin]);
+
 
         // Aplicar filtro por rol
         if ($usr->idRol != 1 && $usr->idRol != 4) {
@@ -720,8 +728,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'total_tickets' => $totalTickets,
             'estadisticas_por_estatus' => $estadisticasPorEstatus,
             'periodo' => 'ultimos_30_dias',
-            'fecha_inicio' => $fechaInicio->format('Y-m-d H:i:s'),
-            'fecha_fin' => now()->format('Y-m-d H:i:s'),
+            'fecha_inicio' => $fecha_inicio->format('Y-m-d H:i:s'),
+            'fecha_fin' => $fecha_fin->format('Y-m-d H:i:s'),
             'data_mensual' => $dataAgrupada // esta contiene los datos por año y mes
         ];
     }
