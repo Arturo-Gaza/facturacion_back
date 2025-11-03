@@ -342,7 +342,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             return null;
         }
         $solicitud->update([
-            'estado_id' => 5
+            'estado_id' => 7
         ]);
         return $solicitud->fresh();
     }
