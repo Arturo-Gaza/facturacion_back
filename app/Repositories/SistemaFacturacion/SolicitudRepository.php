@@ -483,7 +483,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->first();
 
         // fallback al precio directo en la tabla cat_planes si existe
-        $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura-$num_factura : null;
+        $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura - $num_factura : null;
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
         if ($efectivoUsuario->saldo - $precioUnitario < 0) {
             return [
@@ -493,7 +493,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
                 'insuficiente_saldo' => true,
                 'factura_numero' => $num_factura,
-                'factura_restante' => $factura_restante
+                'factura_restante' => $factura_restante,
+                'facturaTotalGratis' => $precioRegistro->hasta_factura
 
             ];
         }
@@ -504,7 +505,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
             'insuficiente_saldo' => false,
             'factura_numero' => $num_factura,
-            'factura_restante' => $factura_restante
+            'factura_restante' => $factura_restante,
+            'facturaTotalGratis' => $precioRegistro->hasta_factura
         ];
     }
 
