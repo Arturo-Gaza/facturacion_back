@@ -25,7 +25,7 @@ interface SolicitudRepositoryInterface
   public function actualizarReceptor(Request $data);
   public function eliminar(int $id);
   public function obtenerImagen(int $id);
-  public function getGeneralByUsuario(int $usuario_id);
+  public function getGeneralByUsuario($fecha_inicio ,$fecha_fin,$usuario_id);
   public function getByID($id): ?Solicitud;
   public function getTodosDatos($id);
   public function store(Request $data, $id_user): Solicitud;

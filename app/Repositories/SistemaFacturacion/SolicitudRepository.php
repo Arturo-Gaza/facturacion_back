@@ -1076,12 +1076,22 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
 
 
-    public function getGeneralByUsuario(int $usuario_id)
+    public function getGeneralByUsuario($fecha_inicio, $fecha_fin, $usuario_id)
     {
         // Obtener conteos con los nombres de estado desde el catálogo
+        $fecha_inicio = $fecha_inicio
+            ? Carbon::parse($fecha_inicio)
+            : now()->subDays(30);
+
+        $fecha_fin = $fecha_fin
+            ? Carbon::parse($fecha_fin)
+            : now();
+
+
+
         $conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
             //->whereNot('estado_id', 5)
-            ->where('solicitudes.created_at', '>=', now()->subDays(30))
+            ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
             ->selectRaw('cat_estatus_solicitud.descripcion_estatus_solicitud as estado, COUNT(*) as count')
             ->groupBy('cat_estatus_solicitud.descripcion_estatus_solicitud')

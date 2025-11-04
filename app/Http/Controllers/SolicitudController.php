@@ -126,7 +126,7 @@ class SolicitudController extends Controller
             $fecha_inicio = $request->input('fecha_inicio', null);
             $fecha_fin = $request->input('fecha_fin', null);
 
-            $all = $this->solicitudRepository->getDashboard($fecha_inicio,$fecha_fin,$idUsr);
+            $all = $this->solicitudRepository->getDashboard($fecha_inicio, $fecha_fin, $idUsr);
             return ApiResponseHelper::sendResponse($all, 'Usuarios obtenidos', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
@@ -245,10 +245,14 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
         }
     }
-    public function getGeneralByUsuario(int $usuario_id)
+    public function getGeneralByUsuario(Request $request)
     {
         try {
-            $all = $this->solicitudRepository->getGeneralByUsuario($usuario_id);
+            $fecha_inicio = $request->input('fecha_inicio', null);
+            $fecha_fin = $request->input('fecha_fin', null);
+             $usuario_id = auth()->user()->id;
+            $all = $this->solicitudRepository->getGeneralByUsuario($fecha_inicio ,$fecha_fin,$usuario_id);
+
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);

@@ -286,6 +286,8 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('MovimientoSaldo/exportExcel', [MovimientoSaldoController::class, 'exportExcel']);
     Route::get('MovimientoSaldo/exportPdf', [MovimientoSaldoController::class, 'exportPdf']);
 
+    Route::post('solicitud/getGeneralByUsuario', [SolicitudController::class, 'getGeneralByUsuario']);
+
 
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
@@ -378,7 +380,6 @@ Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
 
 // Solicitud
 Route::get('solicitud/getByUsuario/{usuario_id}', [SolicitudController::class, 'getByUsuario']);
-Route::get('solicitud/getGeneralByUsuario/{usuario_id}', [SolicitudController::class, 'getGeneralByUsuario']);
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 
