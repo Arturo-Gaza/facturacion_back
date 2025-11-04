@@ -10,42 +10,89 @@ class PreciosSeeder extends Seeder
 {
     public function run(): void
     {
-        $idPlan = 1; // Ajusta según tu tabla cat_planes
         $hoy = Carbon::today();
 
         $precios = [
+            // Planes Personales (id_plan = 1)
             [
-                'nombre_precio'   => 'Gratis',
-                'id_plan'         => $idPlan,
+                'nombre_precio'   => 'Personal Básico',
+                'id_plan'         => 1,
                 'precio'          => 0.00,
                 'desde_factura'   => 1,
-                'hasta_factura'   => 10,
+                'hasta_factura'   => 50,
                 'vigencia_desde'  => $hoy,
                 'vigencia_hasta'  => null,
             ],
             [
-                'nombre_precio'   => 'Bronce',
-                'id_plan'         => $idPlan,
+                'nombre_precio'   => 'Personal Avanzado',
+                'id_plan'         => 1,
                 'precio'          => 199.99,
-                'desde_factura'   => 11,
+                'desde_factura'   => 51,
+                'hasta_factura'   => 200,
+                'vigencia_desde'  => $hoy,
+                'vigencia_hasta'  => null,
+            ],
+            [
+                'nombre_precio'   => 'Personal Premium',
+                'id_plan'         => 1,
+                'precio'          => 349.99,
+                'desde_factura'   => 201,
+                'hasta_factura'   => 500,
+                'vigencia_desde'  => $hoy,
+                'vigencia_hasta'  => null,
+            ],
+            [
+                'nombre_precio'   => 'Personal Máximo',
+                'id_plan'         => 1,
+                'precio'          => 499.99,
+                'desde_factura'   => 501,
+                'hasta_factura'   => null,
+                'vigencia_desde'  => $hoy,
+                'vigencia_hasta'  => null,
+            ],
+
+            // Planes Profesionales (id_plan = 2)
+            [
+                'nombre_precio'   => 'Empresarial Básico',
+                'id_plan'         => 2,
+                'precio'          => 0.00,
+                'desde_factura'   => 1,
                 'hasta_factura'   => 100,
                 'vigencia_desde'  => $hoy,
                 'vigencia_hasta'  => null,
             ],
             [
-                'nombre_precio'   => 'Plata',
-                'id_plan'         => $idPlan,
-                'precio'          => 149.99,
+                'nombre_precio'   => 'Empresarial Pequeña',
+                'id_plan'         => 2,
+                'precio'          => 299.99,
                 'desde_factura'   => 101,
                 'hasta_factura'   => 500,
                 'vigencia_desde'  => $hoy,
                 'vigencia_hasta'  => null,
             ],
             [
-                'nombre_precio'   => 'Oro',
-                'id_plan'         => $idPlan,
-                'precio'          => 99.99,
+                'nombre_precio'   => 'Empresarial Mediana',
+                'id_plan'         => 2,
+                'precio'          => 599.99,
                 'desde_factura'   => 501,
+                'hasta_factura'   => 2000,
+                'vigencia_desde'  => $hoy,
+                'vigencia_hasta'  => null,
+            ],
+            [
+                'nombre_precio'   => 'Empresarial Grande',
+                'id_plan'         => 2,
+                'precio'          => 999.99,
+                'desde_factura'   => 2001,
+                'hasta_factura'   => 10000,
+                'vigencia_desde'  => $hoy,
+                'vigencia_hasta'  => null,
+            ],
+            [
+                'nombre_precio'   => 'Empresarial Corporativo',
+                'id_plan'         => 2,
+                'precio'          => 1499.99,
+                'desde_factura'   => 10001,
                 'hasta_factura'   => null,
                 'vigencia_desde'  => $hoy,
                 'vigencia_hasta'  => null,
