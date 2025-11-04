@@ -250,8 +250,10 @@ class SolicitudController extends Controller
         try {
             $fecha_inicio = $request->input('fecha_inicio', null);
             $fecha_fin = $request->input('fecha_fin', null);
-             $usuario_id = auth()->user()->id;
-            $all = $this->solicitudRepository->getGeneralByUsuario($fecha_inicio ,$fecha_fin,$usuario_id);
+            $usuario_id = $request->filled('usuario_id')
+                ? $request->input('usuario_id')
+                : auth()->user()->id;
+            $all = $this->solicitudRepository->getGeneralByUsuario($fecha_inicio, $fecha_fin, $usuario_id);
 
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
