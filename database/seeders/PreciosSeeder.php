@@ -19,14 +19,14 @@ class PreciosSeeder extends Seeder
                 'id_plan'         => 1,
                 'precio'          => 0.00,
                 'desde_factura'   => 1,
-                'hasta_factura'   => 50,
+                'hasta_factura'   => 10,
                 'vigencia_desde'  => $hoy,
                 'vigencia_hasta'  => null,
             ],
             [
                 'nombre_precio'   => 'Personal Avanzado',
                 'id_plan'         => 1,
-                'precio'          => 199.99,
+                'precio'          => 11,
                 'desde_factura'   => 51,
                 'hasta_factura'   => 200,
                 'vigencia_desde'  => $hoy,
@@ -35,7 +35,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Personal Premium',
                 'id_plan'         => 1,
-                'precio'          => 349.99,
+                'precio'          => 10,
                 'desde_factura'   => 201,
                 'hasta_factura'   => 500,
                 'vigencia_desde'  => $hoy,
@@ -44,7 +44,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Personal Máximo',
                 'id_plan'         => 1,
-                'precio'          => 499.99,
+                'precio'          => 3,
                 'desde_factura'   => 501,
                 'hasta_factura'   => null,
                 'vigencia_desde'  => $hoy,
@@ -64,7 +64,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Empresarial Pequeña',
                 'id_plan'         => 2,
-                'precio'          => 299.99,
+                'precio'          => 20,
                 'desde_factura'   => 101,
                 'hasta_factura'   => 500,
                 'vigencia_desde'  => $hoy,
@@ -73,7 +73,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Empresarial Mediana',
                 'id_plan'         => 2,
-                'precio'          => 599.99,
+                'precio'          => 15,
                 'desde_factura'   => 501,
                 'hasta_factura'   => 2000,
                 'vigencia_desde'  => $hoy,
@@ -82,7 +82,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Empresarial Grande',
                 'id_plan'         => 2,
-                'precio'          => 999.99,
+                'precio'          => 10,
                 'desde_factura'   => 2001,
                 'hasta_factura'   => 10000,
                 'vigencia_desde'  => $hoy,
@@ -91,7 +91,7 @@ class PreciosSeeder extends Seeder
             [
                 'nombre_precio'   => 'Empresarial Corporativo',
                 'id_plan'         => 2,
-                'precio'          => 1499.99,
+                'precio'          => 9,
                 'desde_factura'   => 10001,
                 'hasta_factura'   => null,
                 'vigencia_desde'  => $hoy,
