@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\ApiResponseHelper;
 use App\Models\CatMontosPrepago;
+use App\Models\CatPlanes;
 use App\Models\MovimientoSaldo;
 use App\Models\User;
 use Exception;
@@ -149,6 +150,123 @@ class StripeController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+
+     public function crearPagoByMensual(Request $req)
+    {
+        try {
+            $id_user = $req->input('id_user');
+            $idPlan = $req->input('id_plan'); // id del catálogo de montos
+            Log::error(env('STRIPE_SECRET'));
+            Stripe::setApiKey(env('STRIPE_SECRET'));
+
+            $plan = CatPlanes::find($idPlan);
+            if (!$plan) {
+                return null;
+            }
+
+            $amount = (int) ($plan->precio * 100); // en centavos
+            $paymentIntent = PaymentIntent::create([
+                'amount' => $amount,
+                'currency' => env('DIVISA'),
+                'metadata' => [
+                    'user_id' => $id_user,
+                    'plan_id' => $plan->id,
+                    'origin' => 'web'
+                ]
+            ]);
+
+            // datos retornados por stripe
+            $stripeCustomerId = $paymentIntent->customer ?? null;
+            $stripePaymentMethod = $paymentIntent->payment_method ?? null; // puede venir null
+
+            // puede existir un charge ya (no obligatorio)
+            $stripeChargeId = null;
+            if (!empty($paymentIntent->charges) && !empty($paymentIntent->charges->data) && isset($paymentIntent->charges->data[0]->id)) {
+                $stripeChargeId = $paymentIntent->charges->data[0]->id;
+            }
+
+            // idempotency key (si el cliente la envió)
+            $idempotencyKey = $req->header('Idempotency-Key') ?? $req->header('Idempotency-Key') ?? null;
+
+            // obtener usuario actual (para calcular saldo_antes)
+            $user = User::find($id_user);
+            //$currentSaldo = $user ? (float) $user->saldo : 0.00;
+
+            // monto decimal en unidad monetaria (positivo = recarga)
+            $montoDecimal = $amount / 100;
+
+            // Estatus pendiente = 1 (según tu requerimiento)
+            $estatusPendienteId = 1;
+
+            // campos extra a poblar
+            $payment_method_type = null;
+            $card_brand = null;
+            $card_last4 = null;
+
+            // Si viene payment_method (pm_xxx) intentamos recuperarlo para extraer card.brand y last4
+            if (!empty($stripePaymentMethod)) {
+                try {
+                    $pm = PaymentMethod::retrieve($stripePaymentMethod);
+
+                    $payment_method_type = $pm->type ?? null;
+
+                    if (!empty($pm->card)) {
+                        $card_brand = $pm->card->brand ?? null;
+                        $card_last4 = $pm->card->last4 ?? null;
+                    }
+                } catch (\Exception $e) {
+                    // No hacer fail la creación por esto; solo loguear
+                    $payment_method_type = null;
+                    $card_brand = null;
+                    $card_last4 = null;
+                }
+            }
+
+            DB::beginTransaction();
+
+            $mov = MovimientoSaldo::create([
+                'tipo' => "suscripción",
+                'usuario_id' => $id_user,
+                'monto' => $montoDecimal,
+                'currency' => $paymentIntent->currency ?? env('DIVISA', 'mxn'),
+                'amount_cents' => $amount,
+                'estatus_movimiento_id' => $estatusPendienteId,
+                // no sumamos al saldo_resultante mientras esté pendiente; guardamos saldo_antes para auditoría
+                'saldo_antes' => 0,
+                'saldo_resultante' => 0,
+                'descripcion' => "Suscripción de " . $montoDecimal . " " . ($paymentIntent->currency ?? env('DIVISA', 'mxn')) . " para ". $plan->nombre_plan,
+                'payment_intent_id' => $paymentIntent->id,
+                'stripe_charge_id' => $stripeChargeId,
+                'customer_id' => $stripeCustomerId,
+                'payment_method' => $stripePaymentMethod,
+                'payment_method_type' => $payment_method_type,
+                'card_brand' => $card_brand,
+                'card_last4' => $card_last4,
+                // fees y net se llenan en el webhook cuando tengamos balance_transaction
+                'fees_amount' => null,
+                'fees_currency' => null,
+                'net_amount' => null,
+                'fees_raw' => null,
+                'metadata' => $paymentIntent->metadata ? json_decode(json_encode($paymentIntent->metadata), true) : null,
+                'stripe_event_id' => null,
+                'webhook_payload' => null,
+                'processed_at' => null,
+                'failure_code' => null,
+                'failure_message' => null,
+                'idempotency_key' => $idempotencyKey,
+                'refunded_amount' => 0,
+                'reverted' => false,
+            ]);
+
+            DB::commit();
+
+            return ApiResponseHelper::sendResponse($paymentIntent->client_secret, 'Pago creado correctamente para el plan mensual.', 200);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+
 
     public function confirmStripePayment(Request $request)
     {
