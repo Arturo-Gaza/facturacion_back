@@ -443,29 +443,28 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ];
         }
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
-
-        if ($plan->esMensual()) {
-            // Buscar suscripción activa/vigente (si aplica)
-
-            $vigente = false;
+        $num_factura = $suscripcion->facturas_realizadas + 1;
+        $vigente = false;
             if ($suscripcion) {
                 $vigente = $suscripcion->estaVigente();
             }
+        if ($plan->esMensual()) {
+            // Buscar suscripción activa/vigente (si aplica)
 
+          $facturas_realizadas=$suscripcion->facturas_realizadas; 
+            $factura_restante=$facturas_realizadas-$num_factura;
             return [
                 'tipo' => 'mensual',
                 'vigente' => (bool) $vigente,
-                'monto_a_cobrar' => 0.00,
-                'tier' => null,
-                'saldo_actual' => (float) $efectivoUsuario->saldo,
-                'saldo_despues' => (float) $efectivoUsuario->saldo,
-                'insuficiente_saldo' => false,
-                'factura_numero' => 0,
-                'factura_restante' => 0
+                'monto_a_cobrar' => null,
+                'tier' => $plan->nombre_plan,
+                'saldo_actual' => null,
+                'saldo_despues' => null,
+                'insuficiente_saldo' => $factura_restante <= 0 ? true : false,
+                'factura_numero' => $num_factura,
+                'factura_restante' => $factura_restante
             ];
         }
-        $num_factura = $suscripcion->facturas_realizadas + 1;
-
         $precioRegistro = Precio::where('id_plan', $plan->id)
             ->where(function ($q) use ($hoy) {
                 $q->whereNull('vigencia_desde')->orWhere('vigencia_desde', '<=', $hoy);
@@ -488,6 +487,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if ($efectivoUsuario->saldo - $precioUnitario < 0) {
             return [
                 'monto_a_cobrar' =>  $precioUnitario,
+                'vigente' => (bool) $vigente,
                 'tier' => $precioRegistro->nombre_precio,
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
                 'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
@@ -500,6 +500,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         return [
             'monto_a_cobrar' =>  $precioUnitario,
+            'vigente' => (bool) $vigente,
             'tier' => $precioRegistro->nombre_precio,
             'saldo_actual' => (float) $efectivoUsuario->saldo,
             'saldo_despues' => (float) $efectivoUsuario->saldo - $precioUnitario,
