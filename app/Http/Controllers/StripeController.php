@@ -267,9 +267,228 @@ class StripeController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+public function confirmStripePayment(Request $request)
+{
+    $request->validate([
+        'payment_intent_id' => 'required|string',
+    ]);
 
+    $paymentIntentId = $request->input('payment_intent_id');
 
-    public function confirmStripePayment(Request $request)
+    try {
+        Stripe::setApiKey(env('STRIPE_SECRET'));
+
+        // Recuperamos PaymentIntent (expand para tener charge/balance transaction si están)
+        $pi = PaymentIntent::retrieve($paymentIntentId, [
+            'expand' => ['charges.data.balance_transaction', 'charges.data.payment_method']
+        ]);
+
+        if (!$pi || empty($pi->id)) {
+            return ApiResponseHelper::rollback(null, 'PaymentIntent no encontrado en Stripe', 404);
+        }
+
+        // Buscar movimiento local
+        $mov = MovimientoSaldo::where('payment_intent_id', $paymentIntentId)->first();
+        if (!$mov) {
+            return ApiResponseHelper::rollback(null, 'Movimiento no encontrado en DB', 404);
+        }
+
+        // Idempotencia
+        if ($mov->processed_at) {
+            return ApiResponseHelper::rollback('Movimiento ya procesado', 200);
+        }
+
+        // Validación de montos (Stripe en centavos)
+        $stripeAmount = $pi->amount ?? null;
+        $localAmountCents = $mov->amount_cents ?? (int) round($mov->monto * 100);
+        if ($stripeAmount !== null && $localAmountCents !== null && (int)$stripeAmount !== (int)$localAmountCents) {
+            Log::warning("confirmStripePaymentUnified - Mismatch amount: PI {$paymentIntentId} stripe {$stripeAmount} != local {$localAmountCents} (mov_id {$mov->id})");
+            // No abortamos, sólo queda registrado
+        }
+
+        $status = $pi->status; // expected: succeeded
+
+        // intentar extraer charge y charge id
+        $charge = null;
+        $stripeChargeId = null;
+        if (!empty($pi->charges) && !empty($pi->charges->data) && count($pi->charges->data) > 0) {
+            $charge = $pi->charges->data[0];
+            $stripeChargeId = $charge->id ?? ($pi->latest_charge ?? null);
+        } else {
+            $stripeChargeId = $pi->latest_charge ?? null;
+        }
+
+        // Campos a llenar por defecto desde mov
+        $payment_method_type = $mov->payment_method_type ?? null;
+        $card_brand = $mov->card_brand ?? null;
+        $card_last4 = $mov->card_last4 ?? null;
+        $fees_amount = $mov->fees_amount ?? null;
+        $fees_currency = $mov->fees_currency ?? null;
+        $net_amount = $mov->net_amount ?? null;
+        $fees_raw = $mov->fees_raw ?? null;
+
+        // Extraer payment method details (prefer charge -> payment_method_details)
+        try {
+            if ($charge && !empty($charge->payment_method_details)) {
+                $pmd = $charge->payment_method_details;
+                $payment_method_type = $pmd->type ?? $payment_method_type;
+                if (!empty($pmd->card)) {
+                    $card_brand = $pmd->card->brand ?? $card_brand;
+                    $card_last4 = $pmd->card->last4 ?? $card_last4;
+                }
+            }
+
+            // Si no tenemos last4/brand y existe payment_method id, intentar retrieve
+            $pmId = $pi->payment_method ?? $mov->payment_method ?? null;
+            if (($card_last4 === null || $card_brand === null) && $pmId) {
+                try {
+                    $pm = PaymentMethod::retrieve($pmId);
+                    $payment_method_type = $pm->type ?? $payment_method_type;
+                    if (!empty($pm->card)) {
+                        $card_brand = $pm->card->brand ?? $card_brand;
+                        $card_last4 = $pm->card->last4 ?? $card_last4;
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("confirmStripePaymentUnified: no se pudo recuperar PaymentMethod {$pmId}: " . $e->getMessage());
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning("confirmStripePaymentUnified: error extrayendo payment method details: " . $e->getMessage());
+        }
+
+        // Extraer balance_transaction / fees desde charge (si existe)
+        if ($charge) {
+            $balanceTxId = $charge->balance_transaction ?? null;
+            if ($balanceTxId) {
+                try {
+                    $bt = is_string($balanceTxId) ? BalanceTransaction::retrieve($balanceTxId) : $balanceTxId;
+                    if ($bt) {
+                        $fees_amount = isset($bt->fee) ? ($bt->fee / 100) : $fees_amount;
+                        $fees_currency = $bt->currency ?? $fees_currency;
+                        $net_amount = isset($bt->net) ? ($bt->net / 100) : $net_amount;
+                        $fees_raw = json_decode(json_encode($bt), true);
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("confirmStripePaymentUnified: no se pudo recuperar BalanceTransaction {$balanceTxId}: " . $e->getMessage());
+                }
+            }
+        }
+
+        // Leemos metadata y decidimos tipo
+        $metadata = isset($pi->metadata) ? json_decode(json_encode($pi->metadata), true) : [];
+        $planId = $metadata['plan_id'] ?? null;
+        $isSubscription = !empty($planId); // si tiene plan_id lo tomamos como suscripción
+        // Si prefieres otro flag explícito, añade metadata.payment_type = 'subscription'|'recharge' en tu frontend
+
+        DB::beginTransaction();
+
+        if ($status === 'succeeded') {
+            $estatusCompletado = 2; // ajusta según tu catálogo
+
+            // Si saldo_antes nulo, setear desde usuario (para recarga)
+            if ($mov->saldo_antes === null) {
+                $userForSaldo = User::find($mov->usuario_id);
+                $mov->saldo_antes = $userForSaldo ? (float) $userForSaldo->saldo : 0.00;
+            }
+
+            // Actualizamos campos comunes del movimiento
+            $mov->stripe_charge_id = $stripeChargeId ?? $mov->stripe_charge_id;
+            $mov->customer_id = $pi->customer ?? $mov->customer_id;
+            $mov->payment_method = $pi->payment_method ?? $mov->payment_method;
+            $mov->payment_method_type = $payment_method_type;
+            $mov->card_brand = $card_brand;
+            $mov->card_last4 = $card_last4;
+            $mov->currency = $pi->currency ?? $mov->currency;
+            $mov->amount_cents = $pi->amount ?? $mov->amount_cents;
+            $mov->metadata = $metadata ?: $mov->metadata;
+
+            // fees
+            $mov->fees_amount = $fees_amount;
+            $mov->fees_currency = $fees_currency;
+            $mov->net_amount = $net_amount;
+            $mov->fees_raw = $fees_raw ? json_encode($fees_raw) : $mov->fees_raw;
+
+            $mov->webhook_payload = json_encode($pi);
+            $mov->processed_at = Carbon::now();
+            $mov->failure_code = null;
+            $mov->failure_message = null;
+            $mov->estatus_movimiento_id = $estatusCompletado;
+
+            $user = User::find($mov->usuario_id);
+
+            // Rama: SUSCRIPCIÓN
+            $createdSubscription = null;
+            if ($isSubscription) {
+                if (!$user) {
+                    DB::rollBack();
+                    return ApiResponseHelper::rollback(null, 'Usuario no encontrado para suscripción', 404);
+                }
+
+                // Crear suscripción local (ajusta campos según tu tabla)
+                $createdSubscription = Suscripciones::create([
+                    'usuario_id' => $user->id,
+                    'id_plan' => $planId,
+                    'fecha_inicio' => now(),
+                    'fecha_vencimiento' => now()->addMonth(), // ajustar según duración del plan si aplica
+                    'estado' => Suscripciones::ESTADO_ACTIVA,
+                    'perfiles_utilizados' => 0,
+                    'facturas_realizadas' => 0,
+                ]);
+
+                // Para suscripción usualmente no tocas saldo del usuario.
+                $mov->saldo_resultante = $mov->saldo_antes; // sin cambio
+            } else {
+                // Rama: RECARGA / TOP-UP -> actualizar saldo del usuario
+                if ($user) {
+                    $nuevoSaldo = (float)$user->saldo + ((float)$mov->monto);
+                    $user->saldo = $nuevoSaldo;
+                    $user->save();
+
+                    $mov->saldo_resultante = $nuevoSaldo;
+                } else {
+                    // si no hay user, calculo aproximado
+                    $mov->saldo_resultante = ($mov->saldo_antes ?? 0) + ((float)$mov->monto);
+                }
+            }
+
+            $mov->save();
+            DB::commit();
+
+            // Respuesta con info útil
+            $response = [
+                'saldo_resultante' => $mov->saldo_resultante,
+                'is_subscription' => $isSubscription,
+                'subscription_id' => $createdSubscription ? $createdSubscription->id : null,
+                'movimiento_id' => $mov->id,
+            ];
+
+            $message = $isSubscription ? 'Pago confirmado y suscripción creada.' : 'Pago confirmado y saldo actualizado.';
+            return ApiResponseHelper::sendResponse($response, $message, 200);
+        }
+
+        // Si no succeeded: guardamos info parcial y no actualizamos saldo
+        $mov->stripe_charge_id = $stripeChargeId ?? $mov->stripe_charge_id;
+        $mov->customer_id = $pi->customer ?? $mov->customer_id;
+        $mov->payment_method = $pi->payment_method ?? $mov->payment_method;
+        $mov->payment_method_type = $payment_method_type;
+        $mov->card_brand = $card_brand;
+        $mov->card_last4 = $card_last4;
+        $mov->amount_cents = $pi->amount ?? $mov->amount_cents;
+        $mov->metadata = $metadata ?: $mov->metadata;
+        $mov->webhook_payload = json_encode($pi);
+        $mov->save();
+
+        DB::rollBack();
+        return ApiResponseHelper::rollback(null, "PaymentIntent no está en estado succeeded (status: {$status})", 400);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error confirmStripePaymentUnified: ' . $e->getMessage() . ' - PI:' . ($paymentIntentId ?? 'n/a'));
+        return ApiResponseHelper::rollback(null, 'Error al verificar PaymentIntent: ' . $e->getMessage(), 500);
+    }
+}
+
+    public function confirmStripePaymentOld(Request $request)
     {
         $request->validate([
             'payment_intent_id' => 'required|string',
