@@ -14,7 +14,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Básico Personal',
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
-            'precio'=>0.00,
+            'precio' => 0.00,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Sin fecha de fin (vigente indefinidamente)
         ]);
@@ -24,7 +24,7 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Prepago',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'prepago',
-            'precio'=>0.00,
+            'precio' => 0.00,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Vigencia de 1 año
         ]);
@@ -34,7 +34,9 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Básico Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
-            'precio'=>99.99,
+            'num_usuarios' => 10,
+            'num_facturas' => 100,
+            'precio' => 99.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 1 año de vigencia
         ]);
@@ -43,7 +45,9 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Avanzado Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
-            'precio'=>149.99,
+            'num_usuarios' => 20,
+            'num_facturas' => 200,
+            'precio' => 149.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
@@ -52,7 +56,9 @@ class PlanSeeder extends Seeder
             'nombre_plan' => 'Plan Empresarial Premium Mensual',
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
-            'precio'=>199.99,
+            'num_usuarios' => 40,
+            'num_facturas' => 400,
+            'precio' => 199.99,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 2 años de vigencia
         ]);

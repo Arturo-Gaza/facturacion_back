@@ -16,6 +16,8 @@ class CatPlanes extends Model
         'nombre_plan',
         'tipo_plan',
         'tipo_pago',
+        'num_usuarios',
+        'num_facturas',
         'vigencia_inicio',
         'vigencia_fin',
         'precio'
