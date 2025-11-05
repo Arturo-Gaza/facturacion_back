@@ -296,6 +296,8 @@ Route::post('stripe/crearPagoByMensual', [StripeController::class, 'crearPagoByM
 
 Route::post('stripe/confirmStripePayment', [StripeController::class, 'confirmStripePayment']);
 
+Route::post('stripe/confirmStripePaymentMensual', [StripeController::class, 'confirmStripePaymentMensual']);
+
 
 //Facturacion
 
