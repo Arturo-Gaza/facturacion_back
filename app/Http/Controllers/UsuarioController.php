@@ -125,6 +125,16 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
+    public function enviarCorreoValReceptor(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+            'id_user' => $request->id_user,
+        ];
+        $usuario = $this->usuario->enviarCorreoValReceptor($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
+    }
     public function enviarCorreoInhabilitar(Request $request)
     {
         $data = [
@@ -172,6 +182,18 @@ class UsuarioController extends Controller
             'email' => $request->email,
         ];
         $usuario = $this->usuario->validarCorreoConf($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
+        public function validarCorreoValReceptor(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+        ];
+        $usuario = $this->usuario->validarCorreoValReceptor($data);
         if (!$usuario) {
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
         }
@@ -247,7 +269,7 @@ class UsuarioController extends Controller
         }
     }
 
-        public function desHabilitarPorAdmin(Request $request)
+    public function desHabilitarPorAdmin(Request $request)
     {
         $data = [
             'email_padre' => $request->email_padre,

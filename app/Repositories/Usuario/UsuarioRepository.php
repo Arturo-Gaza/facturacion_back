@@ -492,7 +492,48 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
         // Continuar con el flujo para permitir cambiar contraseña
     }
+    public function enviarCorreoValReceptor($data)
+    {
+        $email = $data['email'];
+        $id_user = $data['id_user'];
+        if (!$email) {
+            return null;
+        }
+        $usr = $this->emailService->enviarCorreoValReceptor($id_user,$email);
+        return $usr;
+    }
+    public function validarCorreoValReceptor($data)
+    {
+        DB::beginTransaction();
+        $codigo = $data['codigo'];
 
+        $email = $data['email'];
+        $expiraEnMinutos = 10;
+        $passwordReset = PasswordConf::where('email', $email)
+            ->where('used', false)
+            ->get();
+
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    DB::rollBack();
+                    return null;
+                }
+                // Actualizar el registro en password_confirm_mail_tokens
+                $reset->update([
+                    'used' => true,
+                    'used_at' => now()
+                ]);
+
+                DB::commit();
+
+                return "Código válido";
+            }
+        }
+        DB::rollBack();
+        return null;
+    }
     public function validarCorreoConf($data)
     {
         DB::beginTransaction();

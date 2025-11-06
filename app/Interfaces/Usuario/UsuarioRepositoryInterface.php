@@ -18,9 +18,11 @@ interface UsuarioRepositoryInterface
   public function getAllHabilitados();
   public function enviarCorreoRec($data);
   public function enviarCorreoConf($data);
+   public function enviarCorreoValReceptor($data);
   public function enviarSMSConf($data);
   public function validarCorreoRec($data);
   public function validarCorreoConf($data);
+    public function validarCorreoValReceptor($data);
   public function enviarCorreoInhabilitar($data);
   public function validarCorreoInhabilitar($data);
   public function enviarCorreoEliminar($data);
