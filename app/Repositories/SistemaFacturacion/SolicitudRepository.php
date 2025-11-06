@@ -234,13 +234,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             // Borrar archivos si existen
             $paths = [
-                $sol->pdf_url,
-                $sol->xml_url
+                $sol->getRawOriginal('pdf_url'),
+                $sol->getRawOriginal('xml_url')
             ];
 
             foreach ($paths as $p) {
-                if ($p && Storage::exists($p)) {
-                    Storage::delete($p);
+                if ($p && Storage::disk('public')->exists($p)) {
+                    Storage::disk('public')->delete($p);
                 }
             }
 
