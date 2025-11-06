@@ -16,6 +16,7 @@ interface SolicitudRepositoryInterface
   public function getMesaAyuda();
   public function getDashboard($fecha_inicio,$fecha_fin,$id);
     public function concluir($id_usuario,$id_solicitud);
+    public function mandarFactura($id_solicitud);
   public function getByUsuario(int $usuario_id);
   public function procesar(int $id);
   public function rechazar($id_solicitud, $id_motivo_rechazo,$id_user);

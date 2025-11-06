@@ -112,6 +112,19 @@ class SolicitudController extends Controller
             ]);
             $id_solicitud = $request->input('id_solicitud');
             $all = $this->solicitudRepository->concluir($id_usuario, $id_solicitud);
+            return ApiResponseHelper::sendResponse($all, 'Correo enviado', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+        public function mandarFactura(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_solicitud' => 'required|integer'
+            ]);
+            $id_solicitud = $request->input('id_solicitud');
+            $all = $this->solicitudRepository->mandarFactura($id_solicitud);
             return ApiResponseHelper::sendResponse($all, 'Solicitud concluida', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);

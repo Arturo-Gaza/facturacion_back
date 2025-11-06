@@ -445,14 +445,14 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
         $num_factura = $suscripcion->facturas_realizadas + 1;
         $vigente = false;
-            if ($suscripcion) {
-                $vigente = $suscripcion->estaVigente();
-            }
+        if ($suscripcion) {
+            $vigente = $suscripcion->estaVigente();
+        }
         if ($plan->esMensual()) {
             // Buscar suscripción activa/vigente (si aplica)
 
-          $facturas_realizadas=$suscripcion->facturas_realizadas; 
-            $factura_restante=$facturas_realizadas-$num_factura;
+            $facturas_realizadas = $suscripcion->facturas_realizadas;
+            $factura_restante = $facturas_realizadas - $num_factura;
             return [
                 'tipo' => 'mensual',
                 'vigente' => (bool) $vigente,
@@ -585,6 +585,48 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         return User::whereIn('idRol', [4, 5])->get();
     }
+    public function mandarFactura($id_solicitud)
+    {
+        $solicitud = Solicitud::find($id_solicitud);
+        $receptor = $solicitud->receptor ?? null;
+        $email = null;
+        if ($receptor) {
+            $email = $receptor->email_facturacion_text;
+        }
+        if ($email) {
+            $xmlRelativePath = $solicitud->getRawOriginal('xml_url');
+
+            if (!empty($xmlRelativePath) && Storage::disk('public')->exists($xmlRelativePath)) {
+                $xmlPath = Storage::disk('public')->path($xmlRelativePath);
+                $archivos[] = $xmlPath;
+                Log::info("Archivo XML encontrado: " . $xmlPath);
+            } else {
+                Log::warning("Archivo XML no disponible o no encontrado. Path: " . ($xmlRelativePath ?? 'NULL'));
+            }
+
+            // Para PDF - con verificación de null
+            $pdfRelativePath = $solicitud->getRawOriginal('pdf_url');
+
+            if (!empty($pdfRelativePath) && Storage::disk('public')->exists($pdfRelativePath)) {
+                $pdfPath = Storage::disk('public')->path($pdfRelativePath);
+                $archivos[] = $pdfPath;
+                Log::info("Archivo PDF encontrado: " . $pdfPath);
+            } else {
+                Log::warning("Archivo PDF no disponible o no encontrado. Path: " . ($pdfRelativePath ?? 'NULL'));
+            }
+
+            // Verificar que tenemos archivos para enviar
+            if (empty($archivos)) {
+                Log::error("No hay archivos disponibles para adjuntar al correo");
+                return "Error: No hay archivos disponibles para enviar";
+            }
+            $this->emailService->enviarCorreoFac($email, $archivos);
+        }else{
+            throw new Exception("Correo no encontrado");
+        }
+
+    }
+
     public function concluir($id_usuario, $id_solicitud)
     {
         $estatus_concluido = 9;
