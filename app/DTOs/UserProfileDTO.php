@@ -24,6 +24,8 @@ class UserProfileDTO
         public ?array $suscripcionActiva,
         public ?bool $tieneSuscripcionActiva,
         public ?bool $enviar_correo,
+        public ?string $rfcPrincipal,
+        public ?string $razonSocialPrincipal,
     ) {}
 
     public static function fromUserModel($user): self
@@ -80,7 +82,10 @@ class UserProfileDTO
             id_estatus_usuario: $user->id_estatus_usuario,
             suscripcionActiva: $suscripcionArray,
             tieneSuscripcionActiva: $tieneSuscripcionActiva,
-             enviar_correo:$user->datosFiscalesPersonal?->enviar_correo
+            enviar_correo: $user->datosFiscalesPersonal?->enviar_correo,
+            rfcPrincipal: $user->datosFiscalesPrincipal?->rfc ,
+            razonSocialPrincipal: $user->datosFiscalesPrincipal?->nombre_razon ,
+
         );
     }
 
@@ -105,7 +110,7 @@ class UserProfileDTO
             'id_estatus_usuario' => $this->id_estatus_usuario,
             'suscripcionActiva' => $this->suscripcionActiva,
             'tieneSuscripcionActiva' => $this->tieneSuscripcionActiva,
-            'enviar_correo'=>$this->enviar_correo
+            'enviar_correo' => $this->enviar_correo
         ];
     }
 }
