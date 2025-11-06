@@ -63,7 +63,7 @@ class Suscripciones extends Model
     public function scopeVigentes($query)
     {
         return $query->where('estado', self::ESTADO_ACTIVA)
-                    ->where('fecha_vencimiento', '>=', now());
+            ->where('fecha_vencimiento', '>=', now());
     }
 
     /**
@@ -71,8 +71,8 @@ class Suscripciones extends Model
      */
     public function estaVigente(): bool
     {
-        return $this->estado === self::ESTADO_ACTIVA && 
-               $this->fecha_vencimiento >= now();
+        return $this->estado === self::ESTADO_ACTIVA &&
+            ($this->fecha_vencimiento === null || $this->fecha_vencimiento >= now());
     }
 
     /**
@@ -80,7 +80,7 @@ class Suscripciones extends Model
      */
     public function estaVencida(): bool
     {
-        return $this->estado === self::ESTADO_ACTIVA && 
-               $this->fecha_vencimiento < now();
+        return $this->estado === self::ESTADO_ACTIVA &&
+            $this->fecha_vencimiento < now();
     }
 }

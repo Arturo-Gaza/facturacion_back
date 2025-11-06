@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\EmailService;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class SolicitudRepository implements SolicitudRepositoryInterface
 {
@@ -218,6 +218,49 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         return $solicitud->fresh();
     }
+    public function revertir($id_usuario, $id_solicitud)
+    {
+        return DB::transaction(function () use ($id_usuario, $id_solicitud) {
+            $sol = Solicitud::find($id_solicitud);
+
+            if (! $sol) {
+                throw new ModelNotFoundException("Solicitud con id {$id_solicitud} no encontrada.");
+            }
+
+
+            // Alternativa: buscar la bitácora inmediata anterior a la fecha en que se puso el 6.
+            // Si no hay nada, usar un estatus por defecto (ej. 1)
+            $estatusRestaurar = 5;
+
+            // Borrar archivos si existen
+            $paths = [
+                $sol->pdf_url,
+                $sol->xml_url
+            ];
+
+            foreach ($paths as $p) {
+                if ($p && Storage::exists($p)) {
+                    Storage::delete($p);
+                }
+            }
+
+            // Actualizar modelo
+            $sol->pdf_url = null;
+            $sol->xml_url = null;
+            $sol->estado_id = $estatusRestaurar;
+            $sol->save();
+
+            // Registrar en bitácora la reversión
+            TabBitacoraSolicitud::create([
+                'id_solicitud' => $id_solicitud,
+                'id_estatus' => $estatusRestaurar,
+                'id_usuario' => $id_usuario,
+            ]);
+
+            return $sol;
+        });
+    }
+
     public function enviar(int $id_sol, int $id_user)
     {
         DB::beginTransaction();
@@ -621,10 +664,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 return "Error: No hay archivos disponibles para enviar";
             }
             $this->emailService->enviarCorreoFac($email, $archivos);
-        }else{
+        } else {
             throw new Exception("Correo no encontrado");
         }
-
     }
 
     public function concluir($id_usuario, $id_solicitud)

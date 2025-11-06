@@ -117,6 +117,20 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+      public function revertir(Request $request)
+    {
+        try {
+            $id_usuario = auth()->user()->id;
+            $request->validate([
+                'id_solicitud' => 'required|integer'
+            ]);
+            $id_solicitud = $request->input('id_solicitud');
+            $all = $this->solicitudRepository->revertir($id_usuario, $id_solicitud);
+            return ApiResponseHelper::sendResponse($all, 'Solicitud revertida', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
         public function mandarFactura(Request $request)
     {
         try {
