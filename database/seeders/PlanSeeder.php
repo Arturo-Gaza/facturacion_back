@@ -12,7 +12,7 @@ class PlanSeeder extends Seeder
         // Plan Básico Personal Prepago
         CatPlanes::create([
             'nombre_plan' => 'Check in',
-            'descripcion_plan'=>"Comienza tu viaje sin complicaciones. Automatiza la Recuperación de tus Gastos de viajes en minutos y olvídate de perseguir facturas.",
+            'descripcion_plan' => "Comienza tu viaje sin complicaciones. Automatiza la Recuperación de tus Gastos de viajes en minutos y olvídate de perseguir facturas.",
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
             'num_usuarios' => 1,
@@ -24,7 +24,7 @@ class PlanSeeder extends Seeder
         // Plan Empresarial Prepago
         CatPlanes::create([
             'nombre_plan' => 'Vuelo',
-            'descripcion_plan'=>"Tu asistente de Recuperación de gastos inteligente. Ideal para profesionales que viajan frecuentemente y necesitan control total de sus comprobaciones.",
+            'descripcion_plan' => "Tu asistente de Recuperación de gastos inteligente. Ideal para profesionales que viajan frecuentemente y necesitan control total de sus comprobaciones.",
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
             'precio' => 0.00,
@@ -35,7 +35,7 @@ class PlanSeeder extends Seeder
         // 3 Planes Empresariales Mensuales (Postpago)
         CatPlanes::create([
             'nombre_plan' => 'Primera Clase',
-            'descripcion_plan'=>"La decisión empresarial que Genera. Automatiza la Recupera Gastos de todo tu equipo y deduce el 95% de tus Gastos de viáticos",
+            'descripcion_plan' => "La decisión empresarial que Genera. Automatiza la Recupera Gastos de todo tu equipo y deduce el 95% de tus Gastos de viáticos",
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'prepago',
             'precio' => 0,
@@ -45,9 +45,10 @@ class PlanSeeder extends Seeder
 
         CatPlanes::create([
             'nombre_plan' => 'Boarding Elite 25 usuarios',
-            'descripcion_plan'=>"Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
+            'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
+            'precio' => 5000.0,
             'num_usuarios' => 25,
             'num_facturas' => 5000,
             'vigencia_inicio' => now(),
@@ -55,13 +56,14 @@ class PlanSeeder extends Seeder
         ]);
         CatPlanes::create([
             'nombre_plan' => 'Boarding Elite 25 usuarios',
+            'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
+            'precio' => 10000.0,
             'num_usuarios' => 50,
             'num_facturas' => 10000,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
- 
     }
 }

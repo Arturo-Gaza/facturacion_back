@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('cat_montos_prepago', function (Blueprint $table) {
             $table->id();
             $table->string('nombre')->unique();
-            $table->string('descripcion')->unique();
+            $table->string('descripcion');
  
             $table->foreignId('id_plan')->constrained('cat_planes')->onDelete('cascade');
 
