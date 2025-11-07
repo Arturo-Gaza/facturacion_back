@@ -55,11 +55,22 @@ class PlanSeeder extends Seeder
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
         CatPlanes::create([
-            'nombre_plan' => 'Boarding Elite 25 usuarios',
+            'nombre_plan' => 'Boarding Elite 50 usuarios',
             'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
             'precio' => 10000.0,
+            'num_usuarios' => 50,
+            'num_facturas' => 10000,
+            'vigencia_inicio' => now(),
+            'vigencia_fin' => null, // 6 meses de vigencia
+        ]);
+                CatPlanes::create([
+            'nombre_plan' => 'Boarding Elite 100 usuarios',
+            'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
+            'tipo_plan' => 'empresarial',
+            'tipo_pago' => 'postpago',
+            'precio' => 20000.0,
             'num_usuarios' => 50,
             'num_facturas' => 10000,
             'vigencia_inicio' => now(),

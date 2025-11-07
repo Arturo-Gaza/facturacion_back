@@ -225,67 +225,7 @@ Ideal para empresas que quieren pagar por lo que consumen",
                 'updated_at' => now(),
             ],
 
-            // Boarding Elite (id_plan = 4)
-            [
-                'id_plan' => 4,
-                'nombre' => 'Boarding Elite 5000 ',
-                'descripcion' => "Tu equipo se concentra en Generar, no en Recuperar
-Gastos. Olvídate de Perseguir Facturas.
-Ideal para empresas que prefieren un Gasto con presupuesto
-mensual controlado",
-                'monto' => 5000.00,
-                'activo' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_plan' => 4,
-                'nombre' => 'Boarding Elite 10000 ',
-                'descripcion' => "Tu equipo se concentra en Generar, no en Recuperar
-Gastos. Olvídate de Perseguir Facturas.
-Ideal para empresas que prefieren un Gasto con presupuesto
-mensual controlado",
-                'monto' => 10000.00,
-                'activo' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_plan' => 4,
-                'nombre' => 'Boarding Elite 20000 ',
-                'descripcion' => "Tu equipo se concentra en Generar, no en Recuperar
-Gastos. Olvídate de Perseguir Facturas.
-Ideal para empresas que prefieren un Gasto con presupuesto
-mensual controlado",
-                'monto' => 20000.00,
-                'activo' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_plan' => 4,
-                'nombre' => 'Boarding Elite 30000 ',
-                'descripcion' => "Tu equipo se concentra en Generar, no en Recuperar
-Gastos. Olvídate de Perseguir Facturas.
-Ideal para empresas que prefieren un Gasto con presupuesto
-mensual controlado",
-                'monto' => 30000.00,
-                'activo' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'id_plan' => 4,
-                'nombre' => 'Boarding Elite 40000 ',
-                'descripcion' => "Tu equipo se concentra en Generar, no en Recuperar
-Gastos. Olvídate de Perseguir Facturas.
-Ideal para empresas que prefieren un Gasto con presupuesto
-mensual controlado",
-                'monto' => 40000.00,
-                'activo' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+           
         ];
 
         DB::table('cat_montos_prepago')->insert($planes);
