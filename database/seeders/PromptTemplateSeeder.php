@@ -11,6 +11,21 @@ class PromptTemplateSeeder extends Seeder
     {
         $prompts = [
             [
+    'name' => 'Extracción de texto plano desde PDF',
+    'type' => 'texto_extraction',
+    'prompt' => <<<PROMPT
+Eres un extractor de texto. Recibirás un documento PDF (inline) y debes devolver **únicamente** el texto extraído legible del documento.
+INSTRUCCIONES:
+- Devuelve SOLO el texto extraído, sin encabezados, sin firmas automáticas, sin etiquetas, sin JSON, sin explicaciones ni metadatos.
+- Conserva saltos de línea donde correspondan. Normaliza espacios (trim al inicio y final).
+- No inventes, no rellenes ni comentes nada. Si no hay texto, devuelve una cadena vacía.
+- No devuelvas instrucciones ni números de página, sólo el texto.
+PARÁMETROS ADICIONALES:
+id solicitud: {\$id}
+PROMPT,
+    'description' => 'Prompt para pedirle a Gemini que devuelva sólo texto plano extraído del PDF.',
+            ],
+            [
     'name' => 'Extracción de datos específicos por giro',
     'type' => 'datos_por_giro_extraction',
     'prompt' => <<<PROMPT

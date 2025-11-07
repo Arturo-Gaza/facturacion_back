@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Services\EmailService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\File;
 
 class SolicitudRepository implements SolicitudRepositoryInterface
 {
@@ -444,8 +445,21 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             $imagePath = $solicitud->getRutaImagenAttribute();
             $imageData = base64_encode(file_get_contents($imagePath));
+            // Extraer el archivo como tal
+            $fileContent = file_get_contents($imagePath);
+            $extension = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
 
-            return $this->ocrService->extractTextFromImage($imageData);
+            if ($extension === 'pdf') {
+                $file = new File($imagePath);
+                $parameters = [
+                    'id' => $solicitud->id
+                ];
+                return $this->aiService->extractTextFromPDF($file, 'texto_extraction',$parameters); 
+            } else {
+                // Si es imagen
+                $imageData = base64_encode($fileContent);
+                return $this->ocrService->extractTextFromImage($imageData);
+            }
         } catch (\Exception $e) {
             Log::error("Error procesando imagen: " . $e->getMessage(), [
                 'solicitud_id' => $solicitud->id

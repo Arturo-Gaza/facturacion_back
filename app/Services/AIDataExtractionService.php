@@ -38,6 +38,68 @@ error_log($prompt);
 
         return $this->fallbackExtraction($textoOCR);
     }
+
+public function extractTextFromPDF($file, string $promptType = 'texto_extraction', array $parameters = null): ?string
+{
+    try {
+        $promptTem = PromptTemplate::where('type', $promptType)->first();
+        $prompt = $promptTem ? $promptTem->prompt : '';
+
+        // Reemplaza placeholders si hay parámetros
+        if ($parameters) {
+            foreach ($parameters as $key => $value) {
+                $placeholder = '{$' . $key . '}';
+                $prompt = str_replace($placeholder, $value, $prompt);
+            }
+        }
+
+        // Leer y codificar en base64 (file debe tener getRealPath())
+        $pdfData = base64_encode(file_get_contents($file->getRealPath()));
+
+        // Llamar a la API de Gemini (igual que en tu método anterior)
+        $response = Http::timeout(60)->withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey, [
+            'contents' => [[
+                'parts' => [
+                    [
+                        'inline_data' => [
+                            'mime_type' => 'application/pdf',
+                            'data' => $pdfData,
+                        ]
+                    ],
+                    [
+                        // Enviamos el prompt que le dice que devuelva solo texto
+                        'text' => $prompt
+                    ]
+                ]
+            ]]
+        ]);
+
+        if (! $response->successful()) {
+            Log::error('Gemini API error: ' . $response->body());
+            return null;
+        }
+
+        $json = $response->json();
+
+        // Aquí obtenemos el texto bruto que devuelve Gemini (igual que antes)
+        $text = $json['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+        // Normaliza retornos de carro o trim si quieres:
+        if (is_string($text)) {
+            $text = trim($text);
+        }
+
+        return $text;
+    } catch (\Exception $e) {
+        Log::error("Error extractTextFromPDF: " . $e->getMessage(), [
+            'file' => method_exists($file, 'getRealPath') ? $file->getRealPath() : null
+        ]);
+        return null;
+    }
+}
+
     public function extractStructuredDataPDF($file, string $promptType = 'receipt_extraction', array $parameters = null)
     {
 
