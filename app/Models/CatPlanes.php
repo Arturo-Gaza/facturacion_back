@@ -14,6 +14,7 @@ class CatPlanes extends Model
 
     protected $fillable = [
         'nombre_plan',
+        'descripcion_plan',
         'tipo_plan',
         'tipo_pago',
         'num_usuarios',

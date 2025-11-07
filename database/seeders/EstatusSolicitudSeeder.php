@@ -84,6 +84,13 @@ class EstatusSolicitudSeeder extends Seeder
                 'color' => 'bg-emerald-600', // Azul oscuro
                 'color_cliente' => 'bg-emerald-600'
             ],
+                        [
+                'descripcion_estatus_solicitud' => 'Eliminado',
+                'descripcion_cliente' => 'Eliminado',
+                'mandarCorreo' => false,
+                'color' => 'bg-emerald-600', // Azul oscuro
+                'color_cliente' => 'bg-emerald-600'
+            ],
         ];
 
         foreach ($estatusData as $data) {

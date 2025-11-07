@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cat_planes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre_plan');
+             $table->string('descripcion_plan');
             $table->decimal('precio',10,2);
             $table->enum('tipo_plan', ['personal', 'empresarial'])->default('personal');
             $table->enum('tipo_pago', ['prepago', 'postpago'])->default('prepago');
