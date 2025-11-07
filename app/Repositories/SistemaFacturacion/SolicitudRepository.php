@@ -384,8 +384,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if (!$solicitud) {
             return null;
         }
+        $solicitud->eliminarImagen();
         $solicitud->update([
-            'estado_id' => 7
+            'estado_id' => 11
         ]);
         return $solicitud->fresh();
     }

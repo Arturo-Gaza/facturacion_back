@@ -127,8 +127,8 @@ class Solicitud extends Model
      */
     public function eliminarImagen(): void
     {
-        if ($this->imagen_url && Storage::exists($this->getRawOriginal('imagen_url'))) {
-            Storage::delete($this->getRawOriginal('imagen_url'));
+        if ($this->imagen_url && Storage::disk('public')->exists($this->getRawOriginal('imagen_url'))) {
+            Storage::disk('public')->delete($this->getRawOriginal('imagen_url'));
         }
     }
 
