@@ -454,17 +454,14 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 $parameters = [
                     'id' => $solicitud->id
                 ];
-                return $this->aiService->extractTextFromPDF($file, 'texto_extraction',$parameters); 
+                return $this->aiService->extractTextFromPDF($file, 'texto_extraction', $parameters);
             } else {
                 // Si es imagen
                 $imageData = base64_encode($fileContent);
                 return $this->ocrService->extractTextFromImage($imageData);
             }
         } catch (\Exception $e) {
-            Log::error("Error procesando imagen: " . $e->getMessage(), [
-                'solicitud_id' => $solicitud->id
-            ]);
-            return null;
+            throw $e;
         }
     }
 
@@ -964,38 +961,83 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
     public function store(Request $request,  $id_user): Solicitud
     {
-        $solicitud = new Solicitud();
-        $usr = User::find($request['usuario_id']);
-        $solicitud->usuario_id = $request->usuario_id;
-        $solicitud->estado_id = 1; // Estado por defecto
+        try {
+            $solicitud = new Solicitud();
+            $usr = User::find($request['usuario_id']);
+            $solicitud->usuario_id = $request->usuario_id;
+            $solicitud->estado_id = 1; // Estado por defecto
 
-        if (isset($usr->datosFiscalesPrincipal) && isset($usr->datosFiscalesPrincipal->id)) {
-            $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
-            $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
-            $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
-        } else {
-            $solicitud->id_receptor = null; // o algún valor por defecto
-            $solicitud->id_regimen = null;
-            $solicitud->usoCFDI = null;
+            if (isset($usr->datosFiscalesPrincipal) && isset($usr->datosFiscalesPrincipal->id)) {
+                $solicitud->id_receptor = $usr->datosFiscalesPrincipal->id;
+                $solicitud->id_regimen = $usr->datosFiscalesPrincipal->regimenPredeterminado->id_regimen;
+                $solicitud->usoCFDI = $usr->datosFiscalesPrincipal->uso_cfdi_predeterminado?->usoCFDI;
+            } else {
+                $solicitud->id_receptor = null; // o algún valor por defecto
+                $solicitud->id_regimen = null;
+                $solicitud->usoCFDI = null;
+            }
+
+
+
+            // Guardar imagen
+            if ($request->hasFile('imagen')) {
+                $rutaImagen = $solicitud->guardarImagen($request->file('imagen'), $id_user);
+                $solicitud->imagen_url = $rutaImagen;
+            }
+            $solicitud->save();
+            $this->procesar($solicitud->id);
+            $solicitud->save();
+            TabBitacoraSolicitud::create([
+                'id_solicitud' => $solicitud->id,
+                'id_estatus' => 1,
+                'id_usuario' => $id_user
+            ]);
+
+            return $solicitud;
+        } catch (\Exception $e) {
+            try {
+            // Si el modelo se guardó y existe, eliminar imagen mediante el método que ya tienes
+            if (isset($solicitud) && $solicitud->getKey()) {
+                // eliminar imagen física si existe
+                try {
+                    $solicitud->eliminarImagen();
+                } catch (\Exception $imgEx) {
+                    Log::error("Error eliminando imagen de solicitud {$solicitud->id}: " . $imgEx->getMessage());
+                }
+
+                // eliminar bitacoras creadas (por si se creó antes del error)
+                try {
+                    TabBitacoraSolicitud::where('id_solicitud', $solicitud->id)->delete();
+                } catch (\Exception $bitEx) {
+                    Log::error("Error eliminando bitacoras de solicitud {$solicitud->id}: " . $bitEx->getMessage());
+                }
+
+                // eliminar el registro de la solicitud (si no estás usando transacción superior,
+                // esto evita dejar un registro parcial en BD)
+                try {
+                    $solicitud->delete();
+                } catch (\Exception $delEx) {
+                    Log::error("Error eliminando registro solicitud {$solicitud->id}: " . $delEx->getMessage());
+                }
+            } else {
+                // Si no hay modelo persistido, pero guardaste la imagen y conoces la ruta, bórrala.
+                if (!empty($rutaImagen) && Storage::disk('public')->exists($rutaImagen)) {
+                    try {
+                        Storage::disk('public')->delete($rutaImagen);
+                    } catch (\Exception $stoEx) {
+                        Log::error("Error eliminando archivo temporal {$rutaImagen}: " . $stoEx->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $cleanupEx) {
+            // Si la limpieza falla por alguna razón, lo registramos pero no ocultamos el error original.
+            Log::error('Error durante limpieza en SolicitudRepository@store: ' . $cleanupEx->getMessage());
         }
 
-
-
-        // Guardar imagen
-        if ($request->hasFile('imagen')) {
-            $rutaImagen = $solicitud->guardarImagen($request->file('imagen'), $id_user);
-            $solicitud->imagen_url = $rutaImagen;
+        // Log del error original y re-lanzar para que el controlador (o quien llamó) lo maneje
+        Log::error('Error en SolicitudRepository@store: ' . $e->getMessage());
+        throw $e;
         }
-        $solicitud->save();
-        $this->procesar($solicitud->id);
-        $solicitud->save();
-        TabBitacoraSolicitud::create([
-            'id_solicitud' => $solicitud->id,
-            'id_estatus' => 1,
-            'id_usuario' => $id_user
-        ]);
-
-        return $solicitud;
     }
 
     public function actualizarEstatus($id_solicitud, $id_estatus, $id_usuario)

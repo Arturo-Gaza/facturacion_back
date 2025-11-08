@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Classes\ApiResponseHelper;
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use Exception;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -117,7 +118,7 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
-      public function revertir(Request $request)
+    public function revertir(Request $request)
     {
         try {
             $id_usuario = auth()->user()->id;
@@ -131,7 +132,7 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
-        public function mandarFactura(Request $request)
+    public function mandarFactura(Request $request)
     {
         try {
             $request->validate([
@@ -319,7 +320,7 @@ class SolicitudController extends Controller
 
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);
-        } catch (Exception $ex) {
+        }  catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex, $ex->getMessage());
         }

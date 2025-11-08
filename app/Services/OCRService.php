@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Exception;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,7 +17,7 @@ class OCRService
     {
         $this->provider = $provider ?: config('ocr.default_provider');
         $config = config("ocr.providers.{$this->provider}");
-        
+
         $this->apiKey = $config['api_key'];
         $this->apiUrl = $config['api_url'];
     }
@@ -25,7 +27,7 @@ class OCRService
         if ($this->provider === 'google_vision') {
             return $this->extractWithGoogleVision($imageContent);
         }
-        
+
         // Agregar más proveedores aquí
         return null;
     }
@@ -56,8 +58,7 @@ class OCRService
             Log::error("Error en OCR API: " . $response->body());
             return null;
         } catch (\Exception $e) {
-            Log::error("Error en OCR Service: " . $e->getMessage());
-            return null;
+            throw new  \Exception("Error inesperado, intentelo mas tarde", 0, $e);
         }
     }
 
