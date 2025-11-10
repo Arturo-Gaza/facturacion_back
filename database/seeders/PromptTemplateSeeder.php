@@ -252,7 +252,8 @@ Estructura requerida:
     "es_persona_moral":"Si es persona moral true si es fisica false",
     "lugar_emision":"Lugar donde fue emitida la constancia",
     "fecha_emision":"Fecha cuando fue emitida la constancia",
-    "nombre_comercial":"Nombre de la empresa solo en caso de ser una persona moral"
+    "nombre_comercial":"Nombre de la empresa solo en caso de ser una persona moral",
+    "correo":"Correo electronico en caso de existir, en caso contrario null"
     "domicilioFiscal": {
         "codigo_postal": "Código Postal",
         "colonia": "Colonia",
