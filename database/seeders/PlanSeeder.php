@@ -17,6 +17,8 @@ class PlanSeeder extends Seeder
             'tipo_pago' => 'prepago',
             'num_usuarios' => 1,
             'precio' => 0.00,
+            'num_rfc'=>1,
+            'meses_vigencia'=>6,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Sin fecha de fin (vigente indefinidamente)
         ]);
@@ -28,6 +30,7 @@ class PlanSeeder extends Seeder
             'tipo_plan' => 'personal',
             'tipo_pago' => 'prepago',
             'precio' => 0.00,
+            'meses_vigencia'=>12,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // Vigencia de 1 año
         ]);
@@ -38,6 +41,7 @@ class PlanSeeder extends Seeder
             'descripcion_plan' => "La decisión empresarial que Genera. Automatiza la Recupera Gastos de todo tu equipo y deduce el 95% de tus Gastos de viáticos",
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'prepago',
+            'meses_vigencia'=>6,
             'precio' => 0,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 1 año de vigencia

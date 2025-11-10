@@ -39,8 +39,9 @@ class DatabaseSeeder extends Seeder
             CatEstatusesSatSeeder::class,
             CatTiposDireccionSeeder::class,
             PromptTemplateSeeder::class,
-            UserSeeder::class,
             PlanSeeder::class,
+            UserSeeder::class,
+            
             MontosPrepagoSeeder::class,
             CatGirosSeeder::class,
             DatosPorGiroSeeder::class,

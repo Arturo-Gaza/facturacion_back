@@ -32,6 +32,7 @@ class User extends Authenticatable
         'intentos',
         'login_activo',
         'saldo',
+        'fecha_vencimiento_saldo',
         'datos_fiscales_principal',
         'datos_fiscales_personal',
         'usuario_padre',
