@@ -261,6 +261,73 @@ class UserSeeder extends Seeder
             ]);
 
             $userEmpleado->save();
+
+
+// ============================
+// USUARIO EMPLEADO 2 (ROL 5)
+// ============================
+
+$userEmpleado2 = User::create([
+    'idRol' => 5,
+    'password' => bcrypt('P@ssword1'),
+    'intentos' => 0,
+    'login_activo' => false,
+    'id_mail_principal' => null,
+]);
+
+$emailEmpleado2 = UserEmail::create([
+    'user_id' => $userEmpleado2->id,
+    'email' => 'empleado2@hopewellsystem.com',
+    'verificado' => true,
+]);
+
+$phoneEmpleado2 = UserPhone::create([
+    'user_id' => $userEmpleado2->id,
+    'telefono' => '5598765432',
+    'verificado' => true,
+]);
+
+$userEmpleado2->update([
+    'id_mail_principal' => $emailEmpleado2->id,
+    'id_telefono_principal' => $phoneEmpleado2->id,
+]);
+
+$datosFiscalesEmpleado2 = DatosFiscal::create([
+    'id_usuario' => $userEmpleado2->id,
+    'nombre_razon' => 'Ana María Torres',
+    'primer_apellido' => 'Torres',
+    'segundo_apellido' => 'García',
+    'es_persona_moral' => false,
+    'rfc' => 'TOGA920202MDFRNL09',
+    'curp' => 'TOGA920202MDFRNL09',
+    'lugar_emision' => 'Zapopan',
+    'fecha_emision' => '2022-01-01',
+    'fecha_inicio_op' => '2022-01-01',
+    'id_estatus_sat' => 1,
+    'email_facturacion_id' => $emailEmpleado2->id,
+    'email_facturacion_text' => $emailEmpleado2->email,
+    'habilitado' => true,
+]);
+
+Direccion::create([
+    'id_fiscal' => $datosFiscalesEmpleado2->id,
+    'id_tipo_direccion' => 2,
+    'calle' => 'Av. López Mateos Sur',
+    'num_exterior' => '1020',
+    'colonia' => 'La Calma',
+    'codigo_postal' => '45070',
+    'municipio' => 'Zapopan',
+    'estado' => 'Jalisco',
+    'pais' => 'México'
+]);
+
+$userEmpleado2->update([
+    'datos_fiscales_principal' => $datosFiscalesEmpleado2->id,
+    'datos_fiscales_personal' => $datosFiscalesEmpleado2->id,
+]);
+
+$userEmpleado2->save();
+
         });
     }
 }
