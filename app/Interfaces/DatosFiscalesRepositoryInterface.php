@@ -17,4 +17,5 @@ interface DatosFiscalesRepositoryInterface
      public function updateCompleto(array $data, array $direccion, array $regimenes, $idDatosFiscales );
     public function update(array $data, $id): ?DatosFiscal;
      public function eliminarReceptor($id);
+      public function validarCantidadRFC( $id_user);
 }

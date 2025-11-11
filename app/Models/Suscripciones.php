@@ -19,7 +19,8 @@ class Suscripciones extends Model
         'fecha_vencimiento',
         'estado',
         'perfiles_utilizados',
-        'facturas_realizadas'
+        'facturas_realizadas',
+        'rfc_realizados'
     ];
 
     protected $casts = [

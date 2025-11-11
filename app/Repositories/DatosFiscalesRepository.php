@@ -10,6 +10,7 @@ use App\Models\DatosFiscal;
 use App\Models\DatosFiscalRegimenFiscal;
 use App\Models\DatosFiscalRegimenUsoCfdi;
 use App\Models\Direccion;
+use App\Models\Suscripciones;
 use App\Models\User;
 use App\Models\UsuarioRegimenFiscal;
 use App\Services\AIDataExtractionService;
@@ -137,7 +138,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             //$correo = $user->mailPrincipal;
             //$datosFiscales->email_facturacion_id = $correo->id;
             //$datosFiscales->email_facturacion_text= $correo->email;
-            $datosFiscales->save(); 
+            $datosFiscales->save();
             if ($data["predeterminado"]) {
                 // Actualizar el usuario con los nuevos datos fiscales principales
 
@@ -372,6 +373,68 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         }
         $textoExtraido = $this->extraerTextoDePDF($archivo, "cfdi_extraction");
         return $textoExtraido;
+    }
+
+    public function validarCantidadRFC($id_user)
+    {
+        $user = User::find($id_user);
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+        // Si no hay plan directo, intentar suscripción activa
+        $plan = null;
+
+        if ($efectivoUsuario->suscripcionActiva) {
+            $plan = $efectivoUsuario->suscripcionActiva->plan;
+        }
+        if (!$plan) {
+            return [
+                'error' => 'No se encontró plan para el usuario.',
+                'monto_a_cobrar' => 0.00,
+                'tier' => null,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo,
+                'insuficiente_saldo' => false,
+                'tipo' => null,
+                'factura_numero' => 0,
+                'factura_restante' => 0
+            ];
+        }
+        $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+        $rfc_realizados = $suscripcion->rfc_realizados + 1;
+        $rfc_permitidas = $plan->num_rfc;
+        $rfc_restante = $plan->num_rfc - $rfc_realizados;
+
+        $vigente = false;
+        if ($suscripcion) {
+            $vigente = $suscripcion->estaVigente();
+        }
+        if (!$rfc_permitidas) {
+
+            return [
+                'tipo' => 'mensual',
+                'vigente' => (bool) $vigente,
+                'monto_a_cobrar' => null,
+                'tier' => $plan->nombre_plan,
+                'saldo_actual' => null,
+                'saldo_despues' => null,
+                'rfc_suficiente' =>  true ,
+                'rfc_numero' => $rfc_realizados,
+                'rfc_restante' => $rfc_restante
+            ];
+        }
+
+        return [
+            'tipo' => 'mensual',
+            'vigente' => (bool) $vigente,
+            'monto_a_cobrar' => null,
+            'tier' => $plan->nombre_plan,
+            'saldo_actual' => null,
+            'saldo_despues' => null,
+            'rfc_suficiente' => $rfc_restante <= 0 ? true : false,
+            'rfc_numero' => $rfc_realizados,
+            'rfc_restante' => $rfc_restante
+        ];
     }
     private function extraerTextoDePDF($archivo)
     {

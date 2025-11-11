@@ -236,4 +236,14 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage());
         }
     }
+        public function validarCantidadRFC()
+    {
+        try {
+            $id_user = auth()->user()->id;
+            $all = $this->datosFiscalesRepository->validarCantidadRFC( $id_user);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
 }
