@@ -124,7 +124,9 @@ class ResetApplication extends Command
             'solicitudes',
             'profiles',
             'temp',
-            'uploads'
+            'uploads',
+            'xml',
+            'pdf'
         ];
 
         $disk = Storage::disk('public');
