@@ -149,7 +149,7 @@ class Solicitud extends Model
         foreach ($archivosExistentes as $archivoExistente) {
             $hashExistente = md5_file(Storage::disk('public')->path($archivoExistente));
             if ($hash === $hashExistente) {
-                Storage::delete($this->pdf_url);
+                Storage::disk('public')->delete($this->pdf_url);
             }
         }
 
@@ -208,7 +208,7 @@ class Solicitud extends Model
         foreach ($archivosExistentes as $archivoExistente) {
             $hashExistente = md5_file(Storage::disk('public')->path($archivoExistente));
             if ($hash === $hashExistente) {
-                Storage::delete($this->xml_url);
+                Storage::disk('public')->delete($this->xml_url);
             }
         }
 
