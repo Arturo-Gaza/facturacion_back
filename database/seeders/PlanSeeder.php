@@ -54,7 +54,7 @@ class PlanSeeder extends Seeder
             'tipo_pago' => 'postpago',
             'precio' => 5000.0,
             'num_usuarios' => 25,
-            'num_facturas' => 5000,
+            'dias_gratis'=>30,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
@@ -65,7 +65,7 @@ class PlanSeeder extends Seeder
             'tipo_pago' => 'postpago',
             'precio' => 10000.0,
             'num_usuarios' => 50,
-            'num_facturas' => 10000,
+            'dias_gratis'=>30,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);
@@ -75,8 +75,30 @@ class PlanSeeder extends Seeder
             'tipo_plan' => 'empresarial',
             'tipo_pago' => 'postpago',
             'precio' => 20000.0,
-            'num_usuarios' => 50,
-            'num_facturas' => 10000,
+            'num_usuarios' => 100,
+            'dias_gratis'=>30,
+            'vigencia_inicio' => now(),
+            'vigencia_fin' => null, // 6 meses de vigencia
+        ]);
+                        CatPlanes::create([
+            'nombre_plan' => 'Boarding Elite 200 usuarios',
+            'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
+            'tipo_plan' => 'empresarial',
+            'tipo_pago' => 'postpago',
+            'precio' => 30000.0,
+            'num_usuarios' => 200,
+            'dias_gratis'=>30,
+            'vigencia_inicio' => now(),
+            'vigencia_fin' => null, // 6 meses de vigencia
+        ]);
+                        CatPlanes::create([
+            'nombre_plan' => 'Boarding Elite 300 usuarios',
+            'descripcion_plan' => "Tu equipo se concentra en Generar, no en Recuperar Gastos. Olvídate de Perseguir Facturas",
+            'tipo_plan' => 'empresarial',
+            'tipo_pago' => 'postpago',
+            'precio' => 40000.0,
+            'num_usuarios' => 300,
+            'dias_gratis'=>30,
             'vigencia_inicio' => now(),
             'vigencia_fin' => null, // 6 meses de vigencia
         ]);

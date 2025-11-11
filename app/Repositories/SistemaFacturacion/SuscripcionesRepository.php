@@ -32,8 +32,10 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
             throw new Exception("Ya existe una suscripción activa para este plan");
         }
         $precio = $plan->precio ?? 0;
-        if ($precio == 0) {
-            $vigencia_fin = $plan->esMensual() ? Carbon::now()->addMonth() : null;
+        $esMensual=$plan->esMensual();
+        if ($precio == 0 || $plan->esMensual()) {
+            $dias_gratis=$plan->dias_gratis;
+            $vigencia_fin = $plan->esMensual() ? Carbon::now()->addDay($dias_gratis) : null;
 
             $sus = Suscripciones::create([
                 'usuario_id' => $id_user,

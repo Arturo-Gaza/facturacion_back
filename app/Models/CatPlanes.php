@@ -21,6 +21,7 @@ class CatPlanes extends Model
         'num_facturas',
         'num_rfc',
         'meses_vigencia',
+        'dias_gratis',
         'vigencia_inicio',
         'vigencia_fin',
         'precio'
@@ -36,7 +37,7 @@ class CatPlanes extends Model
     const TIPO_EMPRESARIAL = 'empresarial';
 
     const PAGO_PREPAGO = 'prepago';
-    const PAGO_MENSUAL = 'mensual';
+    const PAGO_MENSUAL = 'postpago';
 
     /**
      * Scope para planes empresariales
