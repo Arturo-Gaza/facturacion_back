@@ -123,6 +123,13 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         DB::beginTransaction();
 
         try {
+            $id_user=$data['id_usuario'];
+            $ext=$this->validarCantidadRFC($id_user);
+            $rfc_suficiente=$ext["rfc_suficiente"];
+            if(!$rfc_suficiente){
+                throw new Exception("No tienes suficieentes RFC");
+
+            }
             // Crear el dato fiscal
             $datosFiscales = DatosFiscal::create($data);
             // Guardar los regímenes fiscales
@@ -147,6 +154,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                     'datos_fiscales_principal' => $datosFiscales->id
                 ]);
             }
+            $this->aumentarRFCRealizados($id_user);
             DB::commit();
 
             // Devolver el DTO
@@ -456,4 +464,31 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             throw $e;
         }
     }
+    public function aumentarRFCRealizados($id_user)
+{
+    $user = User::find($id_user);
+
+    if (!$user) {
+        return false; // Usuario no encontrado
+    }
+
+    // Usar el usuario padre si existe
+    $efectivoUsuario = $user->usuario_padre
+        ? User::find($user->usuario_padre) ?? $user
+        : $user;
+
+    // Obtener la suscripción activa o la más reciente
+    $suscripcion = $efectivoUsuario->suscripcionActiva
+        ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+    if (!$suscripcion) {
+        return false; // No hay suscripción
+    }
+
+    // Incrementar y guardar
+    $suscripcion->rfc_realizados = ($suscripcion->rfc_realizados ?? 0) + 1;
+    $suscripcion->save();
+
+    return true; // Operación exitosa
+}
 }
