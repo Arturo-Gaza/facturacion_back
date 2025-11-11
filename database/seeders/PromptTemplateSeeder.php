@@ -92,7 +92,7 @@ Estructura requerida:
     "moneda": "tipo de moneda (MXN, USD, etc.)",
     "direccion": "dirección del establecimiento si está disponible",
     "telefono": "teléfono del establecimiento si está disponible"
-    "url_facturacion": "URL para facturación electrónica si está disponible, si no encuentras ninguna url regresa null, no inventes nada"
+    "url_facturacion": "URL para facturación electrónica si está disponible, si no encuentras ninguna url regresa null, no inventes nada, asegurándote de incluir el protocolo correcto (https://) al inicio si está presente. Si no está, agrégalo"
     "giro": "giro comercial identificado",
     "id_giro": "id del giro comercial identificado",
     "datos_facturacion_adicionales": {
