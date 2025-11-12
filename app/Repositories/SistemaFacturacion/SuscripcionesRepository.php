@@ -87,5 +87,6 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
             'facturas_realizadas' => 0,
             'stripe_session_id' => $session->id,
         ]);
+        return $susPendiente;
     }
 }
