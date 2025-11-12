@@ -253,7 +253,7 @@ Estructura requerida:
     "lugar_emision":"Lugar donde fue emitida la constancia",
     "fecha_emision":"Fecha cuando fue emitida la constancia",
     "nombre_comercial":"Nombre de la empresa solo en caso de ser una persona moral",
-    "correo":"Correo electronico en caso de existir, en caso contrario null"
+    "email_facturacion_text":"Correo electronico en caso de existir, en caso contrario null"
     "domicilioFiscal": {
         "codigo_postal": "Código Postal",
         "colonia": "Colonia",
@@ -272,7 +272,6 @@ Estructura requerida:
     "fecha_inicio_regimen","Fecha Inicio del regimen",
     "usosCfdi":["un array vacio"]
     ]
-    "email": "Correo electrónico",
     "telefono": "Número de teléfono",
     "fecha_emision": "Fecha de emisión de la constancia",
     "lugar_emision": "Lugar de emisión de la constancia",
