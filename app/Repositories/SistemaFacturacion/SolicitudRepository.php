@@ -507,17 +507,16 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             // Buscar suscripción activa/vigente (si aplica)
 
             $facturas_realizadas = $suscripcion->facturas_realizadas;
-            $factura_restante = $facturas_realizadas - $num_factura;
             return [
                 'tipo' => 'mensual',
                 'vigente' => (bool) $vigente,
-                'monto_a_cobrar' => null,
+                'monto_a_cobrar' => 0,
                 'tier' => $plan->nombre_plan,
-                'saldo_actual' => null,
-                'saldo_despues' => null,
-                'insuficiente_saldo' => $factura_restante <= 0 ? true : false,
+                'saldo_actual' => 0,
+                'saldo_despues' => 0,
+                'insuficiente_saldo' => (bool) !$vigente,
                 'factura_numero' => $num_factura,
-                'factura_restante' => $factura_restante
+                'factura_restante' => 0
             ];
         }
         $precioRegistro = Precio::where('id_plan', $plan->id)
@@ -541,6 +540,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
         if ($efectivoUsuario->saldo - $precioUnitario < 0) {
             return [
+                'tipo' => 'prepago',
                 'monto_a_cobrar' =>  $precioUnitario,
                 'vigente' => (bool) $vigente,
                 'tier' => $precioRegistro->nombre_precio,
@@ -554,6 +554,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ];
         }
         return [
+            'tipo' => 'prepago',
             'monto_a_cobrar' =>  $precioUnitario,
             'vigente' => (bool) $vigente,
             'tier' => $precioRegistro->nombre_precio,
@@ -1230,8 +1231,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
-            ->selectRaw('cat_estatus_solicitud.id, cat_estatus_solicitud.descripcion_estatus_solicitud as estado, COUNT(*) as count')
-            ->groupBy('cat_estatus_solicitud.id', 'cat_estatus_solicitud.descripcion_estatus_solicitud')
+            ->selectRaw('cat_estatus_solicitud.id, cat_estatus_solicitud.descripcion_cliente as estado, COUNT(*) as count')
+            ->groupBy('cat_estatus_solicitud.id', 'cat_estatus_solicitud.descripcion_cliente')
             ->get();
 
         $total = $conteos->sum('count');
@@ -1250,13 +1251,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         EXTRACT(YEAR FROM solicitudes.created_at)::int as anio,
         EXTRACT(MONTH FROM solicitudes.created_at)::int as mes,
         solicitudes.estado_id,
-        cat_estatus_solicitud.descripcion_estatus_solicitud as nombre_estatus,
+        cat_estatus_solicitud.descripcion_cliente as nombre_estatus,
         COUNT(*) as total
     ")
             ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
             ->where('solicitudes.usuario_id', $usuario_id)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
-            ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_estatus_solicitud')
+            ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_cliente')
             ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
 
         $resultadosMensuales = $queryMensual->get();
