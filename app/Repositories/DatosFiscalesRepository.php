@@ -417,7 +417,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();
         }
-        if (!$rfc_permitidas) {
+        if (!$rfc_permitidas || $rfc_restante >0) {
 
             return [
                 'tipo' => 'mensual',
@@ -439,7 +439,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             'tier' => $plan->nombre_plan,
             'saldo_actual' => null,
             'saldo_despues' => null,
-            'rfc_suficiente' => $rfc_restante <= 0 ? true : false,
+            'rfc_suficiente' => $rfc_restante < 0 ? false : true,
             'rfc_numero' => $rfc_realizados,
             'rfc_restante' => $rfc_restante
         ];
