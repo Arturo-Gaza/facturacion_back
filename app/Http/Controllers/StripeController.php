@@ -469,12 +469,19 @@ class StripeController extends Controller
                 $mov->save();
                 DB::commit();
 
+                $tipoPago = null;
+                if ($planId) {
+                    $plan = CatPlanes::find($planId);
+                    $tipoPago = $plan ? $plan->tipo_pago : null;
+                }
+
                 // Respuesta con info útil
                 $response = [
                     'saldo_resultante' => $mov->saldo_resultante,
                     'is_subscription' => $isSubscription,
                     'subscription_id' => $createdSubscription ? $createdSubscription->id : null,
                     'movimiento_id' => $mov->id,
+                    'tipo_pago' => $tipoPago,
                 ];
 
                 $message = $isSubscription ? 'Pago confirmado y suscripción creada.' : 'Pago confirmado y saldo actualizado.';
