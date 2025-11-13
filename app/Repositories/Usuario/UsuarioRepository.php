@@ -502,6 +502,17 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $usr = $this->emailService->enviarCorreoValReceptor($id_user,$email);
         return $usr;
     }
+
+        public function enviarCorreoCambiarCorreo($data)
+    {
+        $email = $data['email'];
+        $id_user = $data['id_user'];
+        if (!$email) {
+            return null;
+        }
+        $usr = $this->emailService->enviarCorreoCambiarCorreo($id_user,$email);
+        return $usr;
+    }
     public function validarCorreoValReceptor($data)
     {
         DB::beginTransaction();

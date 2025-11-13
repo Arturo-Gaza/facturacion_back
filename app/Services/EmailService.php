@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Mail\MandarCorreo;
+use App\Mail\MandarCorreoCambiarCorreo;
 use App\Mail\MandarCorreoRecuperacion;
 use App\Mail\MandarCorreoConfirmacion;
 use App\Mail\MandarCorreoEliminar;
@@ -183,6 +184,41 @@ class EmailService
 
             try {
                 Mail::to($datosMail["email"])->send(new MandarCorreoValReceptor($datosMail));
+                return "Exito";
+            } catch (\Exception $e) {
+                // Guardar el error en log, base de datos, o notificar al admin
+                Log::error('Error al enviar correo: ' . $e->getMessage());
+                return $e->getMessage();
+            }
+            return $usr;
+        } else {
+            return "null";
+        }
+    }
+
+     public function enviarCorreoCambiarCorreo($id_user,$email)
+    {
+        $usr = User::find($id_user);
+        if ($usr) {
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $datosMail = [
+                'email' => $email,
+                'nombre' => $usr->name . " " . $usr->apellidoP . " " . $usr->apellidoM,
+                'codigo' => $codigo,
+            ];
+
+
+
+            // Guardar nuevo código
+            PasswordConf::create([
+                'email' => $datosMail['email'],
+                'codigo' =>  Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+
+
+            try {
+                Mail::to($datosMail["email"])->send(new MandarCorreoCambiarCorreo($datosMail));
                 return "Exito";
             } catch (\Exception $e) {
                 // Guardar el error en log, base de datos, o notificar al admin

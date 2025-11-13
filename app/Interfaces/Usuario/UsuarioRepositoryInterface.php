@@ -19,6 +19,7 @@ interface UsuarioRepositoryInterface
   public function enviarCorreoRec($data);
   public function enviarCorreoConf($data);
    public function enviarCorreoValReceptor($data);
+    public function enviarCorreoCambiarCorreo($data);
   public function enviarSMSConf($data);
   public function validarCorreoRec($data);
   public function validarCorreoConf($data);

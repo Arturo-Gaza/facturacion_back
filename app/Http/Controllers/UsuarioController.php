@@ -135,6 +135,17 @@ class UsuarioController extends Controller
 
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
     }
+
+        public function enviarCorreoCambiarCorreo(Request $request)
+    {
+        $data = [
+            'email' => $request->email,
+            'id_user' => $request->id_user,
+        ];
+        $usuario = $this->usuario->enviarCorreoCambiarCorreo($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
+    }
     public function enviarCorreoInhabilitar(Request $request)
     {
         $data = [
