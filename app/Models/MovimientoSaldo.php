@@ -44,7 +44,8 @@ class MovimientoSaldo extends Model
         'idempotency_key',
         'refunded_amount',
         'reverted',
-        'tipo'
+        'tipo',
+        'id_solicitud'
     ];
 
     /**

@@ -36,6 +36,7 @@ class Solicitud extends Model
         'id_usuario_asignacion',
         'url_facturacion',
         'fecha_ticket'
+        
     ];
     protected $appends = [
         'clave'
