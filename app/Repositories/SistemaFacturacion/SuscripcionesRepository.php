@@ -17,7 +17,7 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
 
     public function getAll()
     {
-        return Suscripciones::with(['usuario', 'empleado', 'estadoSolicitud'])->get();
+        return Suscripciones::get();
     }
     public function iniciar($id_user, $id_plan)
     {

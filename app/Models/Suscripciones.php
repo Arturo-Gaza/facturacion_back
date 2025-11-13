@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,6 +35,11 @@ class Suscripciones extends Model
     const ESTADO_VENCIDA = 'vencida';
     const ESTADO_CANCELADA = 'cancelada';
 
+    public function getFechaVencimientoAttribute($vlue)
+    {
+        $val= Carbon::parse($vlue)->format('d-M-Y H:i');
+        return $val;
+    }
     /**
      * Relación con el usuario
      */
@@ -84,4 +90,6 @@ class Suscripciones extends Model
         return $this->estado === self::ESTADO_ACTIVA &&
             $this->fecha_vencimiento < now();
     }
+
+
 }
