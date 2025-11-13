@@ -538,7 +538,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         // fallback al precio directo en la tabla cat_planes si existe
         $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura - $num_factura : null;
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
-        if ($efectivoUsuario->saldo - $precioUnitario < 0) {
+        $vigencia_saldo= $user->fecha_vencimiento_saldo;
+        if ($efectivoUsuario->saldo - $precioUnitario < 0 || $vigencia_saldo> now() ) {
             return [
                 'tipo' => 'prepago',
                 'monto_a_cobrar' =>  $precioUnitario,
@@ -549,7 +550,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'insuficiente_saldo' => true,
                 'factura_numero' => $num_factura,
                 'factura_restante' => $factura_restante,
-                'facturaTotalGratis' => $precioRegistro->hasta_factura
+                'facturaTotalGratis' => $precioRegistro->hasta_factura,
+                '$vigencia_saldo'=>$vigencia_saldo
 
             ];
         }
@@ -563,7 +565,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'insuficiente_saldo' => false,
             'factura_numero' => $num_factura,
             'factura_restante' => $factura_restante,
-            'facturaTotalGratis' => $precioRegistro->hasta_factura
+            'facturaTotalGratis' => $precioRegistro->hasta_factura,
+            '$vigencia_saldo'=>$vigencia_saldo
         ];
     }
 
