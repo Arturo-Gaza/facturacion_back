@@ -321,11 +321,11 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             // Actualizar saldo del usuario
             $efectivoUsuario->saldo = $datosCobro["saldo_despues"];
-            
+
 
             // Incrementar contador de facturas
-            $this->incrementarFacturasRealizadas( $efectivoUsuario);
-$efectivoUsuario->save();
+            $this->incrementarFacturasRealizadas($efectivoUsuario);
+            $efectivoUsuario->save();
             DB::commit();
 
             return $datosCobro["saldo_despues"];
@@ -359,7 +359,7 @@ $efectivoUsuario->save();
     public function decrementarFacturasRealizadas(User $user)
     {
         try {
-            
+
 
             $suscripcion = $user->suscripcionActiva ?? Suscripciones::where('usuario_id', $user->id)->latest()->first();
 
@@ -452,17 +452,17 @@ $efectivoUsuario->save();
                 'observacion'           => "Rechazado por:" . $motivo->descripcion
             ]);
             $mov = MovimientoSaldo::where('id_solicitud', $id_solicitud)->first();
-            
-            $estatus_revertido=6;
+
+            $estatus_revertido = 6;
             if ($mov) {
                 $user = User::find($mov->usuario_id);
-            $efectivoUsuario = $user->usuario_padre
-                ? User::find($user->usuario_padre) ?? $user
-                : $user;
-                $mov->estatus_movimiento_id=$estatus_revertido;
-                $descripcion=$mov->descripcion;
+                $efectivoUsuario = $user->usuario_padre
+                    ? User::find($user->usuario_padre) ?? $user
+                    : $user;
+                $mov->estatus_movimiento_id = $estatus_revertido;
+                $descripcion = $mov->descripcion;
                 if ($user) {
-                    $this->decrementarFacturasRealizadas( $efectivoUsuario); // crea esta función si no existe
+                    $this->decrementarFacturasRealizadas($efectivoUsuario); // crea esta función si no existe
                     $efectivoUsuario->saldo += $mov->monto; // devolver el saldo
                     $efectivoUsuario->save();
                 }
@@ -520,25 +520,26 @@ $efectivoUsuario->save();
 
         if ($efectivoUsuario->suscripcionActiva) {
             $plan = $efectivoUsuario->suscripcionActiva->plan;
-            $sus=$efectivoUsuario->planVencido;
         }
         if (!$plan) {
+            $sus = $efectivoUsuario->planVencido;
             return [
-                'error' => 'No se encontró una suscripcion vigente para el usuario.',
+                //'error' => 'No se encontró una suscripcion vigente para el usuario.',
+                'tipo' => 'mensual',
                 'monto_a_cobrar' => 0.00,
                 'tier' => null,
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
                 'saldo_despues' => (float) $efectivoUsuario->saldo,
                 'insuficiente_saldo' => false,
-                'tipo' => null,
                 'factura_numero' => 0,
                 'factura_restante' => 0,
-        'fecha_vencimiento' => $sus?->fecha_vencimiento ?? null,
+                'fecha_vencimiento' => $sus?->fecha_vencimiento ?? null,
+                'vigente' => (bool) false,
             ];
         }
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
         $num_factura = $suscripcion->facturas_realizadas + 1;
-        $fecha_vencimiento=$suscripcion->fecha_vencimiento;
+        $fecha_vencimiento = $suscripcion->fecha_vencimiento;
         $vigente = false;
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();
@@ -557,7 +558,7 @@ $efectivoUsuario->save();
                 'insuficiente_saldo' => (bool) !$vigente,
                 'factura_numero' => $num_factura,
                 'factura_restante' => 0,
-                'fecha_vencimiento'=>$fecha_vencimiento
+                'fecha_vencimiento' => $fecha_vencimiento
             ];
         }
         $precioRegistro = Precio::where('id_plan', $plan->id)
