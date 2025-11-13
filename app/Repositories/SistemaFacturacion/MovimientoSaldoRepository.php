@@ -5,6 +5,7 @@ namespace App\Repositories\SistemaFacturacion;
 
 use App\Interfaces\SistemaFacturacion\MovimientoSaldoRepositoryInterface;
 use App\Models\MovimientoSaldo;
+use App\Models\User;
 use Stripe\Stripe;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
@@ -77,7 +78,6 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
 
         $writer->close();
         return $tempFile;
-        
     }
 
     // Exportar a PDF
@@ -122,7 +122,7 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
             ->setOption('isRemoteEnabled', true);
 
 
-        return ["pdf"=>$pdf,"fileName"=>$fileName];
+        return ["pdf" => $pdf, "fileName" => $fileName];
     }
 
     public function getMyMovimientos($idUsr)
@@ -135,7 +135,8 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
             }])
             ->get();
 
-
+        $user = User::find($idUsr);
+        $saldo = $user->saldo;
 
         $result = $movimientosCollection->map(function ($movimiento) use (&$paymentMethodCache, &$intentCache, &$balanceTxCache) {
             // base
@@ -156,10 +157,14 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
                 'payment_method_type' => $movimiento->payment_method_type,
             ];
 
+
             return $item;
         });
-
-        return $result;
+        $data = [
+            "movimientos" => $result,
+            "saldo_resultante" => $saldo
+        ];
+        return $data;
     }
 
     public function store(array $data): MovimientoSaldo

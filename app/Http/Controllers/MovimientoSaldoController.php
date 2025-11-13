@@ -41,8 +41,8 @@ class MovimientoSaldoController extends Controller
     {
         try {
             $idUsr = auth()->user()->id;
-            $movimiento = $this->movimientoSaldoRepository->getMyMovimientos($idUsr);
-            return ApiResponseHelper::sendResponse($movimiento, 'Movimiento de saldo obtenido', 200);
+            $data = $this->movimientoSaldoRepository->getMyMovimientos($idUsr);
+            return ApiResponseHelper::sendResponse($data["movimientos"], 'Movimiento de saldo obtenido', 200,$data["saldo_resultante"]);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
         }
