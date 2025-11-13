@@ -286,6 +286,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ]);
 
             $user = User::find($id_user);
+            $efectivoUsuario = $user->usuario_padre
+                ? User::find($user->usuario_padre) ?? $user
+                : $user;
             $estatusPendienteId = 1;
 
             // Calcular precio y obtener datos de cobro
@@ -313,15 +316,16 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 ),
                 'refunded_amount' => 0,
                 'reverted' => false,
+                'id_solicitud' => $solicitud->id
             ]);
 
             // Actualizar saldo del usuario
-            $user->saldo = $datosCobro["saldo_despues"];
-            $user->save();
+            $efectivoUsuario->saldo = $datosCobro["saldo_despues"];
+            
 
             // Incrementar contador de facturas
-            $this->incrementarFacturasRealizadas($id_sol, $id_user);
-
+            $this->incrementarFacturasRealizadas( $efectivoUsuario);
+$efectivoUsuario->save();
             DB::commit();
 
             return $datosCobro["saldo_despues"];
@@ -333,15 +337,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
     }
 
-    public function incrementarFacturasRealizadas($id_solicitud, $id_user)
+    public function incrementarFacturasRealizadas(User $user)
     {
         try {
-            $user = User::find($id_user);
-            $efectivoUsuario = $user->usuario_padre
-                ? User::find($user->usuario_padre) ?? $user
-                : $user;
 
-            $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+            $suscripcion = $user->suscripcionActiva ?? Suscripciones::where('usuario_id', $user->id)->latest()->first();
 
             if ($suscripcion) {
                 $suscripcion->increment('facturas_realizadas');
@@ -354,6 +355,26 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             return false;
         }
     }
+
+    public function decrementarFacturasRealizadas(User $user)
+    {
+        try {
+            
+
+            $suscripcion = $user->suscripcionActiva ?? Suscripciones::where('usuario_id', $user->id)->latest()->first();
+
+            if ($suscripcion && $suscripcion->facturas_realizadas > 0) {
+                $suscripcion->decrement('facturas_realizadas');
+                return true;
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error('Error al decrementar facturas realizadas: ' . $e->getMessage());
+            return false;
+        }
+    }
+
 
     public function asignar($id_user, $id_solicitud, $id_empleado)
     {
@@ -430,6 +451,19 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'id_motivo_rechazo'     => $id_motivo_rechazo, // 👈 añade este campo en la tabla si aún no existe
                 'observacion'           => "Rechazado por:" . $motivo->descripcion
             ]);
+            $mov = MovimientoSaldo::where('id_solicitud', $id_solicitud)->first();
+
+            if ($mov) {
+                $user = User::find($mov->usuario_id);
+            $efectivoUsuario = $user->usuario_padre
+                ? User::find($user->usuario_padre) ?? $user
+                : $user;
+                if ($user) {
+                    $this->decrementarFacturasRealizadas( $efectivoUsuario); // crea esta función si no existe
+                    $efectivoUsuario->saldo += $mov->monto; // devolver el saldo
+                    $efectivoUsuario->save();
+                }
+            }
 
             return $solicitud->fresh();
         });
@@ -499,6 +533,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
         $num_factura = $suscripcion->facturas_realizadas + 1;
+        $fecha_vencimiento=$suscripcion->fecha_vencimiento;
         $vigente = false;
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();
@@ -516,7 +551,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'saldo_despues' => 0,
                 'insuficiente_saldo' => (bool) !$vigente,
                 'factura_numero' => $num_factura,
-                'factura_restante' => 0
+                'factura_restante' => 0,
+                'fecha_vencimiento'=>$fecha_vencimiento
             ];
         }
         $precioRegistro = Precio::where('id_plan', $plan->id)
@@ -538,8 +574,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         // fallback al precio directo en la tabla cat_planes si existe
         $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura - $num_factura : null;
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
-        $vigencia_saldo= $user->fecha_vencimiento_saldo;
-        if ($efectivoUsuario->saldo - $precioUnitario < 0 || ($vigencia_saldo> now() && $precioUnitario>0) ) {
+        $vigencia_saldo = $user->fecha_vencimiento_saldo;
+        if ($efectivoUsuario->saldo - $precioUnitario < 0 || ($vigencia_saldo > now() && $precioUnitario > 0)) {
             return [
                 'tipo' => 'prepago',
                 'monto_a_cobrar' =>  $precioUnitario,
@@ -551,7 +587,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'factura_numero' => $num_factura,
                 'factura_restante' => $factura_restante,
                 'facturaTotalGratis' => $precioRegistro->hasta_factura,
-                '$vigencia_saldo'=>$vigencia_saldo
+                '$vigencia_saldo' => $vigencia_saldo
 
             ];
         }
@@ -566,7 +602,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             'factura_numero' => $num_factura,
             'factura_restante' => $factura_restante,
             'facturaTotalGratis' => $precioRegistro->hasta_factura,
-            '$vigencia_saldo'=>$vigencia_saldo
+            '$vigencia_saldo' => $vigencia_saldo
         ];
     }
 
@@ -1000,47 +1036,47 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             return $solicitud;
         } catch (\Exception $e) {
             try {
-            // Si el modelo se guardó y existe, eliminar imagen mediante el método que ya tienes
-            if (isset($solicitud) && $solicitud->getKey()) {
-                // eliminar imagen física si existe
-                try {
-                    $solicitud->eliminarImagen();
-                } catch (\Exception $imgEx) {
-                    Log::error("Error eliminando imagen de solicitud {$solicitud->id}: " . $imgEx->getMessage());
-                }
-
-                // eliminar bitacoras creadas (por si se creó antes del error)
-                try {
-                    TabBitacoraSolicitud::where('id_solicitud', $solicitud->id)->delete();
-                } catch (\Exception $bitEx) {
-                    Log::error("Error eliminando bitacoras de solicitud {$solicitud->id}: " . $bitEx->getMessage());
-                }
-
-                // eliminar el registro de la solicitud (si no estás usando transacción superior,
-                // esto evita dejar un registro parcial en BD)
-                try {
-                    $solicitud->delete();
-                } catch (\Exception $delEx) {
-                    Log::error("Error eliminando registro solicitud {$solicitud->id}: " . $delEx->getMessage());
-                }
-            } else {
-                // Si no hay modelo persistido, pero guardaste la imagen y conoces la ruta, bórrala.
-                if (!empty($rutaImagen) && Storage::disk('public')->exists($rutaImagen)) {
+                // Si el modelo se guardó y existe, eliminar imagen mediante el método que ya tienes
+                if (isset($solicitud) && $solicitud->getKey()) {
+                    // eliminar imagen física si existe
                     try {
-                        Storage::disk('public')->delete($rutaImagen);
-                    } catch (\Exception $stoEx) {
-                        Log::error("Error eliminando archivo temporal {$rutaImagen}: " . $stoEx->getMessage());
+                        $solicitud->eliminarImagen();
+                    } catch (\Exception $imgEx) {
+                        Log::error("Error eliminando imagen de solicitud {$solicitud->id}: " . $imgEx->getMessage());
+                    }
+
+                    // eliminar bitacoras creadas (por si se creó antes del error)
+                    try {
+                        TabBitacoraSolicitud::where('id_solicitud', $solicitud->id)->delete();
+                    } catch (\Exception $bitEx) {
+                        Log::error("Error eliminando bitacoras de solicitud {$solicitud->id}: " . $bitEx->getMessage());
+                    }
+
+                    // eliminar el registro de la solicitud (si no estás usando transacción superior,
+                    // esto evita dejar un registro parcial en BD)
+                    try {
+                        $solicitud->delete();
+                    } catch (\Exception $delEx) {
+                        Log::error("Error eliminando registro solicitud {$solicitud->id}: " . $delEx->getMessage());
+                    }
+                } else {
+                    // Si no hay modelo persistido, pero guardaste la imagen y conoces la ruta, bórrala.
+                    if (!empty($rutaImagen) && Storage::disk('public')->exists($rutaImagen)) {
+                        try {
+                            Storage::disk('public')->delete($rutaImagen);
+                        } catch (\Exception $stoEx) {
+                            Log::error("Error eliminando archivo temporal {$rutaImagen}: " . $stoEx->getMessage());
+                        }
                     }
                 }
+            } catch (\Exception $cleanupEx) {
+                // Si la limpieza falla por alguna razón, lo registramos pero no ocultamos el error original.
+                Log::error('Error durante limpieza en SolicitudRepository@store: ' . $cleanupEx->getMessage());
             }
-        } catch (\Exception $cleanupEx) {
-            // Si la limpieza falla por alguna razón, lo registramos pero no ocultamos el error original.
-            Log::error('Error durante limpieza en SolicitudRepository@store: ' . $cleanupEx->getMessage());
-        }
 
-        // Log del error original y re-lanzar para que el controlador (o quien llamó) lo maneje
-        Log::error('Error en SolicitudRepository@store: ' . $e->getMessage());
-        throw $e;
+            // Log del error original y re-lanzar para que el controlador (o quien llamó) lo maneje
+            Log::error('Error en SolicitudRepository@store: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -1077,7 +1113,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     public function getByUsuario(int $usuario_id)
     {
         $solicitudes = Solicitud::where('usuario_id', $usuario_id)
-             ->whereNot('estado_id', 5)
+            ->whereNot('estado_id', 5)
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
         $solicitudes->each(function ($solicitud) {
