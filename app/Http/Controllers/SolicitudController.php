@@ -356,7 +356,8 @@ class SolicitudController extends Controller
                 'establecimiento',
                 'monto',
                 'url_facturacion',
-                'fecha_ticket'
+                'fecha_ticket',
+                'id_empresa'
             ]);
             $updated = $this->solicitudRepository->editarTicket($data, $id);
 

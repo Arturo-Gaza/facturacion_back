@@ -197,6 +197,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     'monto' => $datosExtraidos['monto'] ?? null,
                     'texto_json' => json_encode($datosExtraidos),
                     'fecha_ticket' => $datosExtraidos['fecha'],
+                    'id_empresa' => $empresa->id
                 ]);
                 /*
                 if (!empty($empresa->id_giro)) {
@@ -460,7 +461,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     ? User::find($user->usuario_padre) ?? $user
                     : $user;
                 $mov->estatus_movimiento_id = $estatus_revertido;
-                
+
                 $mov->descripcion = trim(($mov->descripcion ?? '') . ' (Rechazado por: ' . $motivo->descripcion . ')');
 
                 $mov->save();
@@ -1112,6 +1113,20 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function editarTicket(array $data, $id): ?Solicitud
     {
+
+        if (!empty($data['url_facturacion'])) {
+            // Prioriza id_empresa proveniente en $data, si no intenta con el id guardado en la solicitud
+            $empresaId = $data['id_empresa'] ?? $solicitud->id_empresa ?? null;
+
+            if ($empresaId) {
+                $empresa = CatEmpresa::find($empresaId);
+                if ($empresa) {
+                    $empresa->pagina_web = $data['url_facturacion'];
+                    $empresa->save();
+                }
+            }
+        }
+
         $solicitud = Solicitud::find($id);
         if ($solicitud) {
             $solicitud->update($data);
@@ -1228,7 +1243,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'url_facturacion' => $solicitud->url_facturacion,
                 'monto' => $solicitud->monto,
                 'idreceptor' => $solicitud->id_receptor,
-                'datos_por_giro' => $datosGiro
+                'datos_por_giro' => $datosGiro,
+                'id_empresa'=>$solicitud->id_empresa
 
             ], $fechasDinamicas);
         });

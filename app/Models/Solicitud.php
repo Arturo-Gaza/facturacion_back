@@ -35,7 +35,8 @@ class Solicitud extends Model
         'usoCFDI',
         'id_usuario_asignacion',
         'url_facturacion',
-        'fecha_ticket'
+        'fecha_ticket',
+        'id_empresa'
         
     ];
     protected $appends = [
