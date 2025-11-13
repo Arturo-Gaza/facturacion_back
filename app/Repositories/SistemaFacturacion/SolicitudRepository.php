@@ -539,7 +539,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $factura_restante  = $precioRegistro ? $precioRegistro->hasta_factura - $num_factura : null;
         $precioUnitario = $precioRegistro ? (float) $precioRegistro->precio : (float) ($plan->precio ?? 0.00);
         $vigencia_saldo= $user->fecha_vencimiento_saldo;
-        if ($efectivoUsuario->saldo - $precioUnitario < 0 || $vigencia_saldo> now() ) {
+        if ($efectivoUsuario->saldo - $precioUnitario < 0 || ($vigencia_saldo> now() && $precioUnitario>0) ) {
             return [
                 'tipo' => 'prepago',
                 'monto_a_cobrar' =>  $precioUnitario,
