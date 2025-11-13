@@ -452,12 +452,15 @@ $efectivoUsuario->save();
                 'observacion'           => "Rechazado por:" . $motivo->descripcion
             ]);
             $mov = MovimientoSaldo::where('id_solicitud', $id_solicitud)->first();
-
+            
+            $estatus_revertido=6;
             if ($mov) {
                 $user = User::find($mov->usuario_id);
             $efectivoUsuario = $user->usuario_padre
                 ? User::find($user->usuario_padre) ?? $user
                 : $user;
+                $mov->estatus_movimiento_id=$estatus_revertido;
+                $descripcion=$mov->descripcion;
                 if ($user) {
                     $this->decrementarFacturasRealizadas( $efectivoUsuario); // crea esta función si no existe
                     $efectivoUsuario->saldo += $mov->monto; // devolver el saldo
@@ -517,10 +520,11 @@ $efectivoUsuario->save();
 
         if ($efectivoUsuario->suscripcionActiva) {
             $plan = $efectivoUsuario->suscripcionActiva->plan;
+            $sus=$efectivoUsuario->planVencido;
         }
         if (!$plan) {
             return [
-                'error' => 'No se encontró plan para el usuario.',
+                'error' => 'No se encontró una suscripcion vigente para el usuario.',
                 'monto_a_cobrar' => 0.00,
                 'tier' => null,
                 'saldo_actual' => (float) $efectivoUsuario->saldo,
@@ -528,7 +532,8 @@ $efectivoUsuario->save();
                 'insuficiente_saldo' => false,
                 'tipo' => null,
                 'factura_numero' => 0,
-                'factura_restante' => 0
+                'factura_restante' => 0,
+        'fecha_vencimiento' => $sus?->fecha_vencimiento ?? null,
             ];
         }
         $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();

@@ -37,9 +37,6 @@ class User extends Authenticatable
         'datos_fiscales_personal',
         'usuario_padre',
         'password_temporal',
-        'id_plan',
-        'vigencia_plan_inicio',
-        'vigencia_plan_fin'
     ];
 
     protected $hidden = [
@@ -220,7 +217,9 @@ class User extends Authenticatable
     }
     public function planVencido()
     {
-        return $this->vigencia_plan_fin && $this->vigencia_plan_fin < now();
+        return $this->hasOne(Suscripciones::class, 'usuario_id')
+            ->where('fecha_vencimiento', '<', now())
+            ->latest();
     }
 
     public function suscripcionActiva(): HasOne
