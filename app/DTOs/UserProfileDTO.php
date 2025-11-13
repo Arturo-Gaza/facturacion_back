@@ -45,8 +45,8 @@ class UserProfileDTO
             $suscripcionArray = [
                 'id' => $user->suscripcionActiva->id,
                 'id_plan' => $user->suscripcionActiva->id_plan,
-                'fecha_inicio' => $user->suscripcionActiva->fecha_inicio->format('Y-m-d'),
-                'fecha_vencimiento' => $user->suscripcionActiva?->fecha_vencimiento?->format('Y-m-d'),
+                'fecha_inicio' => $user->suscripcionActiva->fecha_inicio,
+                'fecha_vencimiento' => $user->suscripcionActiva?->fecha_vencimiento,
                 'estado' => $user->suscripcionActiva->estado,
                 'perfiles_utilizados' => $user->suscripcionActiva->perfiles_utilizados,
                 'facturas_realizadas' => $user->suscripcionActiva->facturas_realizadas,

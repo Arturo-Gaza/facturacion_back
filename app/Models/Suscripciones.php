@@ -37,7 +37,13 @@ class Suscripciones extends Model
 
     public function getFechaVencimientoAttribute($vlue)
     {
-        $val= Carbon::parse($vlue)->format('d-M-Y H:i');
+        $val= Carbon::parse($vlue)->format('Y-m-d');
+        return $val;
+    }
+
+        public function getFechaInicioAttribute($vlue)
+    {
+        $val= Carbon::parse($vlue)->format('Y-m-d');
         return $val;
     }
     /**
