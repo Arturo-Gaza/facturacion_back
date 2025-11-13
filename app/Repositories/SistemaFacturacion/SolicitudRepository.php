@@ -461,7 +461,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     : $user;
                 $mov->estatus_movimiento_id = $estatus_revertido;
                 
-                $descripcion = $mov->descripcion;
+                $mov->descripcion = trim(($mov->descripcion ?? '') . ' (Rechazado por: ' . $motivo->descripcion . ')');
+
                 $mov->save();
                 if ($user) {
                     $this->decrementarFacturasRealizadas($efectivoUsuario); // crea esta función si no existe
