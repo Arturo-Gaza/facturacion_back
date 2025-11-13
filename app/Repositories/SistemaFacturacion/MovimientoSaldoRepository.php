@@ -155,6 +155,7 @@ class MovimientoSaldoRepository implements MovimientoSaldoRepositoryInterface
                 'tarjeta' => $movimiento->card_last4,
                 'card_brand' => $movimiento->card_brand,
                 'payment_method_type' => $movimiento->payment_method_type,
+                'idEstatus' => $movimiento->estatusMovimiento->id ?? null,
             ];
 
 
