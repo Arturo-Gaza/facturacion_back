@@ -289,7 +289,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $efectivoUsuario = $user->usuario_padre
                 ? User::find($user->usuario_padre) ?? $user
                 : $user;
-            $estatusPendienteId = 1;
+            $estatusPendienteId = 7;
 
             // Calcular precio y obtener datos de cobro
             $datosCobro = $this->calcularPrecio($id_sol, $id_user);
@@ -460,7 +460,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                     ? User::find($user->usuario_padre) ?? $user
                     : $user;
                 $mov->estatus_movimiento_id = $estatus_revertido;
+                
                 $descripcion = $mov->descripcion;
+                $mov->save();
                 if ($user) {
                     $this->decrementarFacturasRealizadas($efectivoUsuario); // crea esta función si no existe
                     $efectivoUsuario->saldo += $mov->monto; // devolver el saldo

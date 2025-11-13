@@ -388,7 +388,7 @@ class StripeController extends Controller
             DB::beginTransaction();
 
             if ($status === 'succeeded') {
-                $estatusCompletado = 2; // ajusta según tu catálogo
+                $estatusCompletado = 3; // ajusta según tu catálogo
 
                 // Si saldo_antes nulo, setear desde usuario (para recarga)
                 if ($mov->saldo_antes === null) {
