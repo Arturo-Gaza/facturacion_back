@@ -32,9 +32,10 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
             throw new Exception("Ya existe una suscripción activa para este plan");
         }
         $precio = $plan->precio ?? 0;
-        $esMensual=$plan->esMensual();
+        $esMensual = $plan->esMensual();
+        $tipoPago = $plan->tipo_pago ?? null;
         if ($precio == 0 || $plan->esMensual()) {
-            $dias_gratis=$plan->dias_gratis;
+            $dias_gratis = $plan->dias_gratis;
             $vigencia_fin = $plan->esMensual() ? Carbon::now()->addDay($dias_gratis) : null;
 
             $sus = Suscripciones::create([
@@ -47,7 +48,10 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
                 'facturas_realizadas' => 0,
             ]);
 
-            return $sus;
+            return [
+                'suscripcion' => $sus,
+                'tipo_pago' => $tipoPago,
+            ];
         }
         Stripe::setApiKey(env('STRIPE_SECRET'));
 
@@ -57,6 +61,7 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
             'usuario_id' => (string)$id_user,
             'plan_id' => (string)$plan->id,
             'internal_id' => Str::uuid()->toString(),
+            'tipo_pago' => $tipoPago,
         ];
         $session = Session::create([
             'mode' => 'payment',
@@ -87,6 +92,9 @@ class SuscripcionesRepository implements SuscripcionesRepositoryInterface
             'facturas_realizadas' => 0,
             'stripe_session_id' => $session->id,
         ]);
-        return $susPendiente;
+        return [
+            'suscripcion' => $susPendiente,
+            'tipo_pago' => $tipoPago,
+        ];
     }
 }
