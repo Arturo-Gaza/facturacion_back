@@ -292,7 +292,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('solicitud/calcularPrecio/{id}', [SolicitudController::class, 'calcularPrecio']);
 
     Route::get('user/validarCantidadRFC', [DatosFiscalesController::class, 'validarCantidadRFC']);
-    Route::get('user/validarCantidadUsuarios', [DatosFiscalesController::class, 'validarCantidadUsuarios']);
+    Route::get('user/validarCantidadUsuarios', [UsuarioController::class, 'validarCantidadUsuarios']);
 
     Route::post('suscripcion/iniciar/{id}', [SuscripcionController::class, 'iniciar']);
     Route::get('suscripcion/getAll', [SuscripcionController::class, 'getAll']);

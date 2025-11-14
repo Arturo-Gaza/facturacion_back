@@ -246,14 +246,5 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
-            public function validarCantidadUsuarios()
-    {
-        try {
-            $id_user = auth()->user()->id;
-            $all = $this->datosFiscalesRepository->validarCantidadUsuarios( $id_user);
-            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
-        } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
-        }
-    }
+   
 }

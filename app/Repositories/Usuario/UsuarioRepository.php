@@ -10,6 +10,7 @@ use App\Models\PasswordReset;
 use App\Models\PasswordConf;
 use App\Models\PasswordEliminar;
 use App\Models\PasswordInhabilitar;
+use App\Models\Suscripciones;
 use App\Models\User;
 use App\Models\UserSistema;
 use App\Models\UserEmail;
@@ -853,12 +854,82 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return   $user;
     }
 
+    public function validarCantidadUsuarios($id_user)
+    {
+        $user = User::find($id_user);
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+        // Si no hay plan directo, intentar suscripción activa
+        $plan = null;
+
+        if ($efectivoUsuario->suscripcionActiva) {
+            $plan = $efectivoUsuario->suscripcionActiva->plan;
+        }
+        if (!$plan) {
+            return [
+                'error' => 'No se encontró plan para el usuario.',
+                'monto_a_cobrar' => 0.00,
+                'tier' => null,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo,
+                'insuficiente_saldo' => false,
+                'tipo' => null,
+                'factura_numero' => 0,
+                'factura_restante' => 0
+            ];
+        }
+        $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+        $perfiles_utilizados = $suscripcion->perfiles_utilizados + 1;
+        $perfiles_permitidos = $plan->num_usuarios;
+        $perfiles_restantes = $plan->num_usuarios - $perfiles_utilizados;
+
+        $vigente = false;
+        if ($suscripcion) {
+            $vigente = $suscripcion->estaVigente();
+        }
+        if (!$perfiles_permitidos || $perfiles_restantes >0) {
+
+            return [
+                'tipo' => 'mensual',
+                'vigente' => (bool) $vigente,
+                'monto_a_cobrar' => null,
+                'tier' => $plan->nombre_plan,
+                'saldo_actual' => null,
+                'saldo_despues' => null,
+                'perfiles_suficiente' =>  true ,
+                'perfiles_utilizados' => $perfiles_utilizados,
+                'perfiles_restantes' => $perfiles_restantes
+            ];
+        }
+
+        return [
+            'tipo' => 'mensual',
+            'vigente' => (bool) $vigente,
+            'monto_a_cobrar' => null,
+            'tier' => $plan->nombre_plan,
+            'saldo_actual' => null,
+            'saldo_despues' => null,
+            'perfiles_suficiente' => $perfiles_restantes < 0 ? false : true,
+            'perfiles_utilizados' => $perfiles_utilizados,
+            'perfiles_restantes' => $perfiles_restantes
+        ];
+    }
+
     public function storeHijo(array $data)
     {
         $email = $data['email'];
         $idPadre   = $data['id_usuario'];
         $facturantes = $data['facturantes'] ?? [];
         $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
+
+           $ext=$this->validarCantidadUsuarios($idPadre);
+            $usr_suficiente=$ext["perfiles_suficiente"];
+            if(!$usr_suficiente){
+                throw new Exception("No tienes suficieentes perfiles");
+
+            }
+
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
         if ($existingEmail) {
@@ -908,9 +979,52 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'id_mail_principal' => $correo->id,
             'datos_fiscales_principal' => $facturantePredeterminado
         ]);
-
+ $this->aumentarPerfilesRealizados($idPadre);
         return $user;
     }
+
+public function aumentarPerfilesRealizados($id_user, int $cantidad = 1)
+{
+    // Asegurar cantidad mínima
+    $cantidad = max(1, $cantidad);
+
+    // Buscar al usuario
+    $user = User::find($id_user);
+    if (!$user) {
+        return false; // Usuario no encontrado
+    }
+
+    // Determinar usuario efectivo (padre si existe)
+    $efectivoUsuario = $user->usuario_padre
+        ? User::find($user->usuario_padre) ?? $user
+        : $user;
+
+    // Buscar suscripción activa o la más reciente
+    $suscripcion = $efectivoUsuario->suscripcionActiva
+        ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)
+            ->latest()
+            ->first();
+
+    if (!$suscripcion) {
+        return false; // No hay suscripción
+    }
+
+    try {
+        DB::beginTransaction();
+
+        // Incrementar perfiles_utilizados
+        $suscripcion->perfiles_utilizados = ($suscripcion->perfiles_utilizados ?? 0) + $cantidad;
+
+        $suscripcion->save();
+
+        DB::commit();
+        return true;
+    } catch (Exception $e) {
+        DB::rollBack();
+        // Log::error($e->getMessage());
+        return false;
+    }
+}
 
     protected function asignarFacturantesEnTransaccion($idHijo, $facturantes, $facturantePredeterminado, $idPadre)
     {

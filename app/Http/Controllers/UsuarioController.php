@@ -407,4 +407,15 @@ class UsuarioController extends Controller
             return ApiResponseHelper::rollback($ex);
         }
     }
+
+             public function validarCantidadUsuarios()
+    {
+        try {
+            $id_user = auth()->user()->id;
+            $all = $this->usuario->validarCantidadUsuarios( $id_user);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
 }

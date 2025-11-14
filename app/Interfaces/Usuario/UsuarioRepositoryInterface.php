@@ -48,4 +48,5 @@ interface UsuarioRepositoryInterface
   public function generateToken(User $user): string;
   public function loginActive(int $id);
   public function loginInactive(int $id);
+  public function validarCantidadUsuarios( $id_user);
 }
