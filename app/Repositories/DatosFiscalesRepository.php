@@ -444,6 +444,68 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             'rfc_restante' => $rfc_restante
         ];
     }
+   public function validarCantidadUsuarios($id_user)
+    {
+        $user = User::find($id_user);
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+        // Si no hay plan directo, intentar suscripción activa
+        $plan = null;
+
+        if ($efectivoUsuario->suscripcionActiva) {
+            $plan = $efectivoUsuario->suscripcionActiva->plan;
+        }
+        if (!$plan) {
+            return [
+                'error' => 'No se encontró plan para el usuario.',
+                'monto_a_cobrar' => 0.00,
+                'tier' => null,
+                'saldo_actual' => (float) $efectivoUsuario->saldo,
+                'saldo_despues' => (float) $efectivoUsuario->saldo,
+                'insuficiente_saldo' => false,
+                'tipo' => null,
+                'factura_numero' => 0,
+                'factura_restante' => 0
+            ];
+        }
+        $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+        $perfiles_utilizados = $suscripcion->perfiles_utilizados + 1;
+        $perfiles_permitidos = $plan->num_usuarios;
+        $perfiles_restantes = $plan->num_usuarios - $perfiles_utilizados;
+
+        $vigente = false;
+        if ($suscripcion) {
+            $vigente = $suscripcion->estaVigente();
+        }
+        if (!$perfiles_permitidos || $perfiles_restantes >0) {
+
+            return [
+                'tipo' => 'mensual',
+                'vigente' => (bool) $vigente,
+                'monto_a_cobrar' => null,
+                'tier' => $plan->nombre_plan,
+                'saldo_actual' => null,
+                'saldo_despues' => null,
+                'perfiles_suficiente' =>  true ,
+                'perfiles_utilizados' => $perfiles_utilizados,
+                'perfiles_restantes' => $perfiles_restantes
+            ];
+        }
+
+        return [
+            'tipo' => 'mensual',
+            'vigente' => (bool) $vigente,
+            'monto_a_cobrar' => null,
+            'tier' => $plan->nombre_plan,
+            'saldo_actual' => null,
+            'saldo_despues' => null,
+            'perfiles_suficiente' => $perfiles_restantes < 0 ? false : true,
+            'perfiles_utilizados' => $perfiles_utilizados,
+            'perfiles_restantes' => $perfiles_restantes
+        ];
+    }
+
     private function extraerTextoDePDF($archivo)
     {
         try {
