@@ -149,6 +149,7 @@ class EmailService
 
             try {
                 Mail::to($datosMail["email"])->send(new MandarCorreoConfirmacion($datosMail));
+                
                 return "Exito";
             } catch (\Exception $e) {
                 // Guardar el error en log, base de datos, o notificar al admin

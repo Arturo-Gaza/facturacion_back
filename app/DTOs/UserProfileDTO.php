@@ -32,31 +32,36 @@ class UserProfileDTO
     {
         // Obtener datos fiscales principales
 
+        $padre = $user->padre;
+        if(!$padre){
+            $padre=$user;
+        }
+
         $tieneDatosFiscalesPersonal = $user->datosFiscalesPersonal !== null;
         $tieneDatosFiscalesPredeterminado = $user->datosFiscalesPrincipal !== null;
-        $tieneSuscripcionActiva = $user->suscripcionActiva !== null;
+        $tieneSuscripcionActiva = $padre->suscripcionActiva !== null;
         // Manejar dirección personal (puede ser null)
         $direccionPersonalArray = null;
         if ($user->direccionPersonal) {
             $direccionPersonalArray = $user->direccionPersonal->toArray();
         }
-        if ($user->suscripcionActiva) {
+        if ($padre->suscripcionActiva) {
 
             $suscripcionArray = [
-                'id' => $user->suscripcionActiva->id,
-                'id_plan' => $user->suscripcionActiva->id_plan,
-                'fecha_inicio' => $user->suscripcionActiva->fecha_inicio,
-                'fecha_vencimiento' => $user->suscripcionActiva?->fecha_vencimiento,
-                'estado' => $user->suscripcionActiva->estado,
-                'perfiles_utilizados' => $user->suscripcionActiva->perfiles_utilizados,
-                'facturas_realizadas' => $user->suscripcionActiva->facturas_realizadas,
-                'plan' => $user->suscripcionActiva->plan ? [
-                    'id' => $user->suscripcionActiva->plan->id,
-                    'nombre_plan' => $user->suscripcionActiva->plan->nombre_plan,
-                    'tipo_plan' => $user->suscripcionActiva->plan->tipo_plan,
-                    'tipo_pago' => $user->suscripcionActiva->plan->tipo_pago,
-                    'vigencia_inicio' => $user->suscripcionActiva->plan->vigencia_inicio?->format('Y-m-d'),
-                    'vigencia_fin' => $user->suscripcionActiva->plan->vigencia_fin?->format('Y-m-d'),
+                'id' => $padre->suscripcionActiva->id,
+                'id_plan' => $padre->suscripcionActiva->id_plan,
+                'fecha_inicio' => $padre->suscripcionActiva->fecha_inicio,
+                'fecha_vencimiento' => $padre->suscripcionActiva?->fecha_vencimiento,
+                'estado' => $padre->suscripcionActiva->estado,
+                'perfiles_utilizados' => $padre->suscripcionActiva->perfiles_utilizados,
+                'facturas_realizadas' => $padre->suscripcionActiva->facturas_realizadas,
+                'plan' => $padre->suscripcionActiva->plan ? [
+                    'id' => $padre->suscripcionActiva->plan->id,
+                    'nombre_plan' => $padre->suscripcionActiva->plan->nombre_plan,
+                    'tipo_plan' => $padre->suscripcionActiva->plan->tipo_plan,
+                    'tipo_pago' => $padre->suscripcionActiva->plan->tipo_pago,
+                    'vigencia_inicio' => $padre->suscripcionActiva->plan->vigencia_inicio?->format('Y-m-d'),
+                    'vigencia_fin' => $padre->suscripcionActiva->plan->vigencia_fin?->format('Y-m-d'),
                 ] : null
             ];
         } else {
@@ -74,7 +79,7 @@ class UserProfileDTO
             telefono: $user->phone,
             id_departamento: $user->id_departamento,
             departamento: $user->descripcio_depatamento,
-            saldo: (float) $user->saldo,
+            saldo: (float) $padre->saldo,
             datosCompletos: $tieneDatosFiscalesPersonal,
             direccionPersonal: $direccionPersonalArray,
             tienDatoFiscal: $tieneDatosFiscalesPredeterminado,
@@ -83,8 +88,8 @@ class UserProfileDTO
             suscripcionActiva: $suscripcionArray,
             tieneSuscripcionActiva: $tieneSuscripcionActiva,
             enviar_correo: $user->datosFiscalesPersonal?->enviar_correo,
-            rfcPrincipal: $user->datosFiscalesPrincipal?->rfc ,
-            razonSocialPrincipal: $user->datosFiscalesPrincipal?->nombre_razon ,
+            rfcPrincipal: $user->datosFiscalesPrincipal?->rfc,
+            razonSocialPrincipal: $user->datosFiscalesPrincipal?->nombre_razon,
 
         );
     }

@@ -136,7 +136,7 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
     }
 
-        public function enviarCorreoCambiarCorreo(Request $request)
+    public function enviarCorreoCambiarCorreo(Request $request)
     {
         $data = [
             'email' => $request->email,
@@ -198,13 +198,27 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
-        public function validarCorreoValReceptor(Request $request)
+    public function validarCorreoValReceptor(Request $request)
     {
         $data = [
             'codigo' => $request->codigo,
             'email' => $request->email,
         ];
         $usuario = $this->usuario->validarCorreoValReceptor($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
+
+    public function validarCorreoCambiarCorreo(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'email' => $request->email,
+            'id_user' => $request->id_user,
+        ];
+        $usuario = $this->usuario->validarCorreoCambiarCorreo($data);
         if (!$usuario) {
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
         }

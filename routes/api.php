@@ -69,6 +69,9 @@ Route::post('usuario/validarCorreoValReceptor', [UsuarioController::class, 'vali
 Route::post('usuario/enviarCorreoInhabilitar', [UsuarioController::class, 'enviarCorreoInhabilitar']);
 Route::post('usuario/validarCorreoInhabilitar', [UsuarioController::class, 'validarCorreoInhabilitar']);
 
+Route::post('usuario/validarCorreoCambiarCorreo', [UsuarioController::class, 'validarCorreoCambiarCorreo']);
+
+
 Route::post('usuario/enviarCorreoEliminar', [UsuarioController::class, 'enviarCorreoEliminar']);
 Route::post('usuario/validarCorreoEliminar', [UsuarioController::class, 'validarCorreoEliminar']);
 

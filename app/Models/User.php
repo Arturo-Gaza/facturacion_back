@@ -63,6 +63,11 @@ class User extends Authenticatable
         'apellido_materno'
     ];
 
+public function padre()
+{
+    return $this->belongsTo(User::class, 'usuario_padre');
+}
+
     public function estatusUsuario()
     {
         return $this->belongsTo(CatEstatusUsuario::class, 'id_estatus_usuario');

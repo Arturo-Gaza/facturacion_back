@@ -24,6 +24,7 @@ interface UsuarioRepositoryInterface
   public function validarCorreoRec($data);
   public function validarCorreoConf($data);
     public function validarCorreoValReceptor($data);
+    public function validarCorreoCambiarCorreo($data);
   public function enviarCorreoInhabilitar($data);
   public function validarCorreoInhabilitar($data);
   public function enviarCorreoEliminar($data);
