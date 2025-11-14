@@ -59,6 +59,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('usuario/enviarCorreoRec', [UsuarioController::class, 'enviarCorreoRec']);
 Route::post('usuario/enviarCorreoConf', [UsuarioController::class, 'enviarCorreoConf']);
 Route::post('usuario/enviarCorreoValReceptor', [UsuarioController::class, 'enviarCorreoValReceptor']);
+
+Route::post('usuario/enviarSMSValReceptor', [UsuarioController::class, 'enviarSMSValReceptor']);
+
 Route::post('usuario/enviarCorreoCambiarCorreo', [UsuarioController::class, 'enviarCorreoCambiarCorreo']);
 
 
@@ -66,6 +69,9 @@ Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorre
 Route::post('usuario/enviarSMSConf', [UsuarioController::class, 'enviarSMSConf']);
 Route::post('usuario/validarCorreoConf', [UsuarioController::class, 'validarCorreoConf']);
 Route::post('usuario/validarCorreoValReceptor', [UsuarioController::class, 'validarCorreoValReceptor']);
+
+Route::post('usuario/validarSMSValReceptor', [UsuarioController::class, 'validarSMSValReceptor']);
+
 Route::post('usuario/enviarCorreoInhabilitar', [UsuarioController::class, 'enviarCorreoInhabilitar']);
 Route::post('usuario/validarCorreoInhabilitar', [UsuarioController::class, 'validarCorreoInhabilitar']);
 

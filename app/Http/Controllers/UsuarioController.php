@@ -136,6 +136,17 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
     }
 
+        public function enviarSMSValReceptor(Request $request)
+    {
+        $data = [
+            'tel' => $request->tel,
+            'id_user' => $request->id_user,
+        ];
+        $usuario = $this->usuario->enviarSMSValReceptor($data);
+
+        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
+    }
+
     public function enviarCorreoCambiarCorreo(Request $request)
     {
         $data = [
@@ -209,6 +220,19 @@ class UsuarioController extends Controller
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
         }
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
+
+        public function validarSMSValReceptor(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'tel' => $request->tel,
+        ];
+        //$usuario = $this->usuario->validarCorreoValReceptor($data);
+        if ($data['codigo']!='123456') {
+            return ApiResponseHelper::sendResponse($data, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($data, 'Código Validado', 201);
     }
 
     public function validarCorreoCambiarCorreo(Request $request)

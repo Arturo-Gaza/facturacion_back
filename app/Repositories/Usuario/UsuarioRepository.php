@@ -503,6 +503,18 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         return $usr;
     }
 
+
+    public function enviarSMSValReceptor($data)
+    {
+        $email = $data['tel'];
+        $id_user = $data['id_user'];
+        if (!$email) {
+            return null;
+        }
+        //$usr = $this->SM->enviarCorreoValReceptor($id_user, $email);
+        return true;
+    }
+
     public function enviarCorreoCambiarCorreo($data)
     {
         $email = $data['email'];
@@ -550,7 +562,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         DB::beginTransaction();
         $codigo = $data['codigo'];
-        $id_user=$data['id_user'];
+        $id_user = $data['id_user'];
         $email = $data['email'];
         $expiraEnMinutos = 10;
         $passwordReset = PasswordConf::where('email', $email)
@@ -569,13 +581,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                     'used' => true,
                     'used_at' => now()
                 ]);
-                $correoExistente=UserEmail::where("email",$email)->first();
-                if($correoExistente){
+                $correoExistente = UserEmail::where("email", $email)->first();
+                if ($correoExistente) {
                     throw new Exception("El correo ya esta registrado en el sistema");
                 }
-                $user=User::find($id_user);
-                $mail=$user->mailPrincipal;
-                $mail->email=$email;
+                $user = User::find($id_user);
+                $mail = $user->mailPrincipal;
+                $mail->email = $email;
                 $mail->save();
                 DB::commit();
 
