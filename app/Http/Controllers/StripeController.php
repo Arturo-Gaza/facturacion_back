@@ -518,9 +518,13 @@ class StripeController extends Controller
                 $response = [
                     'saldo_resultante' => $mov->saldo_resultante,
                     'is_subscription' => $isSubscription,
+                    'is_renovacion' => $isRenovacion,
                     'subscription_id' => $createdSubscription ? $createdSubscription->id : null,
                     'movimiento_id' => $mov->id,
                     'tipo_pago' => $tipoPago,
+                    'vigencia_saldo'    => $user?->fecha_vencimiento_saldo,
+                    'fecha_vencimiento' => $suscripcion?->fecha_vencimiento,
+
                 ];
 
                 $message = $isSubscription ? 'Pago confirmado y suscripción creada.' : 'Pago confirmado y saldo actualizado.';
