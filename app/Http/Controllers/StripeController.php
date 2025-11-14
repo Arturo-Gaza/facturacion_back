@@ -166,7 +166,12 @@ class StripeController extends Controller
             if (!$plan) {
                 return null;
             }
-
+            $user = User::find($id_user);
+            $sus = $user->suscripcionActiva;
+            $tipo = 'suscripcion';
+            if ($sus && $sus->id_plan == $idPlan) {
+                $tipo = 'renovacion';
+            }
             $amount = (int) ($plan->precio * 100); // en centavos
             $paymentIntent = PaymentIntent::create([
                 'amount' => $amount,
@@ -175,7 +180,7 @@ class StripeController extends Controller
                     'user_id' => $id_user,
                     'plan_id' => $plan->id,
                     'origin' => 'web',
-                    'tipo' => 'suscripcion'
+                    'tipo' => $tipo
                 ]
             ]);
 
@@ -229,7 +234,7 @@ class StripeController extends Controller
             DB::beginTransaction();
 
             $mov = MovimientoSaldo::create([
-                'tipo' => "suscripción",
+                'tipo' => $tipo,
                 'usuario_id' => $id_user,
                 'monto' => $montoDecimal,
                 'currency' => $paymentIntent->currency ?? env('DIVISA', 'mxn'),
@@ -238,7 +243,7 @@ class StripeController extends Controller
                 // no sumamos al saldo_resultante mientras esté pendiente; guardamos saldo_antes para auditoría
                 'saldo_antes' => 0,
                 'saldo_resultante' => 0,
-                'descripcion' => "Suscripción de " . $montoDecimal . " " . ($paymentIntent->currency ?? env('DIVISA', 'mxn')) . " para " . $plan->nombre_plan,
+                'descripcion' => ucfirst($tipo) . " de " . $montoDecimal . " " . ($paymentIntent->currency ?? env('DIVISA', 'mxn')) . " para " . $plan->nombre_plan,
                 'payment_intent_id' => $paymentIntent->id,
                 'stripe_charge_id' => $stripeChargeId,
                 'customer_id' => $stripeCustomerId,
@@ -382,7 +387,8 @@ class StripeController extends Controller
             $planId = $metadata['plan_id'] ?? null;
 
             $tipo = $metadata['tipo'] ?? null;
-            $isSubscription = !empty($tipo) && $tipo === 'suscripcion'; // si tiene plan_id lo tomamos como suscripción
+            $isSubscription = !empty($tipo) && $tipo === 'suscripcion';
+            $isRenovacion = !empty($tipo) && $tipo === 'renovacion'; // si tiene plan_id lo tomamos como suscripción
             // Si prefieres otro flag explícito, añade metadata.payment_type = 'subscription'|'recharge' en tu frontend
 
             DB::beginTransaction();
@@ -442,7 +448,40 @@ class StripeController extends Controller
 
                     // Para suscripción usualmente no tocas saldo del usuario.
                     $mov->saldo_resultante = $mov->saldo_antes; // sin cambio
-                } else {
+                } elseif (!empty($isRenovacion) && $isRenovacion) {
+                    // Ramo: RENOVACIÓN -> agregar 30 días a la suscripción
+                    if (!$user) {
+                        DB::rollBack();
+                        return ApiResponseHelper::rollback(null, 'Usuario no encontrado para renovación', 404);
+                    }
+
+                    // Buscar suscripción activa más reciente del usuario
+                    $suscripcion = Suscripciones::where('usuario_id', $user->id)
+                        ->where('estado', Suscripciones::ESTADO_ACTIVA)
+                        ->latest('fecha_inicio')
+                        ->first();
+
+                    if ($suscripcion) {
+                        // Si fecha_vencimiento es nula, tomar ahora
+                        $venc = $suscripcion->fecha_vencimiento ? Carbon::parse($suscripcion->fecha_vencimiento) : Carbon::now();
+                        $suscripcion->fecha_vencimiento = $venc->addDays(30);
+                        $suscripcion->save();
+                    } else {
+                        // Si no existe suscripción activa, crear una nueva de 30 días
+                        $suscripcion = Suscripciones::create([
+                            'usuario_id' => $user->id,
+                            'id_plan' => $planId,
+                            'fecha_inicio' => now(),
+                            'fecha_vencimiento' => now()->addDays(30),
+                            'estado' => Suscripciones::ESTADO_ACTIVA,
+                            'perfiles_utilizados' => 0,
+                            'facturas_realizadas' => 0,
+                        ]);
+                    }
+
+                    // Renovación no cambia saldo (ajusta si tu negocio lo requiere)
+                    $mov->saldo_resultante = $mov->saldo_antes;
+                } {
                     // Rama: RECARGA / TOP-UP -> actualizar saldo del usuario
                     if ($user) {
                         $nuevoSaldo = (float)$user->saldo + ((float)$mov->monto);

@@ -11,7 +11,7 @@ return new class extends Migration
 
         // Agregar el nuevo campo ENUM
         Schema::table('movimientos_saldo', function (Blueprint $table) {
-            $table->enum('tipo', ['cargo', 'abono','suscripción'])->after('monto');
+            $table->enum('tipo', ['cargo', 'abono','suscripción','renovacion'])->after('monto');
         });
 
         // Opcional: Renombrar 'nuevo_monto' a 'saldo_resultante' si quieres
