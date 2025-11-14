@@ -167,7 +167,7 @@ class StripeController extends Controller
                 return null;
             }
             $user = User::find($id_user);
-            $sus = $user->suscripcionActiva;
+            $sus = Suscripciones::where('usuario_id',$id_user)->where("estado","activa")->first();
             $tipo = 'suscripcion';
             if ($sus && $sus->id_plan == $idPlan) {
                 $tipo = 'renovacion';
