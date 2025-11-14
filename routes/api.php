@@ -87,6 +87,7 @@ Route::post('usuario/recPass', [UsuarioController::class, 'recPass']);
 Route::post('usuario/habilitar', [UsuarioController::class, 'habilitar']);
 Route::post('usuario/desHabilitar', [UsuarioController::class, 'deshabilitar']);
 Route::post('usuario/eliminarPorAdmin', [UsuarioController::class, 'eliminarPorAdmin']);
+Route::post('usuario/habilitarPorAdmin', [UsuarioController::class, 'habilitarPorAdmin']);
 Route::post('usuario/desHabilitarPorAdmin', [UsuarioController::class, 'desHabilitarPorAdmin']);
 Route::post('usuario/eliminar', [UsuarioController::class, 'eliminar']);
 Route::get('usuario/getColaboradores/{id}', [UsuarioController::class, 'getColaboradores']);

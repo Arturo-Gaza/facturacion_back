@@ -442,6 +442,32 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         }
         throw new Exception('Error inesperado', 409);
     }
+
+    public function habilitarPorAdmin($data)
+    {
+        $email_padre = $data['email_padre'];
+        $email_hijo = $data['email_hijo'];
+        $usrPadre = $this->findByEmailOrUser($email_padre);
+        $usrHijo = $this->findByEmailOrUser($email_hijo);
+
+        if (!$usrPadre) {
+            throw new Exception('Usuario padre no encontrado', 404);
+        }
+
+        if (!$usrHijo) {
+            throw new Exception('Usuario hijo no encontrado', 404);
+        }
+        if ($usrHijo->usuario_padre == $usrPadre->id) {
+            // Verificar si el código ha expirado
+
+            //  $usr = User::where('email', $email)->first();
+            $usrHijo->id_estatus_usuario = 1;
+            $usrHijo->save();
+            return "Usuario habilitado correctamente";
+        }
+        throw new Exception('Error inesperado', 409);
+    }
+
     public function eliminarPorAdmin($data)
     {
         $email_padre = $data['email_padre'];

@@ -318,6 +318,21 @@ class UsuarioController extends Controller
         }
     }
 
+    public function habilitarPorAdmin(Request $request)
+    {
+        $data = [
+            'email_padre' => $request->email_padre,
+            'email_hijo' => $request->email_hijo
+        ];
+
+        try {
+            $getById = $this->usuario->habilitarPorAdmin($data);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+        }
+    }
+
     public function desHabilitarPorAdmin(Request $request)
     {
         $data = [
