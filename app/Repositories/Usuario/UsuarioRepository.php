@@ -6,6 +6,7 @@ use App\DTOs\UserProfileDTO;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\DatosFiscal;
+use App\Models\Direccion;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
 use App\Models\PasswordEliminar;
@@ -229,7 +230,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->where('id', $id)
             ->firstOrFail();
         $datosFiscales = $user->datosFiscalesPersonal;
-        $direccionActual = $datosFiscales->domicilioPersonal;
+        $direccionActual = $datosFiscales?->domicilioPersonal;
         $datosFiscalesData = [
             'nombre_razon' => $request->nombre ?? null,
             'primer_apellido' => $request->primer_apellido ?? null,
@@ -246,13 +247,26 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'localidad' => $direccon["localidad"] ?? null,
             'municipio' => $direccon["municipio"] ?? null,
             'estado' => $direccon["estado"] ?? null,
-            'codigo_postal' => $direccon["codigo_postal"] ?? null
+            'codigo_postal' => $direccon["codigo_postal"] ?? null,
+            'id_tipo_direccion'=> 2, // 2 = direccion personal
         ];
         if ($datosFiscales) {
             $datosFiscales->update($datosFiscalesData);
+        } else {
+            $datosFiscales = DatosFiscal::create(array_merge(
+                $datosFiscalesData,
+                ['id_usuario' => $user->id]
+            ));
+
+            // asignar al usuario y guardar
+            $user->datos_fiscales_personal = $datosFiscales->id;
+            $user->save();
         }
         if ($direccionActual) {
             $direccionActual->update($direccionDataCompleta);
+        } else {
+            $direccionDataCompleta['id_fiscal'] = $datosFiscales->id;
+            Direccion::create($direccionDataCompleta);
         }
 
         DB::commit();
@@ -914,7 +928,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();
         }
-        if (!$perfiles_permitidos || $perfiles_restantes >0) {
+        if (!$perfiles_permitidos || $perfiles_restantes > 0) {
 
             return [
                 'tipo' => 'mensual',
@@ -923,7 +937,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 'tier' => $plan->nombre_plan,
                 'saldo_actual' => null,
                 'saldo_despues' => null,
-                'perfiles_suficiente' =>  true ,
+                'perfiles_suficiente' =>  true,
                 'perfiles_utilizados' => $perfiles_utilizados,
                 'perfiles_restantes' => $perfiles_restantes
             ];
@@ -949,12 +963,11 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $facturantes = $data['facturantes'] ?? [];
         $facturantePredeterminado = $data['facturante_predeterminado'] ?? null;
 
-           $ext=$this->validarCantidadUsuarios($idPadre);
-            $usr_suficiente=$ext["perfiles_suficiente"];
-            if(!$usr_suficiente){
-                throw new Exception("No tienes suficieentes perfiles");
-
-            }
+        $ext = $this->validarCantidadUsuarios($idPadre);
+        $usr_suficiente = $ext["perfiles_suficiente"];
+        if (!$usr_suficiente) {
+            throw new Exception("No tienes suficieentes perfiles");
+        }
 
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
@@ -1005,52 +1018,52 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'id_mail_principal' => $correo->id,
             'datos_fiscales_principal' => $facturantePredeterminado
         ]);
- $this->aumentarPerfilesRealizados($idPadre);
+        $this->aumentarPerfilesRealizados($idPadre);
         return $user;
     }
 
-public function aumentarPerfilesRealizados($id_user, int $cantidad = 1)
-{
-    // Asegurar cantidad mínima
-    $cantidad = max(1, $cantidad);
+    public function aumentarPerfilesRealizados($id_user, int $cantidad = 1)
+    {
+        // Asegurar cantidad mínima
+        $cantidad = max(1, $cantidad);
 
-    // Buscar al usuario
-    $user = User::find($id_user);
-    if (!$user) {
-        return false; // Usuario no encontrado
-    }
+        // Buscar al usuario
+        $user = User::find($id_user);
+        if (!$user) {
+            return false; // Usuario no encontrado
+        }
 
-    // Determinar usuario efectivo (padre si existe)
-    $efectivoUsuario = $user->usuario_padre
-        ? User::find($user->usuario_padre) ?? $user
-        : $user;
+        // Determinar usuario efectivo (padre si existe)
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
 
-    // Buscar suscripción activa o la más reciente
-    $suscripcion = $efectivoUsuario->suscripcionActiva
-        ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)
+        // Buscar suscripción activa o la más reciente
+        $suscripcion = $efectivoUsuario->suscripcionActiva
+            ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)
             ->latest()
             ->first();
 
-    if (!$suscripcion) {
-        return false; // No hay suscripción
+        if (!$suscripcion) {
+            return false; // No hay suscripción
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Incrementar perfiles_utilizados
+            $suscripcion->perfiles_utilizados = ($suscripcion->perfiles_utilizados ?? 0) + $cantidad;
+
+            $suscripcion->save();
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            // Log::error($e->getMessage());
+            return false;
+        }
     }
-
-    try {
-        DB::beginTransaction();
-
-        // Incrementar perfiles_utilizados
-        $suscripcion->perfiles_utilizados = ($suscripcion->perfiles_utilizados ?? 0) + $cantidad;
-
-        $suscripcion->save();
-
-        DB::commit();
-        return true;
-    } catch (Exception $e) {
-        DB::rollBack();
-        // Log::error($e->getMessage());
-        return false;
-    }
-}
 
     protected function asignarFacturantesEnTransaccion($idHijo, $facturantes, $facturantePredeterminado, $idPadre)
     {
