@@ -18,7 +18,7 @@ interface SolicitudRepositoryInterface
     public function concluir($id_usuario,$id_solicitud);
      public function revertir($id_usuario,$id_solicitud);
     public function mandarFactura($id_solicitud);
-  public function getByUsuario(int $usuario_id);
+  public function getByUsuario($fecha_inicio ,$fecha_fin,int $usuario_id);
   public function procesar(int $id);
   public function rechazar($id_solicitud, $id_motivo_rechazo,$id_user);
   public function actualizarEstatus($id_solicitud, $id_estatus, $id_usuario);

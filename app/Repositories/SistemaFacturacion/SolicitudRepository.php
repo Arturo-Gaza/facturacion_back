@@ -1180,10 +1180,30 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return $solicitud;
     }
 
-    public function getByUsuario(int $usuario_id)
+    public function getByUsuario($fecha_inicio ,$fecha_fin,int $usuario_id)
     {
-        $solicitudes = Solicitud::where('usuario_id', $usuario_id)
+
+
+        if ($usuario_id === -1) {
+            // -1 indica "todo": tomar al usuario autenticado como raíz y todos sus hijos
+            $rootId = auth()->user()->id;
+            $ids = $this->getUserAndDescendantsIds($rootId);
+        } else {
+            // id específico: solo ese usuario (sin recursividad)
+            $ids = [$usuario_id];
+        }
+
+        $fecha_inicio = $fecha_inicio
+            ? Carbon::parse($fecha_inicio)
+            : now()->subDays(30);
+
+        $fecha_fin = $fecha_fin
+            ? Carbon::parse($fecha_fin)
+            : now();
+
+        $solicitudes = Solicitud::whereIn('usuario_id', $ids)
             ->whereNot('estado_id', 11)
+            ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->with(['usuario', 'empleado', 'estadoSolicitud'])
             ->get();
         $solicitudes->each(function ($solicitud) {

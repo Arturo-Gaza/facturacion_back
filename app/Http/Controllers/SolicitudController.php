@@ -264,10 +264,15 @@ class SolicitudController extends Controller
     }
 
 
-    public function getByUsuario(int $usuario_id)
+    public function getByUsuario(Request $request)
     {
         try {
-            $all = $this->solicitudRepository->getByUsuario($usuario_id);
+            $fecha_inicio = $request->input('fecha_inicio', null);
+            $fecha_fin = $request->input('fecha_fin', null);
+            $usuario_id = $request->filled('usuario_id')
+                ? $request->input('usuario_id')
+                : auth()->user()->id;
+            $all = $this->solicitudRepository->getByUsuario($fecha_inicio, $fecha_fin,$usuario_id);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, 'No se pudo obtener la lista', 500);
@@ -320,7 +325,7 @@ class SolicitudController extends Controller
 
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);
-        }  catch (Exception $ex) {
+        } catch (Exception $ex) {
             DB::rollBack();
             return ApiResponseHelper::rollback($ex, $ex->getMessage());
         }
