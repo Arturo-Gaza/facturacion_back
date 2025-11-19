@@ -184,7 +184,7 @@ class AuthController extends Controller
             $validated = $request->validate([
                 'id_hijo' => 'required|integer|exists:users,id',
                 'id_usuario' => 'required|integer|exists:users,id', // padre
-                'email' => 'required|email',
+                'email' => 'email',
                 'facturantes' => 'required|array',
                 'facturantes.*' => 'integer|exists:datos_fiscales,id',
                 'facturante_predeterminado' => 'required|integer|exists:datos_fiscales,id'
