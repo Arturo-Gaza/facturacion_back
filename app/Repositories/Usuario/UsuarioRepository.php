@@ -462,7 +462,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $email_padre = $data['email_padre'];
         $email_hijo = $data['email_hijo'];
         $usrPadre = $this->findByEmailOrUser($email_padre);
-        $usrHijo = $this->findByEmailOrUser($email_hijo);
+        $usrHijo = $this->findByEmailOrUserAll($email_hijo);
 
         if (!$usrPadre) {
             throw new Exception('Usuario padre no encontrado', 404);
@@ -479,7 +479,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             $usrHijo->save();
             return "Usuario habilitado correctamente";
         }
-        throw new Exception('Error inesperado', 409);
+        throw new Exception('El padre y el hijo no coinciden', 409);
     }
 
     public function eliminarPorAdmin($data)
@@ -749,6 +749,18 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         return User::where('id_estatus_usuario', 1)
             ->where(function ($query) use ($email) {
+                $query->whereHas('mailPrincipal', function ($q) use ($email) {
+                    $q->where('email', $email);
+                })->orWhereHas('telefonoPrincipal', function ($q) use ($email) {
+                    $q->where('telefono', $email);
+                });
+            })
+            ->first();
+    }
+
+        public function findByEmailOrUserAll(string $email): ?User
+    {
+        return User::where(function ($query) use ($email) {
                 $query->whereHas('mailPrincipal', function ($q) use ($email) {
                     $q->where('email', $email);
                 })->orWhereHas('telefonoPrincipal', function ($q) use ($email) {
