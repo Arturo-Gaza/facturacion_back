@@ -1325,11 +1325,40 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
 
 
+    function getUserAndDescendantsIds(int $rootId): array
+    {
+        $ids = [$rootId];
+        $queue = [$rootId];
 
+        while (!empty($queue)) {
+            $current = array_shift($queue);
+            $children = User::where('usuario_padre', $current)->pluck('id')->toArray();
+            if (!empty($children)) {
+                foreach ($children as $c) {
+                    if (!in_array($c, $ids, true)) {
+                        $ids[] = $c;
+                        $queue[] = $c;
+                    }
+                }
+            }
+        }
+
+        return $ids;
+    }
 
 
     public function getGeneralByUsuario($fecha_inicio, $fecha_fin, $usuario_id)
     {
+
+        if ($usuario_id === -1) {
+            // -1 indica "todo": tomar al usuario autenticado como raíz y todos sus hijos
+            $rootId = auth()->user()->id;
+            $ids = $this->getUserAndDescendantsIds($rootId);
+        } else {
+            // id específico: solo ese usuario (sin recursividad)
+            $ids = [$usuario_id];
+        }
+
         $fecha_inicio = $fecha_inicio
             ? Carbon::parse($fecha_inicio)
             : now()->subDays(30);
@@ -1338,7 +1367,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ? Carbon::parse($fecha_fin)
             : now();
 
-        $conteos = Solicitud::where('solicitudes.usuario_id', $usuario_id)
+        $conteos = Solicitud::whereIn('solicitudes.usuario_id', $ids)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
             ->selectRaw('cat_estatus_solicitud.id, cat_estatus_solicitud.descripcion_cliente as estado, COUNT(*) as count')
@@ -1365,7 +1394,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         COUNT(*) as total
     ")
             ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
-            ->where('solicitudes.usuario_id', $usuario_id)
+            ->whereIn('solicitudes.usuario_id', $ids)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_cliente')
             ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
