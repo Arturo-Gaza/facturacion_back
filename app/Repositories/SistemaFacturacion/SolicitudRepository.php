@@ -102,124 +102,170 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     }
     public function procesar(int $id_sol)
     {
-        $solicitud = Solicitud::find($id_sol);
+        $report = [
+            'id_solicitud' => $id_sol,
+            'found' => false,
+            'ocr_text' => null,
+            'ai_result' => null,
+            'datos_adicionales_count' => 0,
+            'empresa' => null,
+            'update_attempted' => false,
+            'update_result' => null,
+            'exception' => null,
+            'steps' => [],
+        ];
 
+        $solicitud = Solicitud::find($id_sol);
         if (!$solicitud) {
-            return null;
+            $report['steps'][] = 'Solicitud no encontrada';
+            return $report;
         }
+        $report['found'] = true;
 
         // Procesar imagen con OCR
-        $textoOCR = $this->procesarImagenConOCR($solicitud);
+        try {
+            $textoOCR = $this->procesarImagenConOCR($solicitud);
+            $report['ocr_text'] = $textoOCR;
+            $report['steps'][] = 'OCR completado';
+        } catch (\Throwable $e) {
+            $report['exception'] = 'OCR error: ' . $e->getMessage();
+            $report['steps'][] = 'OCR falló';
+            return $report;
+        }
 
-        if ($textoOCR) {
-            $cat_giros = CatGiro::all()->toArray();
-            $cat_motivos_rechazo = CatMotivoRechazo::where('validar_por_IA', true)
-                ->where('activo', true)
-                ->get()
-                ->toArray();
+        if (!$textoOCR) {
+            $report['steps'][] = 'OCR devolvió vacío';
+            return $report;
+        }
 
+        // Preparar catálogos para IA
+        $cat_giros = CatGiro::all()->toArray();
+        $cat_motivos_rechazo = CatMotivoRechazo::where('validar_por_IA', true)
+            ->where('activo', true)
+            ->get()
+            ->toArray();
 
-            // Prepara los parámetros
-            $parameters = [
-                'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
-                'cat_motivos_rechazo' => json_encode($cat_motivos_rechazo, JSON_PRETTY_PRINT),
-                'fecha' => Carbon::now()->format('Y-m-d')
-            ];
+        $parameters = [
+            'cat_giro' => json_encode($cat_giros, JSON_PRETTY_PRINT),
+            'cat_motivos_rechazo' => json_encode($cat_motivos_rechazo, JSON_PRETTY_PRINT),
+            'fecha' => Carbon::now()->format('Y-m-d')
+        ];
 
-            // Extraer datos estructurados con IA
+        // Intentar extracción IA
+        try {
             $datosExtraidos = $this->aiService->extractStructuredData($textoOCR, "receipt_extraction", $parameters);
-            $this->validar($datosExtraidos, $solicitud);
-            $datosAdicionales = $datosExtraidos['datos_facturacion_adicionales'];
+            $report['ai_result'] = $datosExtraidos;
+            $report['steps'][] = 'IA completada';
+        } catch (\Throwable $e) {
+            $report['exception'] = 'IA error: ' . $e->getMessage();
+            $report['steps'][] = 'IA falló';
+            return $report;
+        }
 
-            DB::transaction(function () use ($solicitud, $datosAdicionales) {
+        // Guardar datos adicionales en su propia transacción (o unificada; elige lo que prefieras)
+        $datosAdicionales = $datosExtraidos['datos_facturacion_adicionales'] ?? [];
+        $report['datos_adicionales_count'] = count($datosAdicionales);
 
-                // 2. Iterar sobre el array de datos adicionales (clave => valor)
+        try {
+            DB::transaction(function () use ($solicitud, $datosAdicionales, &$report) {
                 foreach ($datosAdicionales as $etiqueta => $valor) {
-
-                    // 3. Opcional: Sanitizar la etiqueta y el valor si es necesario
                     $etiquetaLimpia = str_replace(['_', '-'], ' ', strtolower($etiqueta));
                     $etiquetaFormato = ucwords($etiquetaLimpia);
 
-                    // 4. Crear un nuevo registro en la tabla 'solicitud_dato_adicional'
                     SolicitudDatoAdicional::create([
-                        'id_solicitud' => $solicitud->id, // Usamos la ID de la solicitud principal
-                        'etiqueta' => $etiquetaFormato, // Ejemplo: "Codigo Facturacion Idw"
-                        'valor' => $valor                  // Ejemplo: "001 E94E 65V9 CR4X GFQK"
+                        'id_solicitud' => $solicitud->id,
+                        'etiqueta' => $etiquetaFormato,
+                        'valor' => $valor
                     ]);
                 }
+                $report['steps'][] = 'Datos adicionales guardados';
             });
-
-            $rfcExtraido = $datosExtraidos['rfc'] ?? null;
-            $rfc = $rfcExtraido ? strtoupper(preg_replace('/\s+/', '', $rfcExtraido)) : null;
-
-            $nombreExtraido = $datosExtraidos['nombre_empresa'] ?? $datosExtraidos['establecimiento'] ?? null;
-            $urlExtraida = $datosExtraidos['url_facturacion'] ?? null;
-
-            DB::beginTransaction();
-            try {
-                $empresa = null;
-
-                // 1) Buscar por RFC (preferible)
-                if ($rfc) {
-                    $empresa = CatEmpresa::where('rfc', $rfc)->first();
-                }
-
-                // 2) Si no encontró por RFC y hay nombre, intentar buscar por nombre parecido
-                if (!$empresa && $nombreExtraido) {
-                    $empresa = CatEmpresa::where('nombre_empresa', 'LIKE', '%' . mb_strtolower($nombreExtraido) . '%')->first();
-                }
-
-                // 3) Si no existe, crear una entrada en catálogo
-                if (!$empresa) {
-                    // intentar obtener id_giro si IA devolvió algo
-                    $idGiro = $datosExtraidos['id_giro'];
-
-
-                    $empresa = CatEmpresa::create([
-                        'rfc' => $rfc ?? null,
-                        'nombre_empresa' => $nombreExtraido ? mb_convert_case($nombreExtraido, MB_CASE_TITLE) : null,
-                        'pagina_web' => $urlExtraida ?? null,
-                        'id_giro' => $idGiro,
-                        'activo' => true,
-                    ]);
-                }
-
-                // Definir los valores finales a guardar en la solicitud
-                $urlFacturacionFinal = $empresa->pagina_web ?? $urlExtraida ?? null;
-                $establecimientoFinal = $empresa->nombre_empresa ?? $nombreExtraido ?? null;
-
-                // Actualizar solicitud con lo extraído / resuelto
-                $solicitud->update([
-                    'num_ticket' => $datosExtraidos['num_ticket'] ?? null,
-                    'texto_ocr' => $textoOCR,
-                    'establecimiento' => $establecimientoFinal,
-                    'url_facturacion' => $urlFacturacionFinal,
-                    'monto' => $datosExtraidos['monto'] ?? null,
-                    'texto_json' => json_encode($datosExtraidos),
-                    'fecha_ticket' => $datosExtraidos['fecha'],
-                    'id_empresa' => $empresa->id
-                ]);
-                /*
-                if (!empty($empresa->id_giro)) {
-                    $datosGiroGuardados = $this->extractDatosPorGiroAndSave($solicitud->id, $empresa->id_giro, $textoOCR);
-                    // opcional: guardar un JSON resumen en solicitud
-                    $solicitud->update([
-                        'texto_json' => json_encode(array_merge(json_decode($solicitud->texto_json ?? '{}', true) ?? [], ['datos_giro' => $datosGiroGuardados]))
-                    ]);
-                }
-                */
-
-
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollBack();
-                // opcional: loguear $e->getMessage()
-                // no abortamos; devolvemos la solicitud sin los cambios extra si quieres
-            }
+        } catch (\Throwable $e) {
+            $report['exception'] = 'Error guardando datos adicionales: ' . $e->getMessage();
+            $report['steps'][] = 'Guardado datos adicionales falló';
+            // no abortamos, devolvemos el report con info
         }
 
-        return $solicitud->fresh();
+        // Normalizar RFC, nombre, url
+        $rfcExtraido = $datosExtraidos['rfc'] ?? null;
+        $rfc = $rfcExtraido ? strtoupper(trim(preg_replace('/\s+/', '', $rfcExtraido))) : null;
+
+        // Asegurarse: si quedó cadena vacía, poner null
+        if ($rfc !== null && $rfc === '') {
+            $rfc = null;
+        }
+        $nombreExtraido = $datosExtraidos['nombre_empresa'] ?? $datosExtraidos['establecimiento'] ?? null;
+        $urlExtraida = $datosExtraidos['url_facturacion'] ?? null;
+        $idGiro = $datosExtraidos['id_giro'] ?? null;
+
+        // Usar una transacción para la creación/actualización final
+        try {
+            DB::beginTransaction();
+
+            $empresa = null;
+            if ($rfc) {
+                $empresa = CatEmpresa::where('rfc', $rfc)->first();
+                $report['steps'][] = $empresa ? 'Empresa encontrada por RFC' : 'No encontrada por RFC';
+            }
+
+            if (!$empresa && $nombreExtraido) {
+                $empresa = CatEmpresa::where('nombre_empresa', 'LIKE', '%' . mb_strtolower($nombreExtraido) . '%')->first();
+                $report['steps'][] = $empresa ? 'Empresa encontrada por nombre' : 'No encontrada por nombre';
+            }
+
+            if (!$empresa) {
+                $empresa = CatEmpresa::create([
+                    'rfc' => $rfc ?? null,
+                    'nombre_empresa' => $nombreExtraido ? mb_convert_case($nombreExtraido, MB_CASE_TITLE) : null,
+                    'pagina_web' => $urlExtraida ?? null,
+                    'id_giro' => $idGiro,
+                    'activo' => true,
+                ]);
+                $report['steps'][] = 'Empresa creada';
+            }
+
+            $report['empresa'] = ['id' => $empresa->id ?? null, 'nombre' => $empresa->nombre_empresa ?? null];
+
+            // Preparar array a actualizar
+            $payload = [
+                'num_ticket' => $datosExtraidos['num_ticket'] ?? null,
+                'texto_ocr' => $textoOCR,
+                'establecimiento' => $empresa->nombre_empresa ?? $nombreExtraido ?? null,
+                'url_facturacion' => $empresa->pagina_web ?? $urlExtraida ?? null,
+                'monto' => $datosExtraidos['monto'] ?? null,
+                'texto_json' => json_encode($datosExtraidos),
+                'fecha_ticket' => $datosExtraidos['fecha'] ?? null,
+                'id_empresa' => $empresa->id ?? null
+            ];
+
+            // Chequeo: ver si hay campos que causen problemas (ej. fecha mal formateada)
+            $report['payload_preview'] = $payload;
+
+            // Intentar update (mass-assignment puede fallar)
+            $report['update_attempted'] = true;
+
+            // Forma segura: usar fill + save para obtener booleano de save()
+            $solicitud->fill($payload);
+            $saveResult = $solicitud->save(); // devuelve true/false
+
+            $report['update_result'] = $saveResult;
+            $report['was_changed'] = $solicitud->wasChanged();
+            $report['changed_fields'] = $solicitud->getChanges();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $report['exception'] = 'Error actualización/empresa: ' . $e->getMessage();
+            $report['steps'][] = 'Actualización falló y se hizo rollback';
+        }
+
+        // Refrescar modelo y devolver diagnostico
+        $solicitud->refresh();
+        $report['solicitud_actual'] = $solicitud->toArray();
+
+        return $report;
     }
+
     public function revertir($id_usuario, $id_solicitud)
     {
         return DB::transaction(function () use ($id_usuario, $id_solicitud) {
@@ -1244,7 +1290,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'monto' => $solicitud->monto,
                 'idreceptor' => $solicitud->id_receptor,
                 'datos_por_giro' => $datosGiro,
-                'id_empresa'=>$solicitud->id_empresa
+                'id_empresa' => $solicitud->id_empresa
 
             ], $fechasDinamicas);
         });

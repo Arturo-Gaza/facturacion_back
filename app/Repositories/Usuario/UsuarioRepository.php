@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Usuario;
 
+use App\DTOs\UserColaboradorDTO;
 use App\DTOs\UserProfileDTO;
 use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
@@ -168,13 +169,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function getColaboradores($id)
     {
-        $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal'])
+        $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal','facturantesPermitidos'])
             ->where('usuario_padre', $id)
             ->whereNot('id_estatus_usuario', 3)
             ->get();
         // Crear array de DTOs
         $dtos = $users->map(function ($user) use ($id) {
-            return UserProfileDTO::fromUserModel($user);
+            return UserColaboradorDTO::fromUserModel($user);
         })->toArray();
 
         // Devolver el array de DTOs

@@ -327,9 +327,9 @@ class UsuarioController extends Controller
 
         try {
             $getById = $this->usuario->habilitarPorAdmin($data);
-            return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
+            return ApiResponseHelper::sendResponse($getById, 'Usuario desbloqueado con exito ', 200);
         } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'Ocurrio un error inesperado ', 500);
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
 
