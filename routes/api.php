@@ -280,7 +280,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('solicitud/concluir', [SolicitudController::class, 'concluir']);
 
-        Route::post('solicitud/revertir', [SolicitudController::class, 'revertir']);
+    Route::post('solicitud/revertir', [SolicitudController::class, 'revertir']);
 
     Route::post('solicitud/mandarFactura', [SolicitudController::class, 'mandarFactura']);
     Route::get('solicitud/getFacturaPDF/{id}', [SolicitudController::class, 'getFacturaPDF']);
@@ -309,8 +309,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::get('MovimientoSaldo/exportPdf', [MovimientoSaldoController::class, 'exportPdf']);
 
     Route::post('solicitud/getGeneralByUsuario', [SolicitudController::class, 'getGeneralByUsuario']);
-
-
+    Route::post('solicitud/getByUsuario', [SolicitudController::class, 'getByUsuario']);
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
@@ -405,7 +404,7 @@ Route::post('Servicio/register', [ServicioController::class, 'store']);
 Route::put('Servicio/update/{id}', [ServicioController::class, 'update']);
 
 // Solicitud
-Route::get('solicitud/getByUsuario', [SolicitudController::class, 'getByUsuario']);
+
 Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 
