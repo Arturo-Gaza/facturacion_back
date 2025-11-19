@@ -1180,7 +1180,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         return $solicitud;
     }
 
-    public function getByUsuario($fecha_inicio ,$fecha_fin,int $usuario_id)
+    public function getByUsuario($fecha_inicio, $fecha_fin, int $usuario_id)
     {
 
 
@@ -1369,7 +1369,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
     public function getGeneralByUsuario($fecha_inicio, $fecha_fin, $usuario_id)
     {
-
+        $usuario_id = intval($usuario_id);
         if ($usuario_id === -1) {
             // -1 indica "todo": tomar al usuario autenticado como raíz y todos sus hijos
             $rootId = auth()->user()->id;
