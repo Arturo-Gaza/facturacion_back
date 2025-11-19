@@ -513,7 +513,10 @@ class StripeController extends Controller
                     $plan = CatPlanes::find($planId);
                     $tipoPago = $plan ? $plan->tipo_pago : null;
                 }
-
+  $suscripcion = Suscripciones::where('usuario_id', $user->id)
+                        ->where('estado', Suscripciones::ESTADO_ACTIVA)
+                        ->latest('fecha_inicio')
+                        ->first();
                 // Respuesta con info útil
                 $response = [
                     'saldo_resultante' => $mov->saldo_resultante,
