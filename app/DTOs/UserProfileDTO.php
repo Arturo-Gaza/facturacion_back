@@ -60,8 +60,8 @@ class UserProfileDTO
                     'nombre_plan' => $padre->suscripcionActiva->plan->nombre_plan,
                     'tipo_plan' => $padre->suscripcionActiva->plan->tipo_plan,
                     'tipo_pago' => $padre->suscripcionActiva->plan->tipo_pago,
-                    'vigencia_inicio' => $padre->suscripcionActiva->plan->vigencia_inicio?->format('Y-m-d'),
-                    'vigencia_fin' => $padre->suscripcionActiva->plan->vigencia_fin?->format('Y-m-d'),
+                    'vigencia_inicio' => $padre->suscripcionActiva->plan->vigencia_inicio?->format('d-m-Y'),
+                    'vigencia_fin' => $padre->suscripcionActiva->plan->vigencia_fin?->format('d-m-Y'),
                 ] : null
             ];
         } else {
