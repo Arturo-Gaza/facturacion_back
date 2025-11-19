@@ -43,6 +43,7 @@ interface UsuarioRepositoryInterface
   public function storeCliente(array $data);
   public function storeHijo(array $data);
   public function completarHijo(array $data);
+   public function updateHijo(array $data);
   public function update(array $data, $id);
   public function deleteUser(array $data, $id);
   public function updatePassword(array $data, $id);

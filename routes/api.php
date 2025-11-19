@@ -104,6 +104,7 @@ Route::post('auth/registerCliente', [AuthController::class, 'registerCliente']);
 Route::post('auth/registerHijo', [AuthController::class, 'registerHijo']);
 
 Route::post('auth/completarHijo', [AuthController::class, 'completarHijo']);
+Route::post('auth/updateHijo', [AuthController::class, 'updateHijo']);
 
 
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);

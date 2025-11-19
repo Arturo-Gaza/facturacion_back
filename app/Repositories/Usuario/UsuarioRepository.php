@@ -169,7 +169,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function getColaboradores($id)
     {
-        $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal','facturantesPermitidos'])
+        $users = User::with(['datosFiscalesPrincipal', 'rol', 'departamento', 'mailPrincipal', 'telefonoPrincipal', 'facturantesPermitidos'])
             ->where('usuario_padre', $id)
             ->whereNot('id_estatus_usuario', 3)
             ->get();
@@ -249,7 +249,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             'municipio' => $direccon["municipio"] ?? null,
             'estado' => $direccon["estado"] ?? null,
             'codigo_postal' => $direccon["codigo_postal"] ?? null,
-            'id_tipo_direccion'=> 2, // 2 = direccion personal
+            'id_tipo_direccion' => 2, // 2 = direccion personal
         ];
         if ($datosFiscales) {
             $datosFiscales->update($datosFiscalesData);
@@ -759,15 +759,15 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->first();
     }
 
-        public function findByEmailOrUserAll(string $email): ?User
+    public function findByEmailOrUserAll(string $email): ?User
     {
         return User::where(function ($query) use ($email) {
-                $query->whereHas('mailPrincipal', function ($q) use ($email) {
-                    $q->where('email', $email);
-                })->orWhereHas('telefonoPrincipal', function ($q) use ($email) {
-                    $q->where('telefono', $email);
-                });
-            })
+            $query->whereHas('mailPrincipal', function ($q) use ($email) {
+                $q->where('email', $email);
+            })->orWhereHas('telefonoPrincipal', function ($q) use ($email) {
+                $q->where('telefono', $email);
+            });
+        })
             ->first();
     }
 
@@ -1105,6 +1105,36 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         $userHijo = User::find($idHijo);
         $userHijo->facturantesPermitidos()->sync($facturantesConPivot);
+    }
+
+
+    public function updateHijo($validated)
+    {
+
+
+        $colaborador = User::where('id', $validated['id_hijo'])
+            ->where('usuario_padre', $validated['id_usuario']) // seguridad
+            ->firstOrFail();
+
+        // 1) Actualizar email
+
+
+        // 2) Sincronizar facturantes permitidos (esto quita los viejos y deja solo los enviados)
+        $colaborador->facturantesPermitidos()->sync($validated['facturantes']);
+
+        // 3) Quitar predeterminado a todos
+        $colaborador->facturantesPermitidos()->updateExistingPivot(
+            $validated['facturantes'],
+            ['predeterminado' => false]
+        );
+
+        // 4) Marcar el predeterminado
+        $colaborador->facturantesPermitidos()->updateExistingPivot(
+            $validated['facturante_predeterminado'],
+            ['predeterminado' => true]
+        );
+
+        return 'Colaborador actualizado correctamente';
     }
 
 

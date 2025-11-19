@@ -178,6 +178,23 @@ class AuthController extends Controller
             return ApiResponseHelper::throw(null, $e->getMessage(), 400);
         }
     }
+    public function updateHijo(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'id_hijo' => 'required|integer|exists:users,id',
+                'id_usuario' => 'required|integer|exists:users,id', // padre
+                'email' => 'required|email',
+                'facturantes' => 'required|array',
+                'facturantes.*' => 'integer|exists:datos_fiscales,id',
+                'facturante_predeterminado' => 'required|integer|exists:datos_fiscales,id'
+            ]);
+            $user = $this->userRepo->updateHijo($validated);
+            return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
+        } catch (Exception $e) {
+            return ApiResponseHelper::throw(null, $e->getMessage(), 400);
+        }
+    }
 
     /**
      * @OA\Post(
