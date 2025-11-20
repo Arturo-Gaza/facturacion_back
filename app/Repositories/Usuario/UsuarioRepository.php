@@ -329,9 +329,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function enviarSMSConf($data)
     {
-        $usr = $this->findByEmailOrUser($data['phone']);
+        $phone=$data['phone'];
+        $usr = $this->findByEmailOrUser($phone);
         
-        $phone = $data['phone'];
+        if (!$usr)
+            return null;
+        $userPhone=UserPhone::where('user_id',$usr->id)->where('telefono',$phone)->first();
+        $phone = $userPhone->lada . $userPhone->telefono;
 
         $usr = $this->nsrSercive->sendSMSConf($phone);
         return $usr;
