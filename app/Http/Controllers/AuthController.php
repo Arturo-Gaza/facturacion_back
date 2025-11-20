@@ -230,7 +230,7 @@ class AuthController extends Controller
 
         $user = $this->userRepo->findByEmailOrUser($request->email);
         if ($user == null || !in_array($user->idRol, $rolesUsrsFinales)) {
-            return ApiResponseHelper::rollback(null, 'Credenciales no válidas ', 401);
+            return ApiResponseHelper::rollback(null, 'El usuario no esta registrado', 401);
         }
 
 
