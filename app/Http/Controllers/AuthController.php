@@ -46,8 +46,10 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            Log::debug('Socialite callback request', ['query' => request()->query(), 'all' => request()->all()]);
-            dd(request()->all());
+Log::debug('[Google redirect] session_id: '.session()->getId(), ['session' => session()->all()]);
+// ...redirect...
+
+Log::debug('[Google callback] session_id: '.session()->getId(), ['session' => session()->all(), 'request' => request()->all()]);
             session()->forget('google_token');
             $googleUser = Socialite::driver('google')->user();
 
@@ -107,6 +109,8 @@ class AuthController extends Controller
                 'segundo_apellido' => $nameParts[2] ?? null,
                 'user' => $userProfile
             ]);
+        } catch (\Throwable $e) {
+            dd('stateless failed', $e->getMessage(), $e->getTraceAsString());
         } catch (\Exception $e) {
             Log::error('Error Google Auth: ' . $e->getMessage());
             return response()->json([
