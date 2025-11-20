@@ -46,12 +46,8 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-Log::debug('[Google redirect] session_id: '.session()->getId(), ['session' => session()->all()]);
-// ...redirect...
-
-Log::debug('[Google callback] session_id: '.session()->getId(), ['session' => session()->all(), 'request' => request()->all()]);
-            session()->forget('google_token');
-            $googleUser = Socialite::driver('google')->user();
+          session()->forget('google_token');
+          $googleUser = Socialite::driver('google')->stateless()->user();
 
             // Extraer nombre y apellidos del nombre completo
             $name = $googleUser->getName();
