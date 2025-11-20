@@ -46,6 +46,8 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
+            Log::debug('Socialite callback request', ['query' => request()->query(), 'all' => request()->all()]);
+            dd(request()->all());
             session()->forget('google_token');
             $googleUser = Socialite::driver('google')->user();
 
