@@ -46,8 +46,8 @@ class AuthController extends Controller
     public function handleGoogleCallback()
     {
         try {
-          session()->forget('google_token');
-          $googleUser = Socialite::driver('google')->stateless()->user();
+            session()->forget('google_token');
+            $googleUser = Socialite::driver('google')->stateless()->user();
 
             // Extraer nombre y apellidos del nombre completo
             $name = $googleUser->getName();
@@ -148,7 +148,6 @@ class AuthController extends Controller
     public function registerCliente(Request $request)
     {
         try {
-
             $user = $this->userRepo->storeCliente($request->all());
             return ApiResponseHelper::sendResponse($user, 'Registro insertado correctamente', 201);
         } catch (Exception $e) {

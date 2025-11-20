@@ -13,7 +13,9 @@ return new class extends Migration
     {
 Schema::create('user_phones', function (Blueprint $table) {
     $table->id();
+
     $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+    $table->string('lada')->nullable();
     $table->string('telefono');
     $table->boolean('verificado')->default(true);//Cambiar en un futuro
     $table->timestamps();

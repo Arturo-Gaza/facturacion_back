@@ -20,6 +20,7 @@ use App\Models\UserEmail;
 use App\Models\UserPhone;
 use App\Models\UsuarioRol;
 use App\Services\EmailService;
+use App\Services\NrsService;
 use App\Services\TwilioService;
 use Carbon\Carbon;
 use Exception;
@@ -32,12 +33,12 @@ use Illuminate\Support\Facades\Hash;
 class UsuarioRepository implements UsuarioRepositoryInterface
 {
     protected $emailService;
-    protected $twilioService;
+    protected $nsrSercive;
 
-    public function __construct(EmailService $emailService, TwilioService $twilioService)
+    public function __construct(EmailService $emailService, NrsService $nsrSercive)
     {
         $this->emailService = $emailService;
-        $this->twilioService = $twilioService;
+        $this->nsrSercive = $nsrSercive;
     }
 
 
@@ -329,11 +330,10 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function enviarSMSConf($data)
     {
         $usr = $this->findByEmailOrUser($data['phone']);
-        if (!$usr)
-            return null;
-        $phone = $usr->phone;
+        
+        $phone = $data['phone'];
 
-        $usr = $this->twilioService->sendSMSConf($phone);
+        $usr = $this->nsrSercive->sendSMSConf($phone);
         return $usr;
     }
 
@@ -840,6 +840,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $email = $data['email'];
         $tel   = $data['tel'];
+         $lada   = $data['lada'];
 
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
@@ -897,6 +898,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         $telefono = $user->phones()->create([
             'telefono' => $tel,
+            'lada'=>$lada
         ]);
 
         $user->update([

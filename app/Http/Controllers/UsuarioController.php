@@ -183,7 +183,6 @@ class UsuarioController extends Controller
             'phone' => $request->phone,
         ];
         $usuario = $this->usuario->enviarSMSConf($data);
-
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
     }
 
