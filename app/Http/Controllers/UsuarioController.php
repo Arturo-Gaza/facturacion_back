@@ -113,7 +113,9 @@ class UsuarioController extends Controller
             'email' => $request->email,
         ];
         $usuario = $this->usuario->enviarCorreoRec($data);
-
+        if(!$usuario){
+            throw new Exception("No existe cuenta asociada a ese correo");
+        }
         return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
     }
     public function enviarCorreoConf(Request $request)
