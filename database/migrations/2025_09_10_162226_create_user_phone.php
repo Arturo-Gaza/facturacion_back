@@ -17,7 +17,7 @@ Schema::create('user_phones', function (Blueprint $table) {
     $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
     $table->string('lada')->nullable();
     $table->string('telefono');
-    $table->boolean('verificado')->default(true);//Cambiar en un futuro
+    $table->boolean('verificado')->default(false);//Cambiar en un futuro
     $table->timestamps();
 });
         Schema::create('password_confirm_phone_tokens', function (Blueprint $table) {

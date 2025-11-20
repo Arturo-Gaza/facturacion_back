@@ -10,6 +10,7 @@ use App\Models\DatosFiscal;
 use App\Models\Direccion;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
+use App\Models\PasswordConfPhone;
 use App\Models\PasswordEliminar;
 use App\Models\PasswordInhabilitar;
 use App\Models\Suscripciones;
@@ -329,12 +330,12 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function enviarSMSConf($data)
     {
-        $phone=$data['phone'];
+        $phone = $data['phone'];
         $usr = $this->findByEmailOrUser($phone);
-        
+
         if (!$usr)
             return null;
-        $userPhone=UserPhone::where('user_id',$usr->id)->where('telefono',$phone)->first();
+        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
         $phone = $userPhone->lada . $userPhone->telefono;
 
         $usr = $this->nsrSercive->sendSMSConf($phone);
@@ -512,7 +513,46 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         throw new Exception('Error inesperado', 409);
     }
 
+    public function validarSMSConf($data)
+    {
+        $tel=$data['phone'];
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($tel);
+        if (!$usr)
+            return null;
+        $expiraEnMinutos = 10;
+        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $tel)->first();
+        $phone = $userPhone->lada . $userPhone->telefono;
 
+        $passwordReset = PasswordConfPhone::where('phone', $phone)
+            ->where('used', false)
+            ->get();
+                foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    return null;
+                }
+
+                                // Actualizar el registro en password_confirm_mail_tokens
+                $reset->update([
+                    'used' => true,
+                    'used_at' => now()
+                ]);
+
+                // Actualizar el correo como verificado en user_emails
+                UserPhone::where('telefono', $tel)
+                    ->update([
+                        'verificado' => true
+                    ]);
+
+                DB::commit();
+
+
+                return "Código válido";
+            }
+        }    
+    }
     public function validarCorreoRec($data)
     {
         $codigo = $data['codigo'];
@@ -844,7 +884,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $email = $data['email'];
         $tel   = $data['tel'];
-         $lada   = $data['lada'];
+        $lada   = $data['lada'];
 
         // 1. Buscar email existente
         $existingEmail = UserEmail::where('email', $email)->first();
@@ -902,7 +942,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         $telefono = $user->phones()->create([
             'telefono' => $tel,
-            'lada'=>$lada
+            'lada' => $lada
         ]);
 
         $user->update([
@@ -1148,6 +1188,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     {
         $email = $data['email'];
         $tel   = $data['tel'];
+        $lada   = $data['lada'];
         $user = $this->findByEmailOrUser($email);
         $existingPhone = UserPhone::where('telefono', $tel)->first();
         if ($existingPhone) {
@@ -1176,6 +1217,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
         $telefono = $user->phones()->create([
             'telefono' => $tel,
+            'lada'=>$lada
         ]);
 
         $user->update([

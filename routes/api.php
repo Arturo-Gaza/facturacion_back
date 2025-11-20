@@ -67,6 +67,8 @@ Route::post('usuario/enviarCorreoCambiarCorreo', [UsuarioController::class, 'env
 
 Route::post('usuario/validarCorreoRec', [UsuarioController::class, 'validarCorreoRec']);
 Route::post('usuario/enviarSMSConf', [UsuarioController::class, 'enviarSMSConf']);
+
+Route::post('usuario/validarSMSConf', [UsuarioController::class, 'validarSMSConf']);
 Route::post('usuario/validarCorreoConf', [UsuarioController::class, 'validarCorreoConf']);
 Route::post('usuario/validarCorreoValReceptor', [UsuarioController::class, 'validarCorreoValReceptor']);
 

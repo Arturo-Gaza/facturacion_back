@@ -210,6 +210,19 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
+
+        public function validarSMSConf(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'phone' => $request->phone,
+        ];
+        $usuario = $this->usuario->validarSMSConf($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
     public function validarCorreoValReceptor(Request $request)
     {
         $data = [
