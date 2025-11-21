@@ -515,7 +515,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function validarSMSConf($data)
     {
-        $tel=$data['phone'];
+        $tel = $data['phone'];
         $codigo = $data['codigo'];
         $usr = $this->findByEmailOrUser($tel);
         if (!$usr)
@@ -527,14 +527,14 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $passwordReset = PasswordConfPhone::where('phone', $phone)
             ->where('used', false)
             ->get();
-                foreach ($passwordReset as $reset) {
+        foreach ($passwordReset as $reset) {
             if (Hash::check($codigo, $reset->codigo)) {
                 // Verificar si el código ha expirado
                 if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
                     return null;
                 }
 
-                                // Actualizar el registro en password_confirm_mail_tokens
+                // Actualizar el registro en password_confirm_mail_tokens
                 $reset->update([
                     'used' => true,
                     'used_at' => now()
@@ -551,7 +551,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
                 return "Código válido";
             }
-        }    
+        }
     }
     public function validarCorreoRec($data)
     {
@@ -1213,11 +1213,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         // 3. Crear nuevo usuario
         $data['password'] = Hash::make($data['password']);
 
-
-
         $telefono = $user->phones()->create([
             'telefono' => $tel,
-            'lada'=>$lada
+            'lada' => $lada
         ]);
 
         $user->update([

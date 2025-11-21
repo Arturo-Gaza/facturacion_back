@@ -18,14 +18,14 @@ interface UsuarioRepositoryInterface
   public function getAllHabilitados();
   public function enviarCorreoRec($data);
   public function enviarCorreoConf($data);
-   public function enviarCorreoValReceptor($data);
-   public function enviarSMSValReceptor($data);
-    public function enviarCorreoCambiarCorreo($data);
+  public function enviarCorreoValReceptor($data);
+  public function enviarSMSValReceptor($data);
+  public function enviarCorreoCambiarCorreo($data);
   public function enviarSMSConf($data);
   public function validarCorreoRec($data);
   public function validarCorreoConf($data);
-    public function validarCorreoValReceptor($data);
-    public function validarCorreoCambiarCorreo($data);
+  public function validarCorreoValReceptor($data);
+  public function validarCorreoCambiarCorreo($data);
   public function enviarCorreoInhabilitar($data);
   public function validarCorreoInhabilitar($data);
   public function enviarCorreoEliminar($data);
@@ -34,7 +34,7 @@ interface UsuarioRepositoryInterface
   public function desHabilitar($data);
   public function eliminar($data);
   public function desHabilitarPorAdmin($data);
-    public function habilitarPorAdmin($data);
+  public function habilitarPorAdmin($data);
   public function eliminarPorAdmin($data);
   public function findByEmailOrUser(string $email): ?User;
   public function responseUser(string $email);
@@ -43,13 +43,14 @@ interface UsuarioRepositoryInterface
   public function storeCliente(array $data);
   public function storeHijo(array $data);
   public function completarHijo(array $data);
-   public function updateHijo(array $data);
+  public function updateHijo(array $data);
   public function update(array $data, $id);
   public function deleteUser(array $data, $id);
   public function updatePassword(array $data, $id);
   public function generateToken(User $user): string;
   public function loginActive(int $id);
   public function loginInactive(int $id);
-  public function validarCantidadUsuarios( $id_user);
+  public function validarCantidadUsuarios($id_user);
   public function validarSMSConf($data);
+  
 }

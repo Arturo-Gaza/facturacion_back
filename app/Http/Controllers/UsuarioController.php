@@ -113,7 +113,7 @@ class UsuarioController extends Controller
             'email' => $request->email,
         ];
         $usuario = $this->usuario->enviarCorreoRec($data);
-        if(!$usuario){
+        if (!$usuario) {
             throw new Exception("No existe cuenta asociada a ese correo");
         }
         return ApiResponseHelper::sendResponse($usuario, 'Si el correo está registrado, se ha enviado un código de recuperación', 201);
@@ -138,7 +138,7 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
     }
 
-        public function enviarSMSValReceptor(Request $request)
+    public function enviarSMSValReceptor(Request $request)
     {
         $data = [
             'tel' => $request->tel,
@@ -211,12 +211,13 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
 
-        public function validarSMSConf(Request $request)
+    public function validarSMSConf(Request $request)
     {
         $data = [
             'codigo' => $request->codigo,
             'phone' => $request->phone,
         ];
+
         $usuario = $this->usuario->validarSMSConf($data);
         if (!$usuario) {
             return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
@@ -236,14 +237,14 @@ class UsuarioController extends Controller
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
 
-        public function validarSMSValReceptor(Request $request)
+    public function validarSMSValReceptor(Request $request)
     {
         $data = [
             'codigo' => $request->codigo,
             'tel' => $request->tel,
         ];
         //$usuario = $this->usuario->validarCorreoValReceptor($data);
-        if ($data['codigo']!='123456') {
+        if ($data['codigo'] != '123456') {
             return ApiResponseHelper::sendResponse($data, 'Código inválido', 400);
         }
         return ApiResponseHelper::sendResponse($data, 'Código Validado', 201);
@@ -437,11 +438,11 @@ class UsuarioController extends Controller
         }
     }
 
-             public function validarCantidadUsuarios()
+    public function validarCantidadUsuarios()
     {
         try {
             $id_user = auth()->user()->id;
-            $all = $this->usuario->validarCantidadUsuarios( $id_user);
+            $all = $this->usuario->validarCantidadUsuarios($id_user);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);

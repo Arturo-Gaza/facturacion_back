@@ -11,25 +11,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-Schema::create('user_phones', function (Blueprint $table) {
-    $table->id();
+        Schema::create('user_phones', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-    $table->string('lada')->nullable();
-    $table->string('telefono');
-    $table->boolean('verificado')->default(false);//Cambiar en un futuro
-    $table->timestamps();
-});
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('lada')->nullable();
+            $table->string('telefono');
+            $table->boolean('verificado')->default(false); //Cambiar en un futuro
+            $table->timestamps();
+        });
         Schema::create('password_confirm_phone_tokens', function (Blueprint $table) {
-           $table->id();
+            $table->id();
             $table->string('phone')->index();
             $table->string('codigo');
             $table->boolean('used')->default(false);
             $table->timestamp('used_at')->nullable();
             $table->timestamp('created_at')->nullable();
         });
-
-
     }
 
     /**
