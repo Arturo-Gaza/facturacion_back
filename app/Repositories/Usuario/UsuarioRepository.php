@@ -711,7 +711,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $tel = $data['tel'];
         $lada = $data['lada'];
         $expiraEnMinutos = 10;
-        $passwordReset = PasswordCambiarPhone::where('phone', $lada.$tel)
+        $passwordReset = PasswordCambiarPhone::where('phone', $lada . $tel)
             ->where('used', false)
             ->get();
 
@@ -732,15 +732,11 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 if ($telExistente) {
                     throw new Exception("El correo ya esta registrado en el sistema");
                 }
-
                 $user = User::find($id_user);
                 $phone = $user->telefonoPrincipal;
                 $phone->telefono = $tel;
-                 $phone->lada = $lada;
+                $phone->lada = $lada;
                 $phone->save();
-                DB::commit();
-
-
                 DB::commit();
                 return "Código válido";
             }

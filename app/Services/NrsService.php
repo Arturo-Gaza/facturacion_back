@@ -68,7 +68,6 @@ class NrsService
             // Generamos el código
             $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $message = "El codigo para cambiar el telefono es " . $codigo;
-
             // Guardamos en BD
             PasswordCambiarPhone::create([
                 'phone' => $to,

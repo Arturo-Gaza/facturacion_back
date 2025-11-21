@@ -334,7 +334,7 @@ class UsuarioController extends Controller
             'email' => $request->email,
             'nuevaPass' => $request->nuevaPass,
             'phone' => $request->phone,
-            
+
         ];
 
         try {
@@ -351,7 +351,6 @@ class UsuarioController extends Controller
             'codigo' => $request->codigo,
             'email' => $request->email
         ];
-
         try {
             $getById = $this->usuario->desHabilitar($data);
             return ApiResponseHelper::sendResponse($getById, 'Usuario bloqueado con exito ', 200);
@@ -380,7 +379,6 @@ class UsuarioController extends Controller
             'email_padre' => $request->email_padre,
             'email_hijo' => $request->email_hijo
         ];
-
         try {
             $getById = $this->usuario->habilitarPorAdmin($data);
             return ApiResponseHelper::sendResponse($getById, 'Usuario desbloqueado con exito ', 200);

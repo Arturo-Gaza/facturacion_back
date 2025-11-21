@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PasswordCambiarPhone extends Model
 {
+    
     use HasFactory;
     protected $table = 'password_cambiar_phone_tokens';
     protected $fillable = ['phone', 'codigo', 'created_at', 'used', 'used_at'];

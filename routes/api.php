@@ -101,7 +101,7 @@ Route::get('usuario/getColaboradores/{id}', [UsuarioController::class, 'getColab
 
 
 Route::get('/test', function () {
-    return 'ok v4.0';
+    return 'ok v5.0';
 });
 
 Route::post('auth/login', [AuthController::class, 'login']);
