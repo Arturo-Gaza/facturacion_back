@@ -396,6 +396,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
                 //  $usr = User::where('email', $email)->first();
                 $usr->password = $nuevaPass;
+                $usr->intentos = 0;
                 $usr->save();
                 return "Contraseña cambiada con exito";
             }
