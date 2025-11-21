@@ -13,6 +13,7 @@ use App\Models\PasswordConf;
 use App\Models\PasswordConfPhone;
 use App\Models\PasswordEliminar;
 use App\Models\PasswordInhabilitar;
+use App\Models\PasswordRecPhone;
 use App\Models\Suscripciones;
 use App\Models\User;
 use App\Models\UserSistema;
@@ -338,7 +339,21 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
         $phone = $userPhone->lada . $userPhone->telefono;
 
-        $usr = $this->nsrSercive->sendSMSConf($phone);
+        $usr = $this->nsrSercive->enviarSMSConf($phone);
+        return $usr;
+    }
+
+    public function enviarSMSRec($data)
+    {
+        $phone = $data['phone'];
+        $usr = $this->findByEmailOrUser($phone);
+
+        if (!$usr)
+            return null;
+        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
+        $phone = $userPhone->lada . $userPhone->telefono;
+
+        $usr = $this->nsrSercive->enviarSMSRec($phone);
         return $usr;
     }
 
@@ -525,6 +540,47 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $phone = $userPhone->lada . $userPhone->telefono;
 
         $passwordReset = PasswordConfPhone::where('phone', $phone)
+            ->where('used', false)
+            ->get();
+        foreach ($passwordReset as $reset) {
+            if (Hash::check($codigo, $reset->codigo)) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                    return null;
+                }
+
+                // Actualizar el registro en password_confirm_mail_tokens
+                $reset->update([
+                    'used' => true,
+                    'used_at' => now()
+                ]);
+
+                // Actualizar el correo como verificado en user_emails
+                UserPhone::where('telefono', $tel)
+                    ->update([
+                        'verificado' => true
+                    ]);
+
+                DB::commit();
+
+
+                return "Código válido";
+            }
+        }
+    }
+
+    public function validarSMSRec($data)
+    {
+        $tel = $data['phone'];
+        $codigo = $data['codigo'];
+        $usr = $this->findByEmailOrUser($tel);
+        if (!$usr)
+            return null;
+        $expiraEnMinutos = 10;
+        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $tel)->first();
+        $phone = $userPhone->lada . $userPhone->telefono;
+
+        $passwordReset = PasswordRecPhone::where('phone', $phone)
             ->where('used', false)
             ->get();
         foreach ($passwordReset as $reset) {

@@ -22,6 +22,7 @@ interface UsuarioRepositoryInterface
   public function enviarSMSValReceptor($data);
   public function enviarCorreoCambiarCorreo($data);
   public function enviarSMSConf($data);
+  public function enviarSMSRec($data);
   public function validarCorreoRec($data);
   public function validarCorreoConf($data);
   public function validarCorreoValReceptor($data);
@@ -52,5 +53,5 @@ interface UsuarioRepositoryInterface
   public function loginInactive(int $id);
   public function validarCantidadUsuarios($id_user);
   public function validarSMSConf($data);
-  
+   public function validarSMSRec($data);
 }

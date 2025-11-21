@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use App\Models\PasswordConfPhone;
+use App\Models\PasswordRecPhone;
 use Carbon\Carbon;
 
 class NrsService
@@ -22,7 +23,7 @@ class NrsService
         $this->username = env('NRS_USERNAME');
     }
 
-    public function sendSMSConf($to)
+    public function enviarSMSConf($to)
     {
         try {
             $basicToken = base64_encode("$this->username:$this->password");
@@ -47,16 +48,46 @@ class NrsService
                 "message" => $message
             ]);
 
-            return [
-                'success' => $response->successful(),
-                'response' => $response->json()
-            ];
-
+            if (!$response->successful()) {
+                throw new \Exception( "Error enviando SMS: " . json_encode($response->json()));
+            }
+            return  $response->json();
         } catch (\Exception $e) {
-            return [
-                'success' => false,
-                'error' => $e->getMessage()
-            ];
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+    public function enviarSMSRec($to)
+    {
+        try {
+            $basicToken = base64_encode("$this->username:$this->password");
+            // Generamos el código
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $message = "El código para cambiar tu contraseña es " . $codigo;
+
+            // Guardamos en BD
+            PasswordRecPhone::create([
+                'phone' => $to,
+                'codigo' => Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+
+            // Llamada a 360nrs
+            $response = Http::withHeaders([
+                'Authorization' => "Basic {$basicToken}",
+                'Content-Type' => 'application/json',
+            ])->post($this->url, [
+                "to" => [$to],
+                "from" => $this->from,
+                "message" => $message
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception( "Error enviando SMS: " . json_encode($response->json()));
+            }
+            return  $response->json();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
         }
     }
 }

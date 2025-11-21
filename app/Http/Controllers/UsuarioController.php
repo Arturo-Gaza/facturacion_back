@@ -140,13 +140,17 @@ class UsuarioController extends Controller
 
     public function enviarSMSValReceptor(Request $request)
     {
-        $data = [
-            'tel' => $request->tel,
-            'id_user' => $request->id_user,
-        ];
-        $usuario = $this->usuario->enviarSMSValReceptor($data);
+        try {
+            $data = [
+                'tel' => $request->tel,
+                'id_user' => $request->id_user,
+            ];
+            $usuario = $this->usuario->enviarSMSValReceptor($data);
 
-        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
+            return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de validación', 201);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo obtener el registro', 500);
+        }
     }
 
     public function enviarCorreoCambiarCorreo(Request $request)
@@ -179,12 +183,33 @@ class UsuarioController extends Controller
     }
     public function enviarSMSConf(Request $request)
     {
-        $data = [
-            'phone' => $request->phone,
-        ];
-        $usuario = $this->usuario->enviarSMSConf($data);
-        return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
+        try {
+            $data = [
+                'phone' => $request->phone,
+            ];
+            $usuario = $this->usuario->enviarSMSConf($data);
+            return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo enviar  el SMS', 500);
+        }
     }
+
+    public function enviarSMSRec(Request $request)
+    {
+        try {
+            $data = [
+                'phone' => $request->phone,
+            ];
+            $usuario = $this->usuario->enviarSMSRec($data);
+            if (!$usuario) {
+                throw new Exception("No existe cuenta asociada a ese teléfono");
+            }
+            return ApiResponseHelper::sendResponse($usuario, 'Si el teléfono está registrado, se ha enviado un código de recuperación', 201);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, 'No se pudo enviar  el SMS', 500);
+        }
+    }
+
 
     public function validarCorreoRec(Request $request)
     {
@@ -224,6 +249,20 @@ class UsuarioController extends Controller
         }
         return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
     }
+    public function validarSMSRec(Request $request)
+    {
+        $data = [
+            'codigo' => $request->codigo,
+            'phone' => $request->phone,
+        ];
+
+        $usuario = $this->usuario->validarSMSRec($data);
+        if (!$usuario) {
+            return ApiResponseHelper::sendResponse($usuario, 'Código inválido', 400);
+        }
+        return ApiResponseHelper::sendResponse($usuario, 'Código Validado', 201);
+    }
+
     public function validarCorreoValReceptor(Request $request)
     {
         $data = [
