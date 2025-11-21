@@ -14,6 +14,7 @@ class NrsService
     protected $password;
     protected $from;
     protected $username;
+    protected $appDebug;
 
     public function __construct()
     {
@@ -21,6 +22,7 @@ class NrsService
         $this->password = env('NRS_API_PASSWORD');
         $this->from = env('NRS_SENDER_NAME');
         $this->username = env('NRS_USERNAME');
+        $this->appDebug = env('APP_DEBUG');
     }
 
     public function enviarSMSConf($to)
@@ -37,7 +39,9 @@ class NrsService
                 'codigo' => Hash::make($codigo),
                 'created_at' => Carbon::now(),
             ]);
-
+            if ($this->appDebug) {
+                return "El codigo de validación es: . $codigo";
+            }
             // Llamada a 360nrs
             $response = Http::withHeaders([
                 'Authorization' => "Basic {$basicToken}",
@@ -49,7 +53,7 @@ class NrsService
             ]);
 
             if (!$response->successful()) {
-                throw new \Exception( "Error enviando SMS: " . json_encode($response->json()));
+                throw new \Exception("Error enviando SMS: " . json_encode($response->json()));
             }
             return  $response->json();
         } catch (\Exception $e) {
@@ -71,7 +75,9 @@ class NrsService
                 'codigo' => Hash::make($codigo),
                 'created_at' => Carbon::now(),
             ]);
-
+            if ($this->appDebug) {
+                return "El codigo de validación es: . $codigo";
+            }
             // Llamada a 360nrs
             $response = Http::withHeaders([
                 'Authorization' => "Basic {$basicToken}",
@@ -83,7 +89,7 @@ class NrsService
             ]);
 
             if (!$response->successful()) {
-                throw new \Exception( "Error enviando SMS: " . json_encode($response->json()));
+                throw new \Exception("Error enviando SMS: " . json_encode($response->json()));
             }
             return  $response->json();
         } catch (\Exception $e) {

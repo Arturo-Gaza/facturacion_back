@@ -36,11 +36,13 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 {
     protected $emailService;
     protected $nsrSercive;
+    protected $appDebug;
 
     public function __construct(EmailService $emailService, NrsService $nsrSercive)
     {
         $this->emailService = $emailService;
         $this->nsrSercive = $nsrSercive;
+        $this->appDebug = env('APP_DEBUG');
     }
 
 
@@ -371,6 +373,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 ->get();
         } else {
             $usr = $this->findByEmailOrUser($phone);
+        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
+        $phone = $userPhone->lada . $userPhone->telefono;
+
              $passwordReset = PasswordRecPhone::where('phone', $phone )
                 ->where('used', false)
                 ->get();
@@ -380,7 +385,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
 
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo)) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
                 // Verificar si el código ha expirado
 
 
@@ -552,7 +557,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->where('used', false)
             ->get();
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo)) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
                 // Verificar si el código ha expirado
                 if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
                     return null;
@@ -593,9 +598,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->where('used', false)
             ->get();
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo)) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
                 // Verificar si el código ha expirado
-                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug ) {
                     return null;
                 }
 
