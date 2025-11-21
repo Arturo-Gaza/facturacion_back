@@ -144,6 +144,7 @@ class UsuarioController extends Controller
             $data = [
                 'tel' => $request->tel,
                 'id_user' => $request->id_user,
+                'lada' => $request->lada,
             ];
             $usuario = $this->usuario->enviarSMSValReceptor($data);
 
@@ -281,11 +282,10 @@ class UsuarioController extends Controller
         $data = [
             'codigo' => $request->codigo,
             'tel' => $request->tel,
+            'id_user' => $request->id_user,
+            'lada' => $request->lada,
         ];
-        //$usuario = $this->usuario->validarCorreoValReceptor($data);
-        if ($data['codigo'] != '123456') {
-            return ApiResponseHelper::sendResponse($data, 'Código inválido', 400);
-        }
+        $usuario = $this->usuario->validarSMSCambiarSMS($data);
         return ApiResponseHelper::sendResponse($data, 'Código Validado', 201);
     }
 

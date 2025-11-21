@@ -8,6 +8,7 @@ use App\Interfaces\Usuario\UsuarioRepositoryInterface;
 use App\Models\AsignacionCarga\tab_asignacion;
 use App\Models\DatosFiscal;
 use App\Models\Direccion;
+use App\Models\PasswordCambiarPhone;
 use App\Models\PasswordReset;
 use App\Models\PasswordConf;
 use App\Models\PasswordConfPhone;
@@ -373,10 +374,10 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 ->get();
         } else {
             $usr = $this->findByEmailOrUser($phone);
-        $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
-        $phone = $userPhone->lada . $userPhone->telefono;
+            $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
+            $phone = $userPhone->lada . $userPhone->telefono;
 
-             $passwordReset = PasswordRecPhone::where('phone', $phone )
+            $passwordReset = PasswordRecPhone::where('phone', $phone)
                 ->where('used', false)
                 ->get();
         }
@@ -385,7 +386,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
 
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug) {
                 // Verificar si el código ha expirado
 
 
@@ -558,9 +559,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->where('used', false)
             ->get();
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug) {
                 // Verificar si el código ha expirado
-                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()&&  !$this->appDebug ) {
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug) {
                     return null;
                 }
 
@@ -599,9 +600,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             ->where('used', false)
             ->get();
         foreach ($passwordReset as $reset) {
-            if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug) {
                 // Verificar si el código ha expirado
-                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug ) {
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug) {
                     return null;
                 }
                 DB::commit();
@@ -648,12 +649,15 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
     public function enviarSMSValReceptor($data)
     {
-        $email = $data['tel'];
+        $phone = $data['tel'];
+        $lada = $data['lada'];
+        $phone = $lada . $phone;
         $id_user = $data['id_user'];
-        if (!$email) {
+        if (!$phone) {
             return null;
         }
-        //$usr = $this->SM->enviarCorreoValReceptor($id_user, $email);
+
+        $usr = $this->nsrSercive->enviarSMSCambiarTel($phone);
         return true;
     }
 
@@ -699,7 +703,51 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         DB::rollBack();
         return null;
     }
+    public function validarSMSCambiarSMS($data)
+    {
+        DB::beginTransaction();
+        $codigo = $data['codigo'];
+        $id_user = $data['id_user'];
+        $tel = $data['tel'];
+        $lada = $data['lada'];
+        $expiraEnMinutos = 10;
+        $passwordReset = PasswordCambiarPhone::where('phone', $tel)
+            ->where('used', false)
+            ->get();
 
+        foreach ($passwordReset as $reset) {
+
+            if (Hash::check($codigo, $reset->codigo) || $this->appDebug) {
+                // Verificar si el código ha expirado
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug) {
+                    DB::rollBack();
+                    return null;
+                }
+                $reset->update([
+                    'used' => true,
+                    'used_at' => now()
+                ]);
+
+                $telExistente = UserPhone::where("telefono", $tel)->where("lada", $lada)->first();
+                if ($telExistente) {
+                    throw new Exception("El correo ya esta registrado en el sistema");
+                }
+
+                $user = User::find($id_user);
+                $phone = $user->telefonoPrincipal;
+                $phone->telefono = $tel;
+                 $phone->lada = $lada;
+                $phone->save();
+                DB::commit();
+
+
+                DB::commit();
+                return "Código válido";
+            }
+        }
+        DB::rollBack();
+        return null;
+    }
     public function validarCorreoCambiarCorreo($data)
     {
         DB::beginTransaction();

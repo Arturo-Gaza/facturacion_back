@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\PasswordCambiarPhone;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
 use App\Models\PasswordConfPhone;
@@ -31,7 +32,7 @@ class NrsService
             $basicToken = base64_encode("$this->username:$this->password");
             // Generamos el código
             $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-            $message = "El código de verificación es " . $codigo;
+            $message = "El codigo de verificacion es " . $codigo;
 
             // Guardamos en BD
             PasswordConfPhone::create([
@@ -60,7 +61,41 @@ class NrsService
             throw new \Exception($e->getMessage());
         }
     }
+    public function enviarSMSCambiarTel($to)
+    {
+        try {
+            $basicToken = base64_encode("$this->username:$this->password");
+            // Generamos el código
+            $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $message = "El codigo para cambiar el telefono es " . $codigo;
 
+            // Guardamos en BD
+            PasswordCambiarPhone::create([
+                'phone' => $to,
+                'codigo' => Hash::make($codigo),
+                'created_at' => Carbon::now(),
+            ]);
+            if ($this->appDebug) {
+                return "El codigo de validacion es: . $codigo";
+            }
+            // Llamada a 360nrs
+            $response = Http::withHeaders([
+                'Authorization' => "Basic {$basicToken}",
+                'Content-Type' => 'application/json',
+            ])->post($this->url, [
+                "to" => [$to],
+                "from" => $this->from,
+                "message" => $message
+            ]);
+
+            if (!$response->successful()) {
+                throw new \Exception("Error enviando SMS: " . json_encode($response->json()));
+            }
+            return  $response->json();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
     public function enviarSMSRec($to)
     {
         try {

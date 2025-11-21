@@ -54,4 +54,5 @@ interface UsuarioRepositoryInterface
   public function validarCantidadUsuarios($id_user);
   public function validarSMSConf($data);
    public function validarSMSRec($data);
+   public function validarSMSCambiarSMS($data);
 }
