@@ -604,22 +604,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
                 if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast() &&  !$this->appDebug ) {
                     return null;
                 }
-
-                // Actualizar el registro en password_confirm_mail_tokens
-                $reset->update([
-                    'used' => true,
-                    'used_at' => now()
-                ]);
-
-                // Actualizar el correo como verificado en user_emails
-                UserPhone::where('telefono', $tel)
-                    ->update([
-                        'verificado' => true
-                    ]);
-
                 DB::commit();
-
-
                 return "Código válido";
             }
         }
