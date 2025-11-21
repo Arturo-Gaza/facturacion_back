@@ -711,7 +711,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $tel = $data['tel'];
         $lada = $data['lada'];
         $expiraEnMinutos = 10;
-        $passwordReset = PasswordCambiarPhone::where('phone', $tel)
+        $passwordReset = PasswordCambiarPhone::where('phone', $lada.$tel)
             ->where('used', false)
             ->get();
 
