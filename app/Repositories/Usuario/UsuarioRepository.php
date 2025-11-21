@@ -559,7 +559,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         foreach ($passwordReset as $reset) {
             if (Hash::check($codigo, $reset->codigo) || $this->appDebug ) {
                 // Verificar si el código ha expirado
-                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()) {
+                if (Carbon::parse($reset->created_at)->addMinutes($expiraEnMinutos)->isPast()&&  !$this->appDebug ) {
                     return null;
                 }
 
