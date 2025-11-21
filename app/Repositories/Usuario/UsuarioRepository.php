@@ -360,15 +360,24 @@ class UsuarioRepository implements UsuarioRepositoryInterface
     public function recPass($data)
     {
         $codigo = $data['codigo'];
-        $usr = $this->findByEmailOrUser($data['email']);
+        $phone = $data['phone'];
+        $mail = $data['email'];
+        $nuevaPass = Hash::make($data['nuevaPass']);
+        if ($mail) {
+            $usr = $this->findByEmailOrUser($mail);
+            $email = $usr->email;
+            $passwordReset = PasswordReset::where('email', $email)
+                ->where('used', false)
+                ->get();
+        } else {
+            $usr = $this->findByEmailOrUser($phone);
+             $passwordReset = PasswordRecPhone::where('phone', $phone )
+                ->where('used', false)
+                ->get();
+        }
         if (!$usr)
             return null;
-        $email = $usr->email;
-        $nuevaPass = Hash::make($data['nuevaPass']);
 
-        $passwordReset = PasswordReset::where('email', $email)
-            ->where('used', false)
-            ->get();
 
         foreach ($passwordReset as $reset) {
             if (Hash::check($codigo, $reset->codigo)) {

@@ -333,6 +333,8 @@ class UsuarioController extends Controller
             'codigo' => $request->codigo,
             'email' => $request->email,
             'nuevaPass' => $request->nuevaPass,
+            'phone' => $request->phone,
+            
         ];
 
         try {
