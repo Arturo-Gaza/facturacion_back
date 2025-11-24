@@ -321,6 +321,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('solicitud/getGeneralByUsuario', [SolicitudController::class, 'getGeneralByUsuario']);
     Route::post('solicitud/getByUsuario', [SolicitudController::class, 'getByUsuario']);
+    Route::post('datosFiscales/eliminarReceptor/{id}', [DatosFiscalesController::class, 'eliminarReceptor']);
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
@@ -437,7 +438,7 @@ Route::get('datosFiscales/getById/{id}', [DatosFiscalesController::class, 'getBy
 Route::get('datosFiscales/getByUsr/{id}', [DatosFiscalesController::class, 'getByUsr']);
 Route::post('datosFiscales/register', [DatosFiscalesController::class, 'store']);
 
-Route::post('datosFiscales/eliminarReceptor/{id}', [DatosFiscalesController::class, 'eliminarReceptor']);
+
 
 Route::post('datosFiscales/extraerDatosCFDI', [DatosFiscalesController::class, 'extraerDatosCFDI']);
 

@@ -123,12 +123,11 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         DB::beginTransaction();
 
         try {
-            $id_user=$data['id_usuario'];
-            $ext=$this->validarCantidadRFC($id_user);
-            $rfc_suficiente=$ext["rfc_suficiente"];
-            if(!$rfc_suficiente){
+            $id_user = $data['id_usuario'];
+            $ext = $this->validarCantidadRFC($id_user);
+            $rfc_suficiente = $ext["rfc_suficiente"];
+            if (!$rfc_suficiente) {
                 throw new Exception("No tienes suficieentes RFC");
-
             }
             // Crear el dato fiscal
             $datosFiscales = DatosFiscal::create($data);
@@ -351,7 +350,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         }
         return $datosFiscales;
     }
-    public function eliminarReceptor($id)
+    public function eliminarReceptor($id, $id_user)
     {
         $datosFiscales = DatosFiscal::find($id);
 
@@ -362,14 +361,19 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($datosFiscales->predeterminado) {
             throw new Exception("Este receptor es el predeterminado, no puede ser eliminado");
         }
-
-
         // Opción 1: Deshabilitar
         $datosFiscales->habilitado = 0;
         $datosFiscales->save();
-
         // Opción 2: Si usas soft delete
         // $datosFiscales->delete();
+        $user = User::find($id_user);
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+
+        $suscripcion = $efectivoUsuario->suscripcionActiva ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+        $suscripcion->rfc_realizados=$suscripcion->rfc_realizados - 1;
+        $suscripcion->save();
 
         return $datosFiscales;
     }
@@ -417,7 +421,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();
         }
-        if (!$rfc_permitidas || $rfc_restante >0) {
+        if (!$rfc_permitidas || $rfc_restante > 0) {
 
             return [
                 'tipo' => 'mensual',
@@ -426,7 +430,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
                 'tier' => $plan->nombre_plan,
                 'saldo_actual' => null,
                 'saldo_despues' => null,
-                'rfc_suficiente' =>  true ,
+                'rfc_suficiente' =>  true,
                 'rfc_numero' => $rfc_realizados,
                 'rfc_restante' => $rfc_restante
             ];
@@ -444,7 +448,7 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
             'rfc_restante' => $rfc_restante
         ];
     }
-   
+
     private function extraerTextoDePDF($archivo)
     {
         try {
@@ -466,30 +470,30 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         }
     }
     public function aumentarRFCRealizados($id_user)
-{
-    $user = User::find($id_user);
+    {
+        $user = User::find($id_user);
 
-    if (!$user) {
-        return false; // Usuario no encontrado
+        if (!$user) {
+            return false; // Usuario no encontrado
+        }
+
+        // Usar el usuario padre si existe
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+
+        // Obtener la suscripción activa o la más reciente
+        $suscripcion = $efectivoUsuario->suscripcionActiva
+            ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
+
+        if (!$suscripcion) {
+            return false; // No hay suscripción
+        }
+
+        // Incrementar y guardar
+        $suscripcion->rfc_realizados = ($suscripcion->rfc_realizados ?? 0) + 1;
+        $suscripcion->save();
+
+        return true; // Operación exitosa
     }
-
-    // Usar el usuario padre si existe
-    $efectivoUsuario = $user->usuario_padre
-        ? User::find($user->usuario_padre) ?? $user
-        : $user;
-
-    // Obtener la suscripción activa o la más reciente
-    $suscripcion = $efectivoUsuario->suscripcionActiva
-        ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)->latest()->first();
-
-    if (!$suscripcion) {
-        return false; // No hay suscripción
-    }
-
-    // Incrementar y guardar
-    $suscripcion->rfc_realizados = ($suscripcion->rfc_realizados ?? 0) + 1;
-    $suscripcion->save();
-
-    return true; // Operación exitosa
-}
 }

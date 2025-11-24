@@ -176,8 +176,8 @@ class DatosFiscalesController extends Controller
             ]);
             $direccionData = $request->input('domicilioFiscal');
             $regimenesData = $request->input('regimenesFiscales');
-            $idDatosFiscales=$data["id"];
-            $datosFiscales = $this->datosFiscalesRepository->updateCompleto( $data,  $direccionData,  $regimenesData, $idDatosFiscales);
+            $idDatosFiscales = $data["id"];
+            $datosFiscales = $this->datosFiscalesRepository->updateCompleto($data,  $direccionData,  $regimenesData, $idDatosFiscales);
 
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
@@ -205,7 +205,7 @@ class DatosFiscalesController extends Controller
                 'id_estatus_sat',
                 'datos_extra',
                 'email_facturacion_id',
-                 'email_facturacion_text'
+                'email_facturacion_text'
             ]);
 
             $updated = $this->datosFiscalesRepository->update($data, $id);
@@ -222,13 +222,13 @@ class DatosFiscalesController extends Controller
         }
     }
 
-    public function eliminarReceptor( $id)
+    public function eliminarReceptor($id)
     {
         DB::beginTransaction();
+        $id_user = auth()->user()->id;
+
         try {
-            $updated = $this->datosFiscalesRepository->eliminarReceptor($id);
-
-
+            $updated = $this->datosFiscalesRepository->eliminarReceptor($id,$id_user);
             DB::commit();
             return ApiResponseHelper::sendResponse($updated, 'Receptor eliminado correctamente', 200);
         } catch (Exception $ex) {
@@ -236,15 +236,14 @@ class DatosFiscalesController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage());
         }
     }
-        public function validarCantidadRFC()
+    public function validarCantidadRFC()
     {
         try {
             $id_user = auth()->user()->id;
-            $all = $this->datosFiscalesRepository->validarCantidadRFC( $id_user);
+            $all = $this->datosFiscalesRepository->validarCantidadRFC($id_user);
             return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
-   
 }
