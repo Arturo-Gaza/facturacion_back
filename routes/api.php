@@ -49,6 +49,7 @@ use App\Http\Controllers\StripeController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SuscripcionController;
 use App\Http\Middleware\AcceptJsonMiddleware;
+use  App\Http\Controllers\SistemaFacturacion\CheckIdController;
 use App\Models\Suscripciones;
 use Illuminate\Support\Facades\Route;
 
@@ -117,6 +118,9 @@ Route::post('auth/updateHijo', [AuthController::class, 'updateHijo']);
 Route::get('usuario/getDatos/{id}', [UsuarioController::class, 'getDatos']);
 Route::put('usuario/editarDatos/{id}', [UsuarioController::class, 'editarDatos']);
 Route::get('usuario/getMesaAyuda', [UsuarioController::class, 'getMesaAyuda']);
+
+Route::post('/checkid/buscar', [CheckIdController::class, 'buscar']);
+
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
