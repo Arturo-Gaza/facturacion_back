@@ -41,7 +41,7 @@ class NrsService
                 'created_at' => Carbon::now(),
             ]);
             if ($this->appDebug) {
-                return "El codigo de validación es: . $codigo";
+                return "El codigo de validación es: . $codigo y appDebug es ".$this->appDebug;
             }
             // Llamada a 360nrs
             $response = Http::withHeaders([

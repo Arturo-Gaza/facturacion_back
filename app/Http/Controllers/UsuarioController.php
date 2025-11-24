@@ -191,7 +191,7 @@ class UsuarioController extends Controller
             $usuario = $this->usuario->enviarSMSConf($data);
             return ApiResponseHelper::sendResponse($usuario, 'Se ha enviado un código de confirmación', 201);
         } catch (Exception $ex) {
-            return ApiResponseHelper::rollback($ex, 'No se pudo enviar  el SMS', 500);
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
 
