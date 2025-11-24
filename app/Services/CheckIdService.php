@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\CheckIdResultDto;
 use Illuminate\Support\Facades\Http;
 
 class CheckIdService
@@ -41,6 +42,11 @@ class CheckIdService
         if (!$success) {
              throw new \Exception($respuesta["error"]);
         }
-        return $response->json();
+                $resultado = $respuesta['resultado'] ?? $respuesta;
+
+        // crear DTO y devolver
+        $dto = new CheckIdResultDto($resultado);
+
+        return $dto;
     }
 }
