@@ -338,7 +338,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $usr = $this->findByEmailOrUser($phone);
 
         if (!$usr)
-            return null;
+             throw new \Exception("Error enviando SMS: no se encontro el usuario" );
         $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
         $phone = $userPhone->lada . $userPhone->telefono;
 
