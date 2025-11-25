@@ -783,9 +783,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud = Solicitud::find($id_solicitud);
         $solicitud->estado_id = 9; // Estado por defecto
         $solicitud->save();
-        $receptor = $solicitud->receptor;
-        if ($receptor) {
-            $email = $receptor->email_facturacion_text;
+        $id_user = $solicitud->usuario_id;
+         $id_receptor = $solicitud->id_receptor;
+        $user = User::find($id_user);
+        $receptor=DatosFiscal::find($id_receptor);
+        if ($user) {
+            $email = $user->mailPrincipal->email;
         }
         if ($email) {
             $xmlRelativePath = $solicitud->getRawOriginal('xml_url');
@@ -814,7 +817,17 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 Log::error("No hay archivos disponibles para adjuntar al correo");
                 return "Error: No hay archivos disponibles para enviar";
             }
-            $this->emailService->enviarCorreoFac($email, $archivos);
+            $datosMail = [
+                'email' => $email,
+                'nombre'=>$user->nombre,
+                'ticket'=>$solicitud ->num_ticket,
+                'fecha_ticket'=>$solicitud ->fecha_ticket,
+                'establecimiento'=>$solicitud ->establecimiento,
+                'total'=>$solicitud->monto,
+                'rfc_receptor'=>$receptor->rfc,
+                'nombre_receptor'=>$receptor->nombre_razon
+            ];
+            $this->emailService->enviarCorreoFac($datosMail, $archivos);
         }
 
         TabBitacoraSolicitud::create([

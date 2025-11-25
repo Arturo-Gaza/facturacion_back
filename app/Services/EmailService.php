@@ -71,13 +71,11 @@ class EmailService
             }
         }
     }
-    public function enviarCorreoFac($email, $archivos)
+    public function enviarCorreoFac($datosMail, $archivos)
     {
         try {
-            $datosMail = [
-                'email' => $email
-            ];
-            
+
+            $email=$datosMail["email"];
 
             Mail::to($email)->send(new MandarCorreoFactura($datosMail, $archivos));
             return "Exito";

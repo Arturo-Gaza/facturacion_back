@@ -52,83 +52,46 @@
             </p>
 
             <!-- Factura Details -->
-            <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
-                <h3 style="color: #1f2937; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">📋 Detalles de la Factura</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                    <div>
-                        <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Folio Fiscal</p>
-                        <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['uuid'] ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Fecha de Emisión</p>
-                        <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['fecha'] ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">RFC Emisor</p>
-                        <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['rfc_emisor'] ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Monto Total</p>
-                        <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">${{ number_format($datosMail['total'] ?? 0, 2) }} MXN</p>
-                    </div>
-                </div>
-            </div>
+<div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
+    <h3 style="color: #1f2937; font-size: 18px; font-weight: 600;">📋 Detalles del Ticket</h3>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top:12px;">
+        <div>
+            <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Ticket</p>
+            <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['ticket'] ?? 'N/A' }}</p>
+        </div>
+        <div>
+            <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Establecimiento</p>
+            <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['establecimiento'] ?? 'N/A' }}</p>
+        </div>
+        <div>
+            <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Fecha Ticket</p>
+            <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">{{ $datosMail['fecha_ticket'] ?? 'N/A' }}</p>
+        </div>
+        <div>
+            <p style="color: #6b7280; margin: 0 0 4px 0; font-size: 14px; font-weight: 500;">Monto Total</p>
+            <p style="color: #1f2937; margin: 0; font-size: 14px; font-weight: 600;">${{ number_format($datosMail['total'] ?? 0, 2) }} MXN</p>
+        </div>
+    </div>
+</div>
+
+<!-- Receptor: Sección Receptor -->
+<div style="background-color: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 0 0 24px 0;">
+    <h3 style="color: #1f2937; font-size: 18px; font-weight: 600;">👤 Datos del Receptor</h3>
+    <div style="margin-top:12px;">
+        <p style="color:#6b7280; margin:0 0 4px 0; font-size:14px;">Nombre / Razón</p>
+        <p style="color:#1f2937; font-weight:600;">{{ $datosMail['nombre_receptor'] ?? 'N/A' }}</p>
+
+        <p style="color:#6b7280; margin:12px 0 4px 0; font-size:14px;">RFC</p>
+        <p style="color:#1f2937; font-weight:600;">{{ $datosMail['rfc_receptor'] ?? 'N/A' }}</p>
+
+    </div>
+</div>
 
             <!-- Archivos Adjuntos -->
-            <div style="background-color: #eff6ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 24px; margin: 24px 0;">
-                <h3 style="color: #1e40af; margin: 0 0 16px 0; font-size: 18px; font-weight: 600;">📎 Archivos Adjuntos</h3>
-                
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: center; padding: 12px; background-color: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                        <div style="background-color: #dc2626; border-radius: 4px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="white" stroke-width="2"/>
-                                <path d="M14 2v6h6" stroke="white" stroke-width="2"/>
-                                <path d="M16 13H8" stroke="white" stroke-width="2"/>
-                                <path d="M16 17H8" stroke="white" stroke-width="2"/>
-                                <path d="M10 9H8" stroke="white" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <div style="flex: 1;">
-                            <p style="color: #1f2937; margin: 0 0 2px 0; font-size: 14px; font-weight: 600;">Factura PDF</p>
-                            <p style="color: #6b7280; margin: 0; font-size: 12px;">Documento fiscal en formato PDF</p>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; padding: 12px; background-color: white; border-radius: 6px; border: 1px solid #e5e7eb;">
-                        <div style="background-color: #059669; border-radius: 4px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="white" stroke-width="2"/>
-                                <path d="M14 2v6h6" stroke="white" stroke-width="2"/>
-                                <path d="M16 13H8" stroke="white" stroke-width="2"/>
-                                <path d="M16 17H8" stroke="white" stroke-width="2"/>
-                                <path d="M10 9H9" stroke="white" stroke-width="2"/>
-                            </svg>
-                        </div>
-                        <div style="flex: 1;">
-                            <p style="color: #1f2937; margin: 0 0 2px 0; font-size: 14px; font-weight: 600;">XML de la Factura</p>
-                            <p style="color: #6b7280; margin: 0; font-size: 12px;">Archivo XML con los datos estructurados</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <p style="color: #374151; font-size: 14px; line-height: 1.5; margin: 16px 0 0 0;">
-                    <strong>Nota:</strong> Ambos archivos están adjuntos a este correo electrónico. 
-                    El PDF es para visualización e impresión, mientras que el XML contiene los datos estructurados 
-                    para procesos fiscales y contables.
-                </p>
-            </div>
+
 
             <!-- Next Steps -->
-            <div style="background-color: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 20px; margin: 24px 0;">
-                <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">📝 Próximos pasos recomendados:</h3>
-                <ol style="color: #92400e; font-size: 14px; margin: 0; padding-left: 16px; line-height: 1.6;">
-                    <li style="margin-bottom: 6px;">Guarda los archivos en tu sistema de contabilidad</li>
-                    <li style="margin-bottom: 6px;">Registra la factura en tu declaración mensual</li>
-                    <li>Mantén los archivos por al menos 5 años como respaldo fiscal</li>
-                </ol>
-            </div>
+
 
             <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 32px 0 0 0;">
                 Si tienes alguna pregunta sobre esta factura o necesitas asistencia adicional, 
@@ -138,21 +101,13 @@
 
         <!-- Footer -->
         <div style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-            <p style="color: #374151; margin: 0 0 16px 0; font-size: 16px; font-weight: 500;">
-                Recuperación inteligente de gastos fiscales
-            </p>
+
             <p style="color: #6b7280; margin: 0 0 20px 0; font-size: 14px;">
                 Saludos,<br>
                 <strong>El equipo de Recupera Gastos</strong>
             </p>
             
-            <div style="margin: 24px 0;">
-                <a href="#" style="display: inline-block; margin: 0 12px; color: #059669; text-decoration: none; font-size: 14px; font-weight: 500;">Centro de Ayuda</a>
-                <span style="color: #d1d5db;">|</span>
-                <a href="#" style="display: inline-block; margin: 0 12px; color: #059669; text-decoration: none; font-size: 14px; font-weight: 500;">Contactar Soporte</a>
-                <span style="color: #d1d5db;">|</span>
-                <a href="#" style="display: inline-block; margin: 0 12px; color: #059669; text-decoration: none; font-size: 14px; font-weight: 500;">Términos</a>
-            </div>
+
             
             <hr style="border: none; height: 1px; background-color: #e5e7eb; margin: 24px 0;">
             
