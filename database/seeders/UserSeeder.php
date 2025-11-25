@@ -263,11 +263,139 @@ class UserSeeder extends Seeder
             $userEmpleado->save();
 
 
+            // ============================
+            // USUARIO EMPLEADO 2 (ROL 5)
+            // ============================
+
+            $userEmpleado2 = User::create([
+                'idRol' => 5,
+                'password' => bcrypt('P@ssword1'),
+                'intentos' => 0,
+                'login_activo' => false,
+                'id_mail_principal' => null,
+            ]);
+
+            $emailEmpleado2 = UserEmail::create([
+                'user_id' => $userEmpleado2->id,
+                'email' => 'empleado2@hopewellsystem.com',
+                'verificado' => true,
+            ]);
+
+            $phoneEmpleado2 = UserPhone::create([
+                'user_id' => $userEmpleado2->id,
+                'telefono' => '5598765432',
+                'verificado' => true,
+            ]);
+
+            $userEmpleado2->update([
+                'id_mail_principal' => $emailEmpleado2->id,
+                'id_telefono_principal' => $phoneEmpleado2->id,
+            ]);
+
+            $datosFiscalesEmpleado2 = DatosFiscal::create([
+                'id_usuario' => $userEmpleado2->id,
+                'nombre_razon' => 'Ana María Torres',
+                'primer_apellido' => 'Torres',
+                'segundo_apellido' => 'García',
+                'es_persona_moral' => false,
+                'rfc' => 'TOGA920202MDF',            // 13 chars
+                'curp' => 'TOGA920202MDFRNL09',
+                'lugar_emision' => 'Zapopan',
+                'fecha_emision' => '2022-01-01',
+                'fecha_inicio_op' => '2022-01-01',
+                'id_estatus_sat' => 1,
+                'email_facturacion_id' => $emailEmpleado2->id,
+                'email_facturacion_text' => $emailEmpleado2->email,
+                'habilitado' => true,
+            ]);
+
+            Direccion::create([
+                'id_fiscal' => $datosFiscalesEmpleado2->id,
+                'id_tipo_direccion' => 2,
+                'calle' => 'Av. López Mateos Sur',
+                'num_exterior' => '1020',
+                'colonia' => 'La Calma',
+                'codigo_postal' => '45070',
+                'municipio' => 'Zapopan',
+                'estado' => 'Jalisco',
+                'pais' => 'México'
+            ]);
+
+            $userEmpleado2->update([
+                'datos_fiscales_principal' => $datosFiscalesEmpleado2->id,
+                'datos_fiscales_personal' => $datosFiscalesEmpleado2->id,
+            ]);
+
+            $userEmpleado2->save();
+
+
 // ============================
-// USUARIO EMPLEADO 2 (ROL 5)
+// MESA DE AYUDA - ADMIN + OPERADORES
 // ============================
 
-$userEmpleado2 = User::create([
+// ---- ADMINISTRADOR DE MESA DE AYUDA (ROL 4) - Rodolfo Rustrian
+$userMesaAdmin = User::create([
+    'idRol' => 4,
+    'password' => bcrypt('P@ssword1'),
+    'intentos' => 0,
+    'login_activo' => false,
+    'id_mail_principal' => null,
+]);
+
+$emailMesaAdmin = UserEmail::create([
+    'user_id' => $userMesaAdmin->id,
+    'email' => 'rodolfo.rustrian@hopewellsystem.com',
+    'verificado' => true,
+]);
+
+$phoneMesaAdmin = UserPhone::create([
+    'user_id' => $userMesaAdmin->id,
+    'telefono' => '5511122233',
+    'verificado' => true,
+]);
+
+$userMesaAdmin->update([
+    'id_mail_principal' => $emailMesaAdmin->id,
+    'id_telefono_principal' => $phoneMesaAdmin->id,
+]);
+$userMesaAdmin->save();
+
+$datosFiscalesMesaAdmin = DatosFiscal::create([
+    'id_usuario' => $userMesaAdmin->id,
+    'nombre_razon' => 'Rodolfo',
+    'primer_apellido' => 'Rustrian',
+    'segundo_apellido' => '',
+    'es_persona_moral' => false,
+    'rfc' => 'RURU800101XXX',
+    'curp' => 'RURU800101HDFXXX01',
+    'lugar_emision' => 'Ciudad de México',
+    'fecha_emision' => '2020-01-01',
+    'fecha_inicio_op' => '2020-01-01',
+    'id_estatus_sat' => 1,
+    'email_facturacion_id' => $emailMesaAdmin->id,
+    'email_facturacion_text' => $emailMesaAdmin->email,
+    'habilitado' => true,
+]);
+
+Direccion::create([
+    'id_fiscal' => $datosFiscalesMesaAdmin->id,
+    'id_tipo_direccion' => 2,
+    'calle' => 'Insurgentes Sur',
+    'num_exterior' => '800',
+    'colonia' => 'Del Valle',
+    'codigo_postal' => '03100',
+    'municipio' => 'Benito Juárez',
+    'estado' => 'Ciudad de México',
+    'pais' => 'México'
+]);
+
+$userMesaAdmin->update([
+    'datos_fiscales_principal' => $datosFiscalesMesaAdmin->id,
+    'datos_fiscales_personal' => $datosFiscalesMesaAdmin->id,
+]);
+$userMesaAdmin->save();
+// ---- OPERADOR 1 (ROL 5) - Mauricio Bejarano
+$userOperador1 = User::create([
     'idRol' => 5,
     'password' => bcrypt('P@ssword1'),
     'intentos' => 0,
@@ -275,58 +403,119 @@ $userEmpleado2 = User::create([
     'id_mail_principal' => null,
 ]);
 
-$emailEmpleado2 = UserEmail::create([
-    'user_id' => $userEmpleado2->id,
-    'email' => 'empleado2@hopewellsystem.com',
+$emailOperador1 = UserEmail::create([
+    'user_id' => $userOperador1->id,
+    'email' => 'mauricio.bejarano@hopewellsystem.com',
     'verificado' => true,
 ]);
 
-$phoneEmpleado2 = UserPhone::create([
-    'user_id' => $userEmpleado2->id,
-    'telefono' => '5598765432',
+$phoneOperador1 = UserPhone::create([
+    'user_id' => $userOperador1->id,
+    'telefono' => '5599988776',
     'verificado' => true,
 ]);
 
-$userEmpleado2->update([
-    'id_mail_principal' => $emailEmpleado2->id,
-    'id_telefono_principal' => $phoneEmpleado2->id,
+$userOperador1->update([
+    'id_mail_principal' => $emailOperador1->id,
+    'id_telefono_principal' => $phoneOperador1->id,
 ]);
+$userOperador1->save();
 
-$datosFiscalesEmpleado2 = DatosFiscal::create([
-    'id_usuario' => $userEmpleado2->id,
-    'nombre_razon' => 'Ana María Torres',
-    'primer_apellido' => 'Torres',
-    'segundo_apellido' => 'García',
+$datosFiscalesOperador1 = DatosFiscal::create([
+    'id_usuario' => $userOperador1->id,
+    'nombre_razon' => 'Mauricio',
+    'primer_apellido' => 'Bejarano',
+    'segundo_apellido' => '',
     'es_persona_moral' => false,
-'rfc' => 'TOGA920202MDF',            // 13 chars
-'curp' => 'TOGA920202MDFRNL09',
-    'lugar_emision' => 'Zapopan',
-    'fecha_emision' => '2022-01-01',
-    'fecha_inicio_op' => '2022-01-01',
+    'rfc' => 'BEJM900202XXX',
+    'curp' => 'BEJM900202HDFXXX02',
+    'lugar_emision' => 'Ciudad de México',
+    'fecha_emision' => '2021-06-01',
+    'fecha_inicio_op' => '2021-06-01',
     'id_estatus_sat' => 1,
-    'email_facturacion_id' => $emailEmpleado2->id,
-    'email_facturacion_text' => $emailEmpleado2->email,
+    'email_facturacion_id' => $emailOperador1->id,
+    'email_facturacion_text' => $emailOperador1->email,
     'habilitado' => true,
 ]);
 
 Direccion::create([
-    'id_fiscal' => $datosFiscalesEmpleado2->id,
+    'id_fiscal' => $datosFiscalesOperador1->id,
     'id_tipo_direccion' => 2,
-    'calle' => 'Av. López Mateos Sur',
-    'num_exterior' => '1020',
-    'colonia' => 'La Calma',
-    'codigo_postal' => '45070',
-    'municipio' => 'Zapopan',
-    'estado' => 'Jalisco',
+    'calle' => 'Calle 16 de Septiembre',
+    'num_exterior' => '120',
+    'colonia' => 'Centro',
+    'codigo_postal' => '06000',
+    'municipio' => 'Cuauhtémoc',
+    'estado' => 'Ciudad de México',
     'pais' => 'México'
 ]);
 
-$userEmpleado2->update([
-    'datos_fiscales_principal' => $datosFiscalesEmpleado2->id,
-    'datos_fiscales_personal' => $datosFiscalesEmpleado2->id,
+$userOperador1->update([
+    'datos_fiscales_principal' => $datosFiscalesOperador1->id,
+    'datos_fiscales_personal' => $datosFiscalesOperador1->id,
+]);
+$userOperador1->save();
+// ---- OPERADOR 2 (ROL 5) - Juan M. Castelazo
+$userOperador2 = User::create([
+    'idRol' => 5,
+    'password' => bcrypt('P@ssword1'),
+    'intentos' => 0,
+    'login_activo' => false,
+    'id_mail_principal' => null,
 ]);
 
-$userEmpleado2->save();
+$emailOperador2 = UserEmail::create([
+    'user_id' => $userOperador2->id,
+    'email' => 'juan.castelazo@hopewellsystem.com',
+    'verificado' => true,
+]);
+
+$phoneOperador2 = UserPhone::create([
+    'user_id' => $userOperador2->id,
+    'telefono' => '5588776655',
+    'verificado' => true,
+]);
+
+$userOperador2->update([
+    'id_mail_principal' => $emailOperador2->id,
+    'id_telefono_principal' => $phoneOperador2->id,
+]);
+$userOperador2->save();
+
+$datosFiscalesOperador2 = DatosFiscal::create([
+    'id_usuario' => $userOperador2->id,
+    'nombre_razon' => 'Juan',
+    'primer_apellido' => 'Castelazo',
+    'segundo_apellido' => 'M.',
+    'es_persona_moral' => false,
+    'rfc' => 'CAMA850303XXX',
+    'curp' => 'CAMA850303HDFXXX03',
+    'lugar_emision' => 'Ciudad de México',
+    'fecha_emision' => '2019-03-01',
+    'fecha_inicio_op' => '2019-03-01',
+    'id_estatus_sat' => 1,
+    'email_facturacion_id' => $emailOperador2->id,
+    'email_facturacion_text' => $emailOperador2->email,
+    'habilitado' => true,
+]);
+
+Direccion::create([
+    'id_fiscal' => $datosFiscalesOperador2->id,
+    'id_tipo_direccion' => 2,
+    'calle' => 'Calle del Olmo',
+    'num_exterior' => '45',
+    'colonia' => 'San Rafael',
+    'codigo_postal' => '06470',
+    'municipio' => 'Cuauhtémoc',
+    'estado' => 'Ciudad de México',
+    'pais' => 'México'
+]);
+
+$userOperador2->update([
+    'datos_fiscales_principal' => $datosFiscalesOperador2->id,
+    'datos_fiscales_personal' => $datosFiscalesOperador2->id,
+]);
+$userOperador2->save();
 
         });
     }

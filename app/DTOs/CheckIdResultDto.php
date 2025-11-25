@@ -73,14 +73,16 @@ class CheckIdResultDto
             }
 
             // Detectar si es persona moral (simple heurística: si razonSocial contiene espacio y mayúsculas? mejor dejar false por defecto)
-            $this->es_persona_moral = false;
+            $this->es_persona_moral = !empty($r["rfcRepresentante"]);
         }
 
         // CURP section (persona física data)
         if (!empty($res['curp']) && is_array($res['curp'])) {
             $c = $res['curp'];
             $this->curp = $c['curp'] ?? $this->curp;
-            $this->nombre_razon = $c['nombres']?? ( $this->nombre_razon ?? '');
+            $this->nombre_razon = $this->es_persona_moral
+                ? $this->nombre_razon
+                : ($c['nombres'] ?? $this->nombre_razon ?? '');
             $this->primer_apellido = $c['primerApellido'] ?? null;
             $this->segundo_apellido = $c['segundoApellido'] ?? null;
             $this->nombre_completo = trim(($c['nombres'] ?? '') . ' ' . ($c['primerApellido'] ?? '') . ' ' . ($c['segundoApellido'] ?? ''));
