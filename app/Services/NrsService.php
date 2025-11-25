@@ -33,7 +33,6 @@ class NrsService
             // Generamos el código
             $codigo = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
             $message = "El codigo de verificacion es " . $codigo;
-
             // Guardamos en BD
             PasswordConfPhone::create([
                 'phone' => $to,

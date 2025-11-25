@@ -50,7 +50,6 @@
                 El sistema <strong>Recupera Gastos</strong> ha procesado tu solicitud y hemos recuperado los documentos fiscales de tu factura. 
                 A continuación encontrarás los detalles y los archivos adjuntos.
             </p>
-
             <!-- Factura Details -->
 <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 24px 0;">
     <h3 style="color: #1f2937; font-size: 18px; font-weight: 600;">📋 Detalles del Ticket</h3>

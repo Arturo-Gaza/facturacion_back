@@ -364,7 +364,6 @@ class UsuarioController extends Controller
             'email_padre' => $request->email_padre,
             'email_hijo' => $request->email_hijo
         ];
-
         try {
             $getById = $this->usuario->eliminarPorAdmin($data);
             return ApiResponseHelper::sendResponse($getById, 'Usuario eliminado con exito ', 200);

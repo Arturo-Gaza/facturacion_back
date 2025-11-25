@@ -87,7 +87,6 @@ class CheckIdResultDto
             $this->primer_apellido = $c['primerApellido'] ?? null;
             $this->segundo_apellido = $c['segundoApellido'] ?? null;
             $this->nombre_completo = trim(($c['nombres'] ?? '') . ' ' . ($c['primerApellido'] ?? '') . ' ' . ($c['segundoApellido'] ?? ''));
-
             // fechaNacimiento -> fecha_inicio_op (si quieres usarla así)
             if (!empty($c['fechaNacimiento'])) {
                 try {
@@ -98,7 +97,6 @@ class CheckIdResultDto
                 }
             }
         }
-
         // Codigo postal -> domicilioFiscal.codigo_postal
         if (!empty($res['codigoPostal']) && is_array($res['codigoPostal'])) {
             $cp = $res['codigoPostal'];
@@ -113,7 +111,6 @@ class CheckIdResultDto
         if (!empty($res['regimenFiscal']) && is_array($res['regimenFiscal'])) {
             $rf = $res['regimenFiscal'];
             $regimenTxt = $rf['regimenesFiscales'] ?? null;
-
 
             if ($regimenTxt) {
                 $partes = explode(" - ", $regimenTxt);

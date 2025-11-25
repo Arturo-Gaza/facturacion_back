@@ -104,11 +104,9 @@ class DatosFiscalesController extends Controller
                 'rfc',
                 'curp',
                 'enviar_correo'
-
             ]);
             $direccionData = $request->input('direccion');
             $datosFiscales = $this->datosFiscalesRepository->storeConDomicilio($data, $direccionData);
-
             DB::commit();
             return ApiResponseHelper::sendResponse($datosFiscales, 'Datos fiscales creados correctamente', 201);
         } catch (Exception $ex) {

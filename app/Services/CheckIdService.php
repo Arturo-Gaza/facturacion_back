@@ -45,10 +45,8 @@ class CheckIdService
              throw new \Exception($respuesta["error"]);
         }
                 $resultado = $respuesta['resultado'] ?? $respuesta;
-
         // crear DTO y devolver
         $dto = new CheckIdResultDto($resultado);
-
         return $dto;
     }
 }

@@ -19,13 +19,10 @@ class CheckIdController extends Controller
 
     public function buscar(Request $request)
     {
-
         try {
-
             $request->validate([
                 'termino' => 'required|string'
             ]);
-
             $data = $this->checkId->buscar($request->termino);
             return ApiResponseHelper::sendResponse($data, 'Datos obtenidos correctamente', 200);
         } catch (Exception $ex) {

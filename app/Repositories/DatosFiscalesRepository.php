@@ -416,7 +416,6 @@ class DatosFiscalesRepository implements DatosFiscalesRepositoryInterface
         $rfc_realizados = $suscripcion->rfc_realizados + 1;
         $rfc_permitidas = $plan->num_rfc;
         $rfc_restante = $plan->num_rfc - $rfc_realizados;
-
         $vigente = false;
         if ($suscripcion) {
             $vigente = $suscripcion->estaVigente();

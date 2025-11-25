@@ -304,9 +304,6 @@ class EmailService
             'password_temporal' => $password,
             'url_login' => env("APP_URL")
         ];
-
-
-
         try {
             Mail::to($datosMail["email"])->send(new MandarCorreoHijo($datosMail));
             return "Exito";

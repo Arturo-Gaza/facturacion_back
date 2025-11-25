@@ -1251,7 +1251,6 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         if (!$suscripcion) {
             return false; // No hay suscripción
         }
-
         try {
             DB::beginTransaction();
 
@@ -1264,7 +1263,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             return true;
         } catch (Exception $e) {
             DB::rollBack();
-            // Log::error($e->getMessage());
+            // Log::error($e->getMessage());;
             return false;
         }
     }

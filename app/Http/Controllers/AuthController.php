@@ -42,7 +42,6 @@ class AuthController extends Controller
        return Socialite::driver('google')->stateless()->redirect();
     }
 
-
     public function handleGoogleCallback()
     {
         try {

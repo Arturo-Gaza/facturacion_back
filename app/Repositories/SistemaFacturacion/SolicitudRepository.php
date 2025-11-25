@@ -829,7 +829,6 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ];
             $this->emailService->enviarCorreoFac($datosMail, $archivos);
         }
-
         TabBitacoraSolicitud::create([
             'id_solicitud' => $id_solicitud,
             'id_estatus' => $estatus_concluido,
