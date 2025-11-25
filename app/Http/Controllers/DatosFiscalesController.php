@@ -136,7 +136,8 @@ class DatosFiscalesController extends Controller
                 'fecha_ult_cambio_op',
                 'fecha_inicio_op',
                 'predeterminado',
-                'email_facturacion_text'
+                'email_facturacion_text',
+                'nombre_comercial'
             ]);
             $direccionData = $request->input('domicilioFiscal');
             $regimenesData = $request->input('regimenesFiscales');

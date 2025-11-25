@@ -80,6 +80,7 @@ class CheckIdResultDto
         if (!empty($res['curp']) && is_array($res['curp'])) {
             $c = $res['curp'];
             $this->curp = $c['curp'] ?? $this->curp;
+            $this->curp = $this->es_persona_moral ? "" : $this->curp;
             $this->nombre_razon = $this->es_persona_moral
                 ? $this->nombre_razon
                 : ($c['nombres'] ?? $this->nombre_razon ?? '');
