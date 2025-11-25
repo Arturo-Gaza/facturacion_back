@@ -338,7 +338,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $usr = $this->findByEmailOrUser($phone);
 
         if (!$usr)
-             throw new \Exception("Error enviando SMS: no se encontro el usuario" );
+            throw new \Exception("Error enviando SMS: no se encontro el usuario");
         $userPhone = UserPhone::where('user_id', $usr->id)->where('telefono', $phone)->first();
         $phone = $userPhone->lada . $userPhone->telefono;
 
@@ -539,6 +539,9 @@ class UsuarioRepository implements UsuarioRepositoryInterface
             //  $usr = User::where('email', $email)->first();
             $usrHijo->id_estatus_usuario = 3;
             $usrHijo->save();
+
+            $this->disminuirPerfilesRealizados($usrPadre->id);
+
             return "Usuario inhabilitado correctamente";
         }
         throw new Exception('Error inesperado', 409);
@@ -1212,6 +1215,48 @@ class UsuarioRepository implements UsuarioRepositoryInterface
 
             // Incrementar perfiles_utilizados
             $suscripcion->perfiles_utilizados = ($suscripcion->perfiles_utilizados ?? 0) + $cantidad;
+
+            $suscripcion->save();
+
+            DB::commit();
+            return true;
+        } catch (Exception $e) {
+            DB::rollBack();
+            // Log::error($e->getMessage());
+            return false;
+        }
+    }
+    public function disminuirPerfilesRealizados($id_user, int $cantidad = 1)
+    {
+        // Asegurar cantidad mínima
+        $cantidad = max(1, $cantidad);
+
+        // Buscar al usuario
+        $user = User::find($id_user);
+        if (!$user) {
+            return false; // Usuario no encontrado
+        }
+
+        // Determinar usuario efectivo (padre si existe)
+        $efectivoUsuario = $user->usuario_padre
+            ? User::find($user->usuario_padre) ?? $user
+            : $user;
+
+        // Buscar suscripción activa o la más reciente
+        $suscripcion = $efectivoUsuario->suscripcionActiva
+            ?? Suscripciones::where('usuario_id', $efectivoUsuario->id)
+            ->latest()
+            ->first();
+
+        if (!$suscripcion) {
+            return false; // No hay suscripción
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Incrementar perfiles_utilizados
+            $suscripcion->perfiles_utilizados = ($suscripcion->perfiles_utilizados ?? 0) - $cantidad;
 
             $suscripcion->save();
 

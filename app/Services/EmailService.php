@@ -302,7 +302,7 @@ class EmailService
         $datosMail = [
             'email' => $email,
             'password_temporal' => $password,
-            'url_login' => 'https://tudominio.com/login'
+            'url_login' => env("APP_URL")
         ];
 
 
@@ -323,7 +323,7 @@ class EmailService
         $datosMail = [
             'email' => $email,
             'password_temporal' => $password,
-            'url_login' => 'https://tudominio.com/login'
+            'url_login' => env("APP_URL")
         ];
 
 
