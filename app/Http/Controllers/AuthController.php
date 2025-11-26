@@ -37,14 +37,24 @@ class AuthController extends Controller
     {
         $this->userRepo = $userRepo;
     }
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
     {
+        $transactionKey = request('transaction_key');
+    
+    // 2. Guardarla en la sesión de Laravel temporalmente
+    if ($transactionKey) {
+        session(['google_auth_key' => $transactionKey]);
+    }
        return Socialite::driver('google')->stateless()->redirect();
     }
 
     public function handleGoogleCallback()
     {
         try {
+            $transactionKey = session('google_auth_key');
+        
+        // 2. Limpiar la sesión inmediatamente
+        session()->forget('google_auth_key');
             session()->forget('google_token');
             $googleUser = Socialite::driver('google')->stateless()->user();
 
@@ -95,15 +105,21 @@ class AuthController extends Controller
                 return ApiResponseHelper::rollback($ex);
             }
             $userProfile = UserProfileDTO::fromUserModel($user);
-            return view('google-callback', [
-                'user' => $userresponse,
+           // Generar el contenido HTML del blade
+            $viewContent = view('google-callback', [
+                
                 'token' => $token,
                 'tokenGoogle' => $tokenGoogle,
                 'name' => $nameParts[0] ?? '',
                 'primer_apellido' => $nameParts[1] ?? null,
                 'segundo_apellido' => $nameParts[2] ?? null,
-                'user' => $userProfile
-            ]);
+                'user' => $userProfile,
+                'transactionKey' => $transactionKey
+            ])->render();
+            
+            // Retornar la respuesta con el encabezado COOP
+           return response($viewContent)
+    ->header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
         } catch (\Throwable $e) {
             dd('stateless failed', $e->getMessage(), $e->getTraceAsString());
         } catch (\Exception $e) {

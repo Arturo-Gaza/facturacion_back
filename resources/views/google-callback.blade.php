@@ -5,11 +5,12 @@
 </head>
 <body>
     <script>
-
-        // Extraer el origin de la URL
+        // 1. Extraer la clave de transacción
+        debugger
         const urlParams = new URLSearchParams(window.location.search);
-        const targetOrigin = urlParams.get('origin') || '*';
+        const transactionKey = "{{ $transactionKey ?? null }}";
         
+        // El payload sigue siendo el mismo
         const payload = {
             type: "google-auth-success",
             status: true,
@@ -17,42 +18,26 @@
             token: "{{ $token }}",
             tokenGoogle: "{{ $tokenGoogle }}"
         };
+   
 
-
-        if (window.opener) {
+        if (transactionKey && window.localStorage) {
             try {
-                window.opener.postMessage(payload, targetOrigin);
+                // 2. Guardar el payload en localStorage usando la clave
+                window.localStorage.setItem(transactionKey, JSON.stringify(payload));
+                
+                // 3. Cerrar la ventana para activar el listener del opener
+                window.close();
+
             } catch (error) {
-                console.error("Error enviando mensaje:", error);
-                
-                // Fallback: intentar con origen específico
-                const fallbackOrigins = [
-                    targetOrigin,
-                    window.location.origin,
-                    "http://localhost:5173",
-                    "http://127.0.0.1:5173",
-                    "*"
-                ];
-                
-                for (const origin of fallbackOrigins) {
-                    try {
-                        window.opener.postMessage(payload, origin);
-                        break;
-                    } catch (e) {
-                        console.warn("Fallback failed for origin:", origin);
-                    }
-                }
+                console.error("Error guardando payload en localStorage:", error);
+                alert("Error de comunicación segura. Por favor intenta nuevamente.");
             }
         } else {
-            console.error("No hay opener disponible");
-            alert("Error: No se puede comunicar con la ventana principal. Por favor cierra esta ventana e intenta nuevamente.");
+            console.error("No se encontró clave de transacción o localStorage no disponible");
+            console.error(transactionKey);
+            alert("Error: Fallo en la configuración de seguridad. Por favor cierra esta ventana e intenta nuevamente.");
         }
 
-        // Cerrar después de un tiempo
-        setTimeout(() => {
-            console.log("Cerrando ventana...");
-            window.close();
-        }, 1000);
     </script>
 </body>
 </html>
