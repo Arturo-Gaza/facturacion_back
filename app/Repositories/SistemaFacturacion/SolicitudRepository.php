@@ -672,7 +672,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             error_log("Error al decodificar JSON o el campo 'todos_datos' no existe.");
             return null;
         }
-        $todosDatos = $data['todos_datos'];
+        $todosDatos = $data;
 
 
         $datosLimpios = array_filter($todosDatos, function ($value) {
