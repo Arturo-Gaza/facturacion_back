@@ -104,7 +104,7 @@ class CheckIdResultDto
             // No tenemos colonia/calley demas, el servicio CheckID solo devuelve CP en tu ejemplo.
             // Puedes obtener mas datos si tienes un lookup de CP -> colonia/estado/municipio
             // Por ahora intentamos mapear entidad si viene en curp
-            $this->domicilioFiscal['estado'] = $res['curp']['entidad'] ?? $this->domicilioFiscal['estado'];
+            $this->domicilioFiscal['estado'] =null;
         }
 
         // regimenFiscal -> regimenesFiscales

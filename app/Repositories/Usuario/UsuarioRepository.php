@@ -1337,7 +1337,7 @@ class UsuarioRepository implements UsuarioRepositoryInterface
         $existingPhone = UserPhone::where('telefono', $tel)->first();
         if ($existingPhone) {
             if ($existingPhone->verificado) {
-                throw new \Exception('Usuario existente ', 409);
+                throw new \Exception('El teléfono ingresado ya existe en el sistema.', 409);
             } else {
                 // Eliminar usuario completo
                 $userToDelete = User::where('id_telefono_principal', $existingPhone->id)
