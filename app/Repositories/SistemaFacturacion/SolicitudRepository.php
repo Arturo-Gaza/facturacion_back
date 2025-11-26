@@ -662,6 +662,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         ];
     }
 
+    
     public function getTodosDatos($id)
     {
         $sol = Solicitud::find($id);
