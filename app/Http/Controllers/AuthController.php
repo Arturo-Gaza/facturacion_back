@@ -198,28 +198,12 @@ class AuthController extends Controller
             $this->userRepo->loginActive($user->id);
 
             DB::commit();
-
             // 6. Devolver respuesta JSON para mobile
-            return response()->json([
-                'success' => true,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'avatar' => $user->avatar,
-                    'google_id' => $user->google_id
-                ],
-                'token' => $token,
-                'message' => $user->wasRecentlyCreated ? 'Usuario registrado' : 'Login exitoso'
-            ]);
+            return ApiResponseHelper::sendResponse($user, $user->wasRecentlyCreated ? 'Usuario registrado' : 'Login exitoso', 201, $token);
         } catch (\Throwable $e) {
             DB::rollBack();
             Log::error('Error Mobile Google Auth: ' . $e->getMessage());
-
-            return response()->json([
-                'error' => 'Error en autenticación móvil',
-                'message' => $e->getMessage()
-            ], 500);
+            return ApiResponseHelper::throw(null, $e->getMessage(), 500);
         }
     }
 
