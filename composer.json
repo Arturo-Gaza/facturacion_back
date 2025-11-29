@@ -10,6 +10,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "box/spout": "^3.3",
         "darkaonline/l5-swagger": "^8.6",
+        "google/apiclient": "^2.18",
         "intervention/image": "^3.11",
         "laravel/fortify": "^1.31",
         "laravel/framework": "^11.9",

@@ -18,6 +18,7 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
 use Exception;
+use Google_Client;
 use Illuminate\Support\Facades\Log;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -40,21 +41,21 @@ class AuthController extends Controller
     public function redirectToGoogle(Request $request)
     {
         $transactionKey = request('transaction_key');
-    
-    // 2. Guardarla en la sesión de Laravel temporalmente
-    if ($transactionKey) {
-        session(['google_auth_key' => $transactionKey]);
-    }
-       return Socialite::driver('google')->stateless()->redirect();
+
+        // 2. Guardarla en la sesión de Laravel temporalmente
+        if ($transactionKey) {
+            session(['google_auth_key' => $transactionKey]);
+        }
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
     public function handleGoogleCallback()
     {
         try {
             $transactionKey = session('google_auth_key');
-        
-        // 2. Limpiar la sesión inmediatamente
-        session()->forget('google_auth_key');
+
+            // 2. Limpiar la sesión inmediatamente
+            session()->forget('google_auth_key');
             session()->forget('google_token');
             $googleUser = Socialite::driver('google')->stateless()->user();
 
@@ -105,9 +106,9 @@ class AuthController extends Controller
                 return ApiResponseHelper::rollback($ex);
             }
             $userProfile = UserProfileDTO::fromUserModel($user);
-           // Generar el contenido HTML del blade
+            // Generar el contenido HTML del blade
             $viewContent = view('google-callback', [
-                
+
                 'token' => $token,
                 'tokenGoogle' => $tokenGoogle,
                 'name' => $nameParts[0] ?? '',
@@ -116,10 +117,10 @@ class AuthController extends Controller
                 'user' => $userProfile,
                 'transactionKey' => $transactionKey
             ])->render();
-            
+
             // Retornar la respuesta con el encabezado COOP
-           return response($viewContent)
-    ->header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+            return response($viewContent)
+                ->header('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
         } catch (\Throwable $e) {
             dd('stateless failed', $e->getMessage(), $e->getTraceAsString());
         } catch (\Exception $e) {
@@ -130,6 +131,98 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    // En tu AuthController o nuevo controller
+    public function mobileGoogleAuth(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Validar que viene el token
+            $request->validate([
+                'idToken' => 'required|string'
+            ]);
+
+            $idToken = $request->idToken;
+
+            // 2. Verificar el token con Google
+            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $payload = $client->verifyIdToken($idToken);
+
+            if (!$payload) {
+                return response()->json([
+                    'error' => 'Token inválido'
+                ], 401);
+            }
+
+            // 3. Extraer datos del usuario (VERIFICADOS por Google)
+            $googleId = $payload['sub'];
+            $email = $payload['email'];
+            $name = $payload['name'];
+            $avatar = $payload['picture'] ?? null;
+            $emailVerified = $payload['email_verified'] ?? false;
+
+            // 4. Buscar o crear usuario (usa tu lógica existente)
+            $user = $this->userRepo->findByEmailOrUser($email);
+
+            if ($user) {
+                $user->update([
+                    'google_id' => $googleId,
+                    'avatar' => $avatar,
+                    'intentos' => 0,
+                    'login_activo' => true,
+                ]);
+            } else {
+                // Crear el usuario (similar a tu lógica actual)
+                $user = User::create([
+                    'google_id' => $googleId,
+                    'avatar' => $avatar,
+                    'password' => null,
+                    'intentos' => 0,
+                    'login_activo' => true,
+                    'idRol' => 2,
+                ]);
+
+                // Crear el registro en user_emails
+                $userEmail = UserEmail::create([
+                    'user_id' => $user->id,
+                    'email' => $email,
+                    'verificado' => $emailVerified,
+                ]);
+
+                $user->update(['id_mail_principal' => $userEmail->id]);
+            }
+
+            // 5. Generar tokens para tu app
+            $token = $user->createToken('mobile-app')->plainTextToken;
+            $this->userRepo->loginActive($user->id);
+
+            DB::commit();
+
+            // 6. Devolver respuesta JSON para mobile
+            return response()->json([
+                'success' => true,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'avatar' => $user->avatar,
+                    'google_id' => $user->google_id
+                ],
+                'token' => $token,
+                'message' => $user->wasRecentlyCreated ? 'Usuario registrado' : 'Login exitoso'
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('Error Mobile Google Auth: ' . $e->getMessage());
+
+            return response()->json([
+                'error' => 'Error en autenticación móvil',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * @OA\Post(
      *     path="/api/auth/register",
