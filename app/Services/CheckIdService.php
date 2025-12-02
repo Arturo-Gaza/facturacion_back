@@ -32,7 +32,7 @@ class CheckIdService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])
-        ->timeout(200)
+        //->timeout(200)
         ->post($this->baseUrl, $payload);
 
         // Opcional: lanzar excepción si falla
