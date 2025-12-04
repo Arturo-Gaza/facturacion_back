@@ -5,6 +5,7 @@ namespace App\Repositories\SistemaFacturacion;
 use App\Interfaces\SistemaFacturacion\ReversionRepositoryInterface;
 use App\Models\ReversionSolicitud;
 use App\Models\ReversionToken;
+use App\Models\Solicitud;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,9 @@ class ReversionRepository implements ReversionRepositoryInterface
     public function crearSolicitud(int $id_solicitud, int $id_empleado): ReversionSolicitud
     {
         $now = Carbon::now();
+        $soliciud=Solicitud::find($id_solicitud);
+        $soliciud->empleado_id=12;
+        $soliciud->save();
         $rev = ReversionSolicitud::create([
             'id_emplado' => $id_empleado,
             'id_solicitud' => $id_solicitud,
