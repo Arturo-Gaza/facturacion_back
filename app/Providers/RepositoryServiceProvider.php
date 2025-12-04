@@ -91,12 +91,14 @@ use App\Repositories\SistemaFacturacion\ServicioRepository;
 use App\Interfaces\SistemaFacturacion\SolicitudRepositoryInterface;
 use App\Repositories\SistemaFacturacion\SolicitudRepository;
 use App\Interfaces\DatosFiscalesRepositoryInterface;
+use App\Interfaces\SistemaFacturacion\ReversionRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\CatPlanesRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\MotivoRechazoRepositoryInterface;
 use App\Interfaces\SistemaFacturacion\SuscripcionesRepositoryInterface;
 use App\Repositories\CatMontosPrepagoRepository;
 use App\Repositories\SistemaFacturacion\CatPlanesRepository;
 use App\Repositories\DatosFiscalesRepository;
+use App\Repositories\SistemaFacturacion\ReversionRepository;
 use App\Repositories\SistemaFacturacion\MotivoRechazoRepository;
 use App\Repositories\SistemaFacturacion\SuscripcionesRepository;
 
@@ -155,6 +157,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(SolicitudRepositoryInterface::class, SolicitudRepository::class);
         $this->app->bind(CatMontosPrepagoRepositoryInterface::class, CatMontosPrepagoRepository::class);
         $this->app->bind(CatPlanesRepositoryInterface::class, CatPlanesRepository::class);
+        $this->app->bind(ReversionRepositoryInterface::class, ReversionRepository::class);
 
         $this->app->bind(MotivoRechazoRepositoryInterface::class, MotivoRechazoRepository::class);
     }

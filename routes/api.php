@@ -45,6 +45,7 @@ use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\DatosFiscalesController;
 use App\Http\Controllers\MotivoRechazoController;
+use App\Http\Controllers\ReversionController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\SuscripcionController;
@@ -322,6 +323,21 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('solicitud/getGeneralByUsuario', [SolicitudController::class, 'getGeneralByUsuario']);
     Route::post('solicitud/getByUsuario', [SolicitudController::class, 'getByUsuario']);
     Route::post('datosFiscales/eliminarReceptor/{id}', [DatosFiscalesController::class, 'eliminarReceptor']);
+
+    Route::post('solicitud/concluir', [SolicitudController::class, 'concluir']);
+
+    // 1.1 Crear solicitud de reversión (Mesa de Ayuda)
+Route::post('reversion/solicitar', [ReversionController::class, 'solicitar']);
+
+// 1.3 Usar token para ejecutar la reversión (Mesa de Ayuda)
+Route::post('reversion/usar-token', [ReversionController::class, 'usarToken']);
+
+// 2.2 Generar token (Administrador)
+Route::post('reversion/generar-token', [ReversionController::class, 'generarToken']);
+
+// 2.3 Rechazar solicitud (Administrador)
+Route::post('reversion/rechazar', [ReversionController::class, 'rechazar']);
+
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
