@@ -17,7 +17,7 @@ class ReversionRepository implements ReversionRepositoryInterface
     {
         $now = Carbon::now();
         $soliciud=Solicitud::find($id_solicitud);
-        $soliciud->empleado_id=12;
+        $soliciud->estado_id=12;
         $soliciud->save();
         $rev = ReversionSolicitud::create([
             'id_emplado' => $id_empleado,
