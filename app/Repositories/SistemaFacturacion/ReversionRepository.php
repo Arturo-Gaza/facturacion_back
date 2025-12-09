@@ -32,9 +32,10 @@ class ReversionRepository implements ReversionRepositoryInterface
         return $rev;
     }
 
-    public function generarToken(int $reversionId, int $adminId, int $ttlMinutes = 5): string
+    public function generarToken(int $id_solicitud, int $adminId, int $ttlMinutes = 5): string
     {
-        $rev = $this->getById($reversionId);
+        
+         $rev=ReversionSolicitud::where('id_solicitud',$id_solicitud);
         if (!$rev) {
             throw new Exception('Solicitud no encontrada');
         }
