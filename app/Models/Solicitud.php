@@ -37,7 +37,7 @@ class Solicitud extends Model
         'url_facturacion',
         'fecha_ticket',
         'id_empresa'
-        
+
     ];
     protected $appends = [
         'clave'
@@ -186,12 +186,18 @@ class Solicitud extends Model
     /**
      * Eliminar imagen asociada
      */
-    public function eliminarPDF(): void
+    public function eliminarPDF(): ?string
     {
-        if ($this->pdf_url && Storage::exists($this->getRawOriginal('pdf_url'))) {
-            Storage::delete($this->getRawOriginal('pdf_url'));
+        $ruta = $this->getRawOriginal('pdf_url');
+
+        if ($ruta && Storage::exists($ruta)) {
+            Storage::delete($ruta);
+            return $ruta; // ← Regresa la ruta del PDF eliminado
         }
+
+        return null; // ← Si no existía o no se pudo eliminar
     }
+
 
     public function guardarXML(UploadedFile $archivo, $usuarioId, string $carpeta = 'xml'): string
     {
@@ -245,11 +251,16 @@ class Solicitud extends Model
     /**
      * Eliminar imagen asociada
      */
-    public function eliminarXML(): void
+    public function eliminarXML(): ?string
     {
-        if ($this->xml_url && Storage::exists($this->getRawOriginal('xml_url'))) {
-            Storage::delete($this->getRawOriginal('xml_url'));
+        $ruta = $this->getRawOriginal('xml_url');
+
+        if ($ruta && Storage::exists($ruta)) {
+            Storage::delete($ruta);
+            return $ruta; // ← Regresa la ruta del archivo eliminado
         }
+
+        return null; // ← Si no existía o no se eliminó
     }
 
     /**

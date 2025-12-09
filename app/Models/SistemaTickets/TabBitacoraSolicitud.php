@@ -17,6 +17,8 @@ class TabBitacoraSolicitud extends Model
         'id_solicitud',
         'id_estatus',
         'id_usuario',
+        'pdf_url_anterior' ,
+        'xml_url_anterior' 
     ];
 
     public function usuario()
@@ -44,7 +46,4 @@ class TabBitacoraSolicitud extends Model
     {
         return optional($this->usuario)->user;
     }
-
-
-
 }

@@ -662,7 +662,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         ];
     }
 
-    
+
     public function getTodosDatos($id)
     {
         $sol = Solicitud::find($id);
@@ -785,9 +785,9 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $solicitud->estado_id = 9; // Estado por defecto
         $solicitud->save();
         $id_user = $solicitud->usuario_id;
-         $id_receptor = $solicitud->id_receptor;
+        $id_receptor = $solicitud->id_receptor;
         $user = User::find($id_user);
-        $receptor=DatosFiscal::find($id_receptor);
+        $receptor = DatosFiscal::find($id_receptor);
         if ($user) {
             $email = $user->mailPrincipal->email;
         }
@@ -820,13 +820,13 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
             $datosMail = [
                 'email' => $email,
-                'nombre'=>$user->nombre,
-                'ticket'=>$solicitud ->num_ticket,
-                'fecha_ticket'=>$solicitud ->fecha_ticket,
-                'establecimiento'=>$solicitud ->establecimiento,
-                'total'=>$solicitud->monto,
-                'rfc_receptor'=>$receptor->rfc,
-                'nombre_receptor'=>$receptor->nombre_razon
+                'nombre' => $user->nombre,
+                'ticket' => $solicitud->num_ticket,
+                'fecha_ticket' => $solicitud->fecha_ticket,
+                'establecimiento' => $solicitud->establecimiento,
+                'total' => $solicitud->monto,
+                'rfc_receptor' => $receptor->rfc,
+                'nombre_receptor' => $receptor->nombre_razon
             ];
             $this->emailService->enviarCorreoFac($datosMail, $archivos);
         }
@@ -1244,6 +1244,39 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $sol->save();
         return $sol;
     }
+
+    public function reemplazarFactura($idUsr, $pdf, $xml, $id_solicitud)
+    {
+        $status = 9;
+        $sol = Solicitud::findOrFail($id_solicitud);
+
+        // Eliminar y guardar nuevo PDF
+        $rutaPdfAnterior = $sol->eliminarPDF();
+        $rutaPdf = $sol->guardarPDF($pdf, $idUsr);
+        $sol->pdf_url = $rutaPdf;
+
+        // Eliminar y guardar nuevo XML
+        $rutaXMLAnterior = $sol->eliminarXML();
+        $rutaXML = $sol->guardarXML($xml, $idUsr);
+        $sol->xml_url = $rutaXML;
+
+        // Actualizar estatus
+        $sol->estado_id = $status;
+
+        // Crear bitácora
+        TabBitacoraSolicitud::create([
+            'id_solicitud' => $id_solicitud,
+            'id_estatus' => $status,
+            'id_usuario' => $idUsr,
+            'pdf_url_anterior' => $rutaPdfAnterior,
+            'xml_url_anterior' => $rutaXMLAnterior,
+        ]);
+
+        $sol->save();
+
+        return $sol;
+    }
+
 
     public function getConsola($idUsr)
     {

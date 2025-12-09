@@ -13,6 +13,7 @@ interface SolicitudRepositoryInterface
   public function getFacturaXML($id);
   public function getConsola($idUsr);
   public function subirFactura($idUsr, $pdf, $xml, $id_solicitud);
+  public function reemplazarFactura($idUsr, $pdf, $xml, $id_solicitud);
   public function getMesaAyuda();
   public function getDashboard($fecha_inicio,$fecha_fin,$id);
     public function concluir($id_usuario,$id_solicitud);

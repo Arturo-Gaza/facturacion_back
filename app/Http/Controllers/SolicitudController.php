@@ -94,6 +94,29 @@ class SolicitudController extends Controller
         }
     }
 
+        public function reemplazarFactura(Request $request)
+    {
+        try {
+            $idUsr = auth()->user()->id;
+            $request->validate([
+                'id_solicitud' => 'required|integer'
+            ]);
+
+            $id_solicitud = $request->input('id_solicitud');
+
+            if ($request->hasFile('pdf')) {
+                $pdf = $request->file('pdf');
+            }
+            if ($request->hasFile('xml')) {
+                $xml = $request->file('xml');
+            }
+            $all = $this->solicitudRepository->subirFactura($idUsr, $pdf, $xml, $id_solicitud);
+            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
+
     public function getMesaAyuda()
     {
         try {

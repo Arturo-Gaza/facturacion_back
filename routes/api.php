@@ -290,6 +290,8 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('solicitud/subirFactura', [SolicitudController::class, 'subirFactura']);
 
+    Route::post('solicitud/reemplazarFactura', [SolicitudController::class, 'subirFacturaOtraVezPorqueElPendejoSeEquivoco']);
+
     Route::post('solicitud/concluir', [SolicitudController::class, 'concluir']);
 
     Route::post('solicitud/revertir', [SolicitudController::class, 'revertir']);
@@ -327,17 +329,16 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
     Route::post('solicitud/concluir', [SolicitudController::class, 'concluir']);
 
     // 1.1 Crear solicitud de reversión (Mesa de Ayuda)
-Route::post('reversion/solicitar', [ReversionController::class, 'solicitar']);
+    Route::post('reversion/solicitar', [ReversionController::class, 'solicitar']);
 
-// 1.3 Usar token para ejecutar la reversión (Mesa de Ayuda)
-Route::post('reversion/usar-token', [ReversionController::class, 'usarToken']);
+    // 1.3 Usar token para ejecutar la reversión (Mesa de Ayuda)
+    Route::post('reversion/usar-token', [ReversionController::class, 'usarToken']);
 
-// 2.2 Generar token (Administrador)
-Route::post('reversion/generar-token', [ReversionController::class, 'generarToken']);
+    // 2.2 Generar token (Administrador)
+    Route::post('reversion/generar-token', [ReversionController::class, 'generarToken']);
 
-// 2.3 Rechazar solicitud (Administrador)
-Route::post('reversion/rechazar', [ReversionController::class, 'rechazar']);
-
+    // 2.3 Rechazar solicitud (Administrador)
+    Route::post('reversion/rechazar', [ReversionController::class, 'rechazar']);
 });
 Route::post('stripeWebhook/handle', [StripeWebhookController::class, 'handle']);
 Route::post('stripe/crearPagoByPrepago', [StripeController::class, 'crearPagoByPrepago']);
