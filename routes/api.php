@@ -290,7 +290,7 @@ Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class]
 
     Route::post('solicitud/subirFactura', [SolicitudController::class, 'subirFactura']);
 
-    Route::post('solicitud/reemplazarFactura', [SolicitudController::class, 'subirFacturaOtraVezPorqueElPendejoSeEquivoco']);
+    Route::post('solicitud/reemplazarFactura', [SolicitudController::class, 'reemplazarFactura']);
 
     Route::post('solicitud/concluir', [SolicitudController::class, 'concluir']);
 
