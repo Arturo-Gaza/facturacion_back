@@ -67,9 +67,10 @@ class ReversionRepository implements ReversionRepositoryInterface
         return $tokenPlain;
     }
 
-    public function validarYUsarToken(int $reversionId, string $tokenPlain, int $operadorId): array
+    public function validarYUsarToken(int $id_solicitud, string $tokenPlain, int $operadorId): array
     {
-        $rev = $this->getById($reversionId);
+       $rev=ReversionSolicitud::where('id_solicitud',$id_solicitud)->first();
+       $reversionId=$rev->id;
         if (!$rev) {
             return ['exito' => false, 'detalle' => 'Solicitud no encontrada'];
         }
