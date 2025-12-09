@@ -88,7 +88,7 @@ class SolicitudController extends Controller
                 $xml = $request->file('xml');
             }
             $all = $this->solicitudRepository->subirFactura($idUsr, $pdf, $xml, $id_solicitud);
-            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+            return ApiResponseHelper::sendResponse($all, 'Los archivos fueron actualizados exitosamente.', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
