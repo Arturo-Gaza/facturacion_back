@@ -50,7 +50,7 @@ class ReversionRepository implements ReversionRepositoryInterface
         $now = Carbon::now();
 
         $token = ReversionToken::create([
-            'reversion_id' => $reversionId,
+            'reversion_id' => $rev->id,
             'token' => $tokenHash,
             'created_at' => $now,
             'created_por_admin' => $adminId,
@@ -62,7 +62,7 @@ class ReversionRepository implements ReversionRepositoryInterface
         $rev->updated_at = $now;
         $rev->save();
 
-        $this->auditar($reversionId, 'TOKEN_GENERADO', ['admin' => $adminId], $adminId);
+        $this->auditar($id_solicitud, 'TOKEN_GENERADO', ['admin' => $adminId], $adminId);
 
         return $tokenPlain;
     }
