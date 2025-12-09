@@ -111,7 +111,7 @@ class SolicitudController extends Controller
                 $xml = $request->file('xml');
             }
             $all = $this->solicitudRepository->subirFactura($idUsr, $pdf, $xml, $id_solicitud);
-            return ApiResponseHelper::sendResponse($all, 'Solicitudes obtenidas', 200);
+            return ApiResponseHelper::sendResponse($all, 'Ya no la cagues mi pendejo', 200);
         } catch (Exception $ex) {
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
