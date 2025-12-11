@@ -77,7 +77,7 @@
 <div style="background-color: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; margin: 0 0 24px 0;">
     <h3 style="color: #1f2937; font-size: 18px; font-weight: 600;">👤 Datos del Receptor</h3>
     <div style="margin-top:12px;">
-        <p style="color:#6b7280; margin:0 0 4px 0; font-size:14px;">Nombre / Razón</p>
+        <p style="color:#6b7280; margin:0 0 4px 0; font-size:14px;">Nombre / Razón Social</p>
         <p style="color:#1f2937; font-weight:600;">{{ $datosMail['nombre_receptor'] ?? 'N/A' }}</p>
 
         <p style="color:#6b7280; margin:12px 0 4px 0; font-size:14px;">RFC</p>

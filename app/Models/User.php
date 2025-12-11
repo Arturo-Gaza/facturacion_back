@@ -145,12 +145,13 @@ public function padre()
 
     public function getApellidoPaternoAttribute()
     {
-        return optional($this->datosFiscalesPersonal)->apellido_paterno;
+        $ap= optional($this->datosFiscalesPersonal)->primer_apellido;
+        return $ap;
     }
 
     public function getApellidoMaternoAttribute()
     {
-        return optional($this->datosFiscalesPersonal)->apellido_materno;
+        return optional($this->datosFiscalesPersonal)->segundo_apellido;
     }
 
     public function emails()

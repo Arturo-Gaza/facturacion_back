@@ -73,6 +73,22 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $solicitud->delete();
             throw new Exception($motivo_rechazo->detalle);
         } else {
+
+            $numTicket = $datosExtraidos['num_ticket'] ?? null;
+            $monto     = $datosExtraidos['monto'] ?? null;
+            $fecha     = $datosExtraidos['fecha'] ?? null;
+            $rfc       = $datosExtraidos['rfc'] ?? null;
+            $nombreEmpresa       = $datosExtraidos['nombre_empresa'] ?? null;
+            $establecimiento     = $datosExtraidos['establecimiento'] ?? null;
+
+            $comercioEncontrado = $rfc || $nombreEmpresa || $establecimiento;
+
+            if (!$numTicket || !$monto || !$fecha || !$comercioEncontrado) {
+                throw new \Exception(
+                    "No se pudieron extraer los datos mínimos para procesar el ticket (número de ticket, monto, fecha y RFC del establecimiento)."
+                );
+            }
+
             if ($datosExtraidos["fecha"] && env("APLICA_VIGENCIA")) {
                 $fechaTicket = Carbon::parse($datosExtraidos["fecha"]);
                 $mesTicket = $fechaTicket->format('Y-m');
@@ -135,7 +151,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         if (!$textoOCR) {
             $report['steps'][] = 'OCR devolvió vacío';
-            return $report;
+            throw new Exception("No se encontro texto en la imagen");
+           
         }
 
         // Preparar catálogos para IA
@@ -165,7 +182,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         // Guardar datos adicionales en su propia transacción (o unificada; elige lo que prefieras)
         $datosAdicionales = $datosExtraidos['datos_facturacion_adicionales'] ?? [];
         $report['datos_adicionales_count'] = count($datosAdicionales);
-
+        $this->validar($datosExtraidos, $solicitud);
+        $report['steps'][] = 'Validación: OK';
         try {
             DB::transaction(function () use ($solicitud, $datosAdicionales, &$report) {
                 foreach ($datosAdicionales as $etiqueta => $valor) {
@@ -826,7 +844,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
                 'establecimiento' => $solicitud->establecimiento,
                 'total' => $solicitud->monto,
                 'rfc_receptor' => $receptor->rfc,
-                'nombre_receptor' => $receptor->nombre_razon
+                'nombre_receptor' => $receptor->nombre_razon . ' ' . $receptor->primer_apellido . ' ' . $receptor->segundo_apellido
             ];
             $this->emailService->enviarCorreoFac($datosMail, $archivos);
         }
