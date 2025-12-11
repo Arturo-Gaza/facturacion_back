@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('reversion_tokens', function (Blueprint $table) {
             $table->id();
 
+            
             // Vinculado a una solicitud
             $table->unsignedBigInteger('reversion_id')->index();
             $table->foreign('reversion_id')

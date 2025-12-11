@@ -8,6 +8,7 @@ class ReversionSolicitud extends Model
 {
     protected $table = 'reversion_solicitudes';
 
+    
     protected $fillable = [
         'id_emplado',
         'id_solicitud',

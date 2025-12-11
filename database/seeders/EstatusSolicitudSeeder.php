@@ -13,6 +13,7 @@ class EstatusSolicitudSeeder extends Seeder
      */
     public function run(): void
     {
+        
         $estatusData = [
             [
                 'descripcion_estatus_solicitud' => 'Cargado',

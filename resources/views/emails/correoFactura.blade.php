@@ -21,6 +21,7 @@
             <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 16px; font-weight: 500;">Factura recuperada exitosamente</p>
         </div>
 
+        
         <!-- Content -->
         <div style="padding: 40px 30px;">
             <!-- Success Alert -->

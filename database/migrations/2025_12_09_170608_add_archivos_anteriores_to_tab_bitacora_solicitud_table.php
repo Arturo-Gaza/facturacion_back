@@ -14,6 +14,7 @@ return new class extends Migration
         });
     }
 
+    
     public function down(): void
     {
         Schema::table('tab_bitacora_solicitud', function (Blueprint $table) {

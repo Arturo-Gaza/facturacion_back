@@ -47,6 +47,7 @@ class Solicitud extends Model
         'estado' => 'string',
     ];
 
+    
     public function usuario(): BelongsTo
     {
         return $this->belongsTo(User::class, 'usuario_id');

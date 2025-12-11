@@ -356,6 +356,8 @@ class SolicitudController extends Controller
             $id_user = auth('sanctum')->id();
             $solicitud = $this->solicitudRepository->store($request, $id_user);
 
+            
+
             DB::commit();
             return ApiResponseHelper::sendResponse($solicitud, 'Solicitud creada correctamente', 201);
         } catch (Exception $ex) {

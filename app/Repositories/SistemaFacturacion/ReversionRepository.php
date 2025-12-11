@@ -69,6 +69,8 @@ class ReversionRepository implements ReversionRepositoryInterface
 
     public function validarYUsarToken(int $id_solicitud, string $tokenPlain, int $operadorId): array
     {
+
+        
        $rev=ReversionSolicitud::where('id_solicitud',$id_solicitud)->first();
        $reversionId=$rev->id;
         if (!$rev) {

@@ -20,6 +20,7 @@ class ReversionToken extends Model
     // PERO no hay updated_at, así que lo desactivamos
     public $timestamps = false;
 
+    
     protected $casts = [
         'created_at' => 'datetime',
         'used_at' => 'datetime',

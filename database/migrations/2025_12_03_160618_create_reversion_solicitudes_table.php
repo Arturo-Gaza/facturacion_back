@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('reversion_solicitudes', function (Blueprint $table) {
             $table->id();
-
             // Quién solicita (mesa de ayuda)
             $table->unsignedBigInteger('id_emplado')->constrained('users');
 

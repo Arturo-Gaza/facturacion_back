@@ -20,4 +20,5 @@ return new class extends Migration
             $table->dropColumn('id_cliente');
         });
     }
+    
 };

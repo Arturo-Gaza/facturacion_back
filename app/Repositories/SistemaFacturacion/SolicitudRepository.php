@@ -73,8 +73,6 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             $solicitud->delete();
             throw new Exception($motivo_rechazo->detalle);
         } else {
-
-            $numTicket = $datosExtraidos['num_ticket'] ?? null;
             $monto     = $datosExtraidos['monto'] ?? null;
             $fecha     = $datosExtraidos['fecha'] ?? null;
             $rfc       = $datosExtraidos['rfc'] ?? null;
@@ -83,7 +81,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
             $comercioEncontrado = $rfc || $nombreEmpresa || $establecimiento;
 
-            if (!$numTicket || !$monto || !$fecha || !$comercioEncontrado) {
+            if (!$monto || !$fecha || !$comercioEncontrado) {
                 throw new \Exception(
                     "No se pudieron extraer los datos mínimos para procesar el ticket (número de ticket, monto, fecha y RFC del establecimiento)."
                 );
@@ -1131,11 +1129,14 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
 
 
+            
 
             // Guardar imagen
             if ($request->hasFile('imagen')) {
                 $rutaImagen = $solicitud->guardarImagen($request->file('imagen'), $id_user);
                 $solicitud->imagen_url = $rutaImagen;
+            }else{
+               throw new Exception("Archivo no valido, debe ser menor a 5MB");
             }
             $solicitud->save();
             $this->procesar($solicitud->id);

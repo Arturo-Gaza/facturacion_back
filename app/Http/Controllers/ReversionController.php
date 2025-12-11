@@ -53,6 +53,7 @@ class ReversionController extends Controller
 
     public function usarToken(Request $request)
     {
+        
         try {
             $userId = auth()->user()->id;
             $request->validate([

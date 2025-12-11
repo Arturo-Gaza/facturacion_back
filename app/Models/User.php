@@ -143,6 +143,7 @@ public function padre()
         return $nombre;
     }
 
+    
     public function getApellidoPaternoAttribute()
     {
         $ap= optional($this->datosFiscalesPersonal)->primer_apellido;

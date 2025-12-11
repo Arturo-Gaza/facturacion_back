@@ -9,6 +9,7 @@ class CatEstatusSolicitudClienteSeeder extends Seeder
 {
     public function run()
     {
+        
         // ----  Definir IDs agrupados  ----
         $procesandoId = 5; // Procesando real
         $concluidoId  = 9; // Concluido real

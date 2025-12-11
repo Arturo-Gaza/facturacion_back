@@ -81,6 +81,7 @@ class CheckIdService
         throw new \Exception("CheckID: formato de respuesta inesperado");
     }
 
+    
     if (!$respuesta['exitoso']) {
         // incluye error recibido si lo hay
         $err = $respuesta['error'] ?? json_encode($respuesta);

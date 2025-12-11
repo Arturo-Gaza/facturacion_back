@@ -109,6 +109,7 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        
         $this->app->bind(UsuarioRepositoryInterface::class, UsuarioRepository::class);
         $this->app->bind(CatRolesRepositoryInterface::class, CatRolesRepository::class);
         $this->app->bind(CatUnidadMedidasRepositoryInterface::class, CatUnidadMedidasRepository::class);

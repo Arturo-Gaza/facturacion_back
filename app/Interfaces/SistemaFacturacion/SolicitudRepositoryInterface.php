@@ -16,8 +16,8 @@ interface SolicitudRepositoryInterface
   public function reemplazarFactura($idUsr, $pdf, $xml, $id_solicitud);
   public function getMesaAyuda();
   public function getDashboard($fecha_inicio,$fecha_fin,$id);
-    public function concluir($id_usuario,$id_solicitud);
-     public function revertir($id_usuario,$id_solicitud);
+ public function concluir($id_usuario,$id_solicitud);
+  public function revertir($id_usuario,$id_solicitud);
     public function mandarFactura($id_solicitud);
   public function getByUsuario($fecha_inicio ,$fecha_fin,int $usuario_id);
   public function procesar(int $id);

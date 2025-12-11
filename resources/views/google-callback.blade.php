@@ -19,7 +19,6 @@
             tokenGoogle: "{{ $tokenGoogle }}"
         };
    
-
         if (transactionKey && window.localStorage) {
             try {
                 // 2. Guardar el payload en localStorage usando la clave

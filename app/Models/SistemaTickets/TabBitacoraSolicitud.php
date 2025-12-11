@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TabBitacoraSolicitud extends Model
 {
+    
     use HasFactory;
     protected $table = 'tab_bitacora_solicitud';
     protected $fillable = [
