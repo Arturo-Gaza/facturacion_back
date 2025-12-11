@@ -438,6 +438,8 @@ Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 
 Route::post('solicitud/rechazar', [SolicitudController::class, 'rechazar']);
+Route::get('solicitud//getMotivoRechazo/{id}', [SolicitudController::class, 'motivoRechazo']);
+
 
 
 Route::get('solicitud/eliminar/{id}', [SolicitudController::class, 'eliminar']);

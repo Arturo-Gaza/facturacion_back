@@ -476,7 +476,33 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         ]);
         return $solicitud->fresh();
     }
+    public function motivoRechazo(int $id)
+    {
+        // Buscar solicitud
+        $solicitud = Solicitud::find($id);
+        if (!$solicitud) {
+            throw new \Exception('Solicitud no encontrada');
+        }
 
+        // Verificar si está rechazada
+        if ($solicitud->estado_id != 7) {
+            throw new \Exception('La solicitud no está rechazada');
+
+        }
+
+        // Buscar observación con motivo de rechazo
+        $observacion = TabObservacionesSolicitudes::where('id_solicitud', $id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$observacion) {
+             throw new \Exception('No se encontró motivo de rechazo registrado');
+
+        }
+
+
+        return $observacion;
+    }
     public function rechazar($id_solicitud, $id_motivo_rechazo, $id_user)
     {
         return DB::transaction(function () use ($id_solicitud, $id_motivo_rechazo, $id_user) {

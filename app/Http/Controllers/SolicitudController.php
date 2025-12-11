@@ -211,6 +211,16 @@ class SolicitudController extends Controller
             return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
         }
     }
+        public function motivoRechazo(int $id)
+    {
+        try {
+           
+            $all = $this->solicitudRepository->motivoRechazo($id);
+            return ApiResponseHelper::sendResponse($all, 'Motivos obtenidos', 200);
+        } catch (Exception $ex) {
+            return ApiResponseHelper::rollback($ex, $ex->getMessage(), 500);
+        }
+    }
 
     public function actualizarEstatus(Request $request)
     {
