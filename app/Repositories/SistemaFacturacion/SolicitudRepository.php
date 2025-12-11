@@ -1455,8 +1455,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->whereNotIn('solicitudes.estado_id', [1, 11]) // ← excluye Cargado y Eliminado
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
-            ->selectRaw('cat_estatus_solicitud.id, cat_estatus_solicitud.descripcion_cliente as estado, COUNT(*) as count')
-            ->groupBy('cat_estatus_solicitud.id', 'cat_estatus_solicitud.descripcion_cliente')
+            ->selectRaw('cat_estatus_solicitud.id_cliente as id, cat_estatus_solicitud.descripcion_cliente as estado, COUNT(*) as count')
+            ->groupBy('cat_estatus_solicitud.id_cliente', 'cat_estatus_solicitud.descripcion_cliente')
             ->get();
 
         $total = $conteos->sum('count');
@@ -1472,19 +1472,19 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         // ---------------------- Parte 2: data_mensual ----------------------
         $queryMensual = Solicitud::selectRaw("
-        EXTRACT(YEAR FROM solicitudes.created_at)::int as anio,
-        EXTRACT(MONTH FROM solicitudes.created_at)::int as mes,
-        solicitudes.estado_id,
-        cat_estatus_solicitud.descripcion_cliente as nombre_estatus,
-        COUNT(*) as total
-    ")
-            ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
+    EXTRACT(YEAR FROM solicitudes.created_at)::int as anio,
+    EXTRACT(MONTH FROM solicitudes.created_at)::int as mes,
+    COALESCE(ce_canon.id, ce.id) as estado_id, -- id canónico (si existe) o el id actual
+    COALESCE(ce_canon.descripcion_cliente, ce.descripcion_cliente) as nombre_estatus, -- descripción canónica si existe
+    COUNT(*) as total
+")
+            ->join('cat_estatus_solicitud as ce', 'ce.id', '=', 'solicitudes.estado_id') // ce = estatus actual
+            ->leftJoin('cat_estatus_solicitud as ce_canon', 'ce.id_cliente', '=', 'ce_canon.id') // ce_canon = estatus canónico
             ->whereIn('solicitudes.usuario_id', $ids)
-            ->whereNotIn('solicitudes.estado_id', [1, 11]) // ← excluye Cargado y Eliminado
+            ->whereNotIn('solicitudes.estado_id', [1, 11])
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
-            ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_cliente')
+            ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), COALESCE(ce_canon.id, ce.id), COALESCE(ce_canon.descripcion_cliente, ce.descripcion_cliente)')
             ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
-
         $resultadosMensuales = $queryMensual->get();
 
         $meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];

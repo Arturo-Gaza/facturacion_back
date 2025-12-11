@@ -8,6 +8,7 @@ use App\Models\CatMotivoRechazo;
 use App\Models\DatosPorGiro;
 use App\Models\SistemaTickets\EstatusSolicitud;
 use App\Models\User;
+use CatEstatusSolicitudClienteSeeder;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -48,7 +49,8 @@ class DatabaseSeeder extends Seeder
             CatEstatusMovimientoSeeder::class,
             PreciosSeeder::class,
             CatMotivoRechazoSeeder::class,
-             CatEmpresasSeeder::class
+             CatEmpresasSeeder::class,
+              CatEstatusSolicitudClienteSeeder::class,
 
         ]);
 

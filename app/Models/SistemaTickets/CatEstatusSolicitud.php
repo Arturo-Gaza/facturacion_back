@@ -12,6 +12,7 @@ class CatEstatusSolicitud extends Model
     protected $fillable = [
         'descripcion_estatus_solicitud',
         'descripcion_cliente',
+         'id_cliente',
         'mandarCorreo',
         'color',
         'color_cliente'
