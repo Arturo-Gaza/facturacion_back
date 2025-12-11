@@ -152,7 +152,6 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         if (!$textoOCR) {
             $report['steps'][] = 'OCR devolvió vacío';
             throw new Exception("No se encontro texto en la imagen");
-           
         }
 
         // Preparar catálogos para IA
@@ -871,8 +870,8 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         $estatus = CatEstatusSolicitud::select('id', 'descripcion_estatus_solicitud')->get();
 
         // Construir consulta base con filtros por rol
-        $query = Solicitud::whereBetween('created_at', [$fecha_inicio, $fecha_fin]);
-
+        $query = Solicitud::whereBetween('created_at', [$fecha_inicio, $fecha_fin])
+            ->whereNotIn('estado_id', [1, 11]);
 
         // Aplicar filtro por rol
         if ($usr->idRol  == 5) {
@@ -911,6 +910,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         cat_estatus_solicitud.descripcion_estatus_solicitud as nombre_estatus,
         COUNT(*) as total")
             ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
+            ->whereNotIn('estado_id', [1, 11])
             ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_estatus_solicitud')
             ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
 
@@ -1453,6 +1453,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
 
         $conteos = Solicitud::whereIn('solicitudes.usuario_id', $ids)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
+            ->whereNotIn('solicitudes.estado_id', [1, 11]) // ← excluye Cargado y Eliminado
             ->join('cat_estatus_solicitud', 'solicitudes.estado_id', '=', 'cat_estatus_solicitud.id')
             ->selectRaw('cat_estatus_solicitud.id, cat_estatus_solicitud.descripcion_cliente as estado, COUNT(*) as count')
             ->groupBy('cat_estatus_solicitud.id', 'cat_estatus_solicitud.descripcion_cliente')
@@ -1479,6 +1480,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     ")
             ->join('cat_estatus_solicitud', 'cat_estatus_solicitud.id', '=', 'solicitudes.estado_id')
             ->whereIn('solicitudes.usuario_id', $ids)
+            ->whereNotIn('solicitudes.estado_id', [1, 11]) // ← excluye Cargado y Eliminado
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])
             ->groupByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at), solicitudes.estado_id, cat_estatus_solicitud.descripcion_cliente')
             ->orderByRaw('EXTRACT(YEAR FROM solicitudes.created_at), EXTRACT(MONTH FROM solicitudes.created_at)');
