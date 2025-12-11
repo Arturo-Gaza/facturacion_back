@@ -124,6 +124,8 @@ Route::post('/checkid/buscar', [CheckIdController::class, 'buscar']);
 
 //Route::post('catProductos/register', [CatProductosController::class, 'store']);
 
+Route::post('/auth/google/mobile', [AuthController::class, 'mobileGoogleAuth']);
+
 Route::middleware(['auth:sanctum', "response.time", AcceptJsonMiddleware::class])->group(function () {
 
     //Cierre de sesión
@@ -438,7 +440,7 @@ Route::get('solicitud/getAll', [SolicitudController::class, 'getAll']);
 Route::get('solicitud/procesar/{id}', [SolicitudController::class, 'procesar']);
 
 Route::post('solicitud/rechazar', [SolicitudController::class, 'rechazar']);
-Route::get('solicitud//getMotivoRechazo/{id}', [SolicitudController::class, 'motivoRechazo']);
+Route::get('solicitud/getMotivoRechazo/{id}', [SolicitudController::class, 'motivoRechazo']);
 
 
 
