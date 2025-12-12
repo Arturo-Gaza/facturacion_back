@@ -485,7 +485,6 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         // Verificar si está rechazada
         if ($solicitud->estado_id != 7) {
             throw new \Exception('La solicitud no está rechazada');
-
         }
 
         // Buscar observación con motivo de rechazo
@@ -494,8 +493,7 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             ->first();
 
         if (!$observacion) {
-             throw new \Exception('No se encontró motivo de rechazo registrado');
-
+            throw new \Exception('No se encontró motivo de rechazo registrado');
         }
 
 
@@ -882,12 +880,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
     {
         $usr = User::find($idUsr);
         $fecha_inicio = $fecha_inicio
-            ? Carbon::parse($fecha_inicio)
-            : now()->subDays(30);
+            ? Carbon::parse($fecha_inicio)->startOfDay()
+            : now()->subDays(30)->startOfDay();
 
         $fecha_fin = $fecha_fin
-            ? Carbon::parse($fecha_fin)
-            : now();
+            ? Carbon::parse($fecha_fin)->endOfDay()
+            : now()->endOfDay();
 
 
         // Obtener todos los estatus del catálogo
@@ -1129,14 +1127,14 @@ class SolicitudRepository implements SolicitudRepositoryInterface
             }
 
 
-            
+
 
             // Guardar imagen
             if ($request->hasFile('imagen')) {
                 $rutaImagen = $solicitud->guardarImagen($request->file('imagen'), $id_user);
                 $solicitud->imagen_url = $rutaImagen;
-            }else{
-               throw new Exception("Archivo no valido, debe ser menor a 5MB");
+            } else {
+                throw new Exception("Archivo no valido, debe ser menor a 5MB");
             }
             $solicitud->save();
             $this->procesar($solicitud->id);
@@ -1471,12 +1469,12 @@ class SolicitudRepository implements SolicitudRepositoryInterface
         }
 
         $fecha_inicio = $fecha_inicio
-            ? Carbon::parse($fecha_inicio)
-            : now()->subDays(30);
+            ? Carbon::parse($fecha_inicio)->startOfDay()
+            : now()->subDays(30)->startOfDay();
 
         $fecha_fin = $fecha_fin
-            ? Carbon::parse($fecha_fin)
-            : now();
+            ? Carbon::parse($fecha_fin)->endOfDay()
+            : now()->endOfDay();
 
         $conteos = Solicitud::whereIn('solicitudes.usuario_id', $ids)
             ->whereBetween('solicitudes.created_at', [$fecha_inicio, $fecha_fin])

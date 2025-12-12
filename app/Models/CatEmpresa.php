@@ -47,11 +47,11 @@ class CatEmpresa extends Model
     public function scopeBuscar($query, $search)
     {
         return $query->where('rfc', 'LIKE', "%{$search}%")
-                    ->orWhere('nombre_empresa', 'LIKE', "%{$search}%")
-                    ->orWhere('pagina_web', 'LIKE', "%{$search}%")
-                    ->orWhereHas('giro', function($q) use ($search) {
-                        $q->where('nombre', 'LIKE', "%{$search}%");
-                    });
+            ->orWhere('nombre_empresa', 'LIKE', "%{$search}%")
+            ->orWhere('pagina_web', 'LIKE', "%{$search}%")
+            ->orWhereHas('giro', function ($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%");
+            });
     }
 
     /**
@@ -67,7 +67,7 @@ class CatEmpresa extends Model
      */
     public function setRfcAttribute($value)
     {
-        $this->attributes['rfc'] = strtoupper(trim($value));
+        $this->attributes['rfc'] = $value ? strtoupper(trim($value)) : null;
     }
 
     /**
