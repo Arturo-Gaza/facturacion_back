@@ -50,7 +50,7 @@ class AuthController extends Controller
     }
 
 
-    
+
     public function handleGoogleCallback()
     {
         try {
@@ -148,7 +148,7 @@ class AuthController extends Controller
             $idToken = $request->idToken;
 
             // 2. Verificar el token con Google
-            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+            $client = new Google_Client(['client_id' => env('GOOGLE_CLIENT_ID_ANDROID')]);
             $payload = $client->verifyIdToken($idToken);
 
             if (!$payload) {
