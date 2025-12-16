@@ -49,8 +49,6 @@ class AuthController extends Controller
         return Socialite::driver('google')->stateless()->redirect();
     }
 
-
-
     public function handleGoogleCallback()
     {
         try {
@@ -200,6 +198,16 @@ class AuthController extends Controller
             $this->userRepo->loginActive($user->id);
 
             DB::commit();
+
+        $userProfile = UserProfileDTO::fromUserModel($user);
+        return response()->json([
+            'success' => true,
+            'message' => 'Inicio de sesión correcto',
+            'data' =>  $userProfile->toArray(),
+            'token' => $token,
+
+        ], 200);
+
             // 6. Devolver respuesta JSON para mobile
             return ApiResponseHelper::sendResponse($user, $user->wasRecentlyCreated ? 'Usuario registrado' : 'Login exitoso', 201, $token);
         } catch (\Throwable $e) {

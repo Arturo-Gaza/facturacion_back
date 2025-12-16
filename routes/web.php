@@ -12,4 +12,5 @@ Route::get('/auth/google', [AuthController::class, 'redirectToGoogle']);
 Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 Route::post('/auth/google/mobile', [AuthController::class, 'mobileGoogleAuth']);
 
+
 require __DIR__.'/auth.php';
