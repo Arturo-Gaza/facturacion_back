@@ -77,4 +77,5 @@ class CatEmpresa extends Model
     {
         return ucwords(strtolower($value));
     }
+    
 }

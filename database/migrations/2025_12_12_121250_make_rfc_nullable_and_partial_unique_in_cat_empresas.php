@@ -14,6 +14,7 @@ return new class extends Migration
         });
     }
 
+    
     public function down()
     {
         Schema::table('cat_empresas', function (Blueprint $table) {
